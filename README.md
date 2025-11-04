@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Hub
 
-## Getting Started
+Hub personale per la gestione di attività, fitness, alimentazione e giochi.
 
-First, run the development server:
+## 🚀 Stack Tecnologico
+
+- **Framework**: Next.js 16 (App Router)
+- **Linguaggio**: TypeScript
+- **Styling**: Tailwind CSS
+- **Database**: Supabase PostgreSQL
+- **Autenticazione**: Supabase Auth
+- **Hosting**: Vercel (gratuito)
+
+## 📦 Moduli Disponibili
+
+### 🏆 Game Prize
+Sistema di sfide e premi per il compleanno.
+
+### 💪 Fitness
+Tracker completo per allenamenti con sessioni ed esercizi.
+
+### 🍽️ Alimentazione
+Monitoraggio pasti giornalieri.
+
+### 🎁 Wishlist
+Lista desideri condivisibile.
+
+## 🛠️ Installazione
 
 ```bash
+# Installa dipendenze
+npm install
+
+# Avvia in sviluppo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Apri [http://localhost:3000](http://localhost:3000) nel browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌍 Variabili d'Ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Il file `.env.local` contiene:
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🗄️ Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Database Supabase con tabelle per:
+- Utenti e preferenze
+- Wishlist, Pasti, Workout
+- Game Prize (10 tabelle)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 Script
 
-## Deploy on Vercel
+```bash
+npm run dev    # Sviluppo
+npm run build  # Build produzione
+npm start      # Avvio produzione
+npm run lint   # Lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Deploy su Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push su GitHub
+2. Importa progetto su Vercel
+3. Aggiungi variabili d'ambiente
+4. Deploy automatico!
+
+## 💰 Costi
+
+**TOTALE: €0/mese** (Vercel Hobby + Supabase Free)
+
+---
+
+**Versione**: 1.0.0 | **Data**: Novembre 2025
