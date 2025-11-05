@@ -113,29 +113,6 @@ export default async function DashboardPage() {
             </div>
           </Link>
         </div>
-
-        {/* Quick Stats */}
-        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Panoramica Rapida</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">0</p>
-              <p className="text-sm text-gray-600">Sfide completate</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">0</p>
-              <p className="text-sm text-gray-600">Workout questa settimana</p>
-            </div>
-            <div className="text-center p-4 bg-orange-50 rounded-lg">
-              <p className="text-2xl font-bold text-orange-600">0</p>
-              <p className="text-sm text-gray-600">Pasti registrati</p>
-            </div>
-            <div className="text-center p-4 bg-pink-50 rounded-lg">
-              <p className="text-2xl font-bold text-pink-600">0</p>
-              <p className="text-sm text-gray-600">Elementi wishlist</p>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   )
