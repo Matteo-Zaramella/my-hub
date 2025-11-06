@@ -1,9 +1,10 @@
 # My Hub - Project Status
 
-**Last Updated:** 2025-11-05
-**Project Location:** `D:/my-hub`
-**Server:** http://localhost:3000
+**Last Updated:** 2025-11-05 21:40
+**Project Location:** `C:\Users\matte\Desktop\My Hub`
+**Server:** http://localhost:3000 (RUNNING)
 **Database:** Supabase (project: wuvuapmjclahbmngntku)
+**MCP Supabase:** Configurato in `.mcp.json` (richiede riavvio Claude Code)
 
 ---
 
@@ -195,12 +196,16 @@
 ## 📝 Notes for Next Session
 
 ### Immediate Actions Needed:
-1. **Restart Claude Code** to activate Vercel MCP connection
-2. Create GitHub repository for the project
-3. Push code to GitHub
-4. Deploy to Vercel via MCP
-5. Configure Supabase environment variables in Vercel
-6. Test deployment and verify all modules work in production
+1. ⚠️ **FIX DATABASE FIRST**: Esegui `ALTER TABLE workout_sessions ADD COLUMN note TEXT;` in Supabase SQL Editor
+2. **Restart Claude Code** to activate Supabase MCP (configurato in `.mcp.json`)
+3. Test completo di tutti i moduli (dopo fix database)
+4. Commit modifiche recenti (hydration fix + MCP config)
+5. Push code to GitHub (repository già esistente: Matteo-Zaramella/my-hub)
+6. Deploy to Vercel
+7. Configure Supabase environment variables in Vercel
+8. Test deployment and verify all modules work in production
+
+**File creato:** `NEXT_STEPS.md` - Guida dettagliata per riprendere il lavoro
 
 ### Known Issues:
 - Cloudflare MCP configured but not connecting (low priority, not needed for current deployment)

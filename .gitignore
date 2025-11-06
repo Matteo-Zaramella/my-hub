@@ -42,3 +42,15 @@ CREDENTIALS.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# MCP configuration (contains tokens)
+.mcp.json
+mcp-config*.json
+
+# Database dumps and backups
+*.sql
+backups/
+
+# Claude specific
+.claude.json
+\!.env.example
