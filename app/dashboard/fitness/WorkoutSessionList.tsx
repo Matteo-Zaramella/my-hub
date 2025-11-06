@@ -17,6 +17,7 @@ interface WorkoutSession {
   data: string
   workout_type: string
   completato: boolean
+  note: string | null
   created_at: string
   workout_exercises: WorkoutExercise[]
 }

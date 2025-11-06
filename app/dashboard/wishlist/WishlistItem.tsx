@@ -32,7 +32,7 @@ export default function WishlistItem({ item }: WishlistItemProps) {
     setLoading(true)
 
     const { error } = await supabase
-      .from('wishlist')
+      .from('wishlist_items')
       .update({
         nome,
         descrizione: descrizione || null,
@@ -59,7 +59,7 @@ export default function WishlistItem({ item }: WishlistItemProps) {
     setLoading(true)
 
     const { error } = await supabase
-      .from('wishlist')
+      .from('wishlist_items')
       .delete()
       .eq('id', item.id)
 

@@ -31,7 +31,7 @@ export default function WishlistForm() {
       }
 
       const { error: insertError } = await supabase
-        .from('wishlist')
+        .from('wishlist_items')
         .insert([
           {
             user_id: user.id,

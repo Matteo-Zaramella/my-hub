@@ -18,6 +18,7 @@ interface WorkoutSession {
   data: string
   workout_type: string
   completato: boolean
+  note: string | null
   created_at: string
   workout_exercises: WorkoutExercise[]
 }
@@ -29,9 +30,34 @@ interface WorkoutSessionItemProps {
 export default function WorkoutSessionItem({ session }: WorkoutSessionItemProps) {
   const [loading, setLoading] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [data, setData] = useState(session.data)
+  const [note, setNote] = useState(session.note || '')
 
   const router = useRouter()
   const supabase = createClient()
+
+  const handleUpdate = async () => {
+    setLoading(true)
+
+    const { error } = await supabase
+      .from('workout_sessions')
+      .update({
+        data,
+        note,
+      })
+      .eq('id', session.id)
+
+    if (error) {
+      alert('Errore durante l\'aggiornamento')
+      console.error(error)
+    } else {
+      setIsEditing(false)
+      router.refresh()
+    }
+
+    setLoading(false)
+  }
 
   const handleDelete = async () => {
     if (!confirm('Eliminare questa sessione di allenamento?')) return
@@ -144,6 +170,18 @@ export default function WorkoutSessionItem({ session }: WorkoutSessionItemProps)
             <button
               onClick={(e) => {
                 e.stopPropagation()
+                setIsEditing(true)
+              }}
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+              title="Modifica"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
                 handleDelete()
               }}
               disabled={loading}
@@ -157,6 +195,57 @@ export default function WorkoutSessionItem({ session }: WorkoutSessionItemProps)
           </div>
         </div>
       </div>
+
+      {/* Edit Form */}
+      {isEditing && (
+        <div className="px-4 pb-4 border-t">
+          <div className="mt-4 space-y-3">
+            <h3 className="text-sm font-bold text-gray-800">Modifica Sessione</h3>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Data
+              </label>
+              <input
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Note
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 text-sm"
+                rows={3}
+                placeholder="Aggiungi note sulla sessione..."
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleUpdate}
+                disabled={loading}
+                className="flex-1 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 text-sm"
+              >
+                {loading ? 'Salvataggio...' : 'Salva'}
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                disabled={loading}
+                className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition disabled:opacity-50 text-sm"
+              >
+                Annulla
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Expanded Details */}
       {expanded && (

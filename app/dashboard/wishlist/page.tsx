@@ -17,7 +17,7 @@ export default async function WishlistPage() {
 
   // Fetch wishlist items
   const { data: items, error } = await supabase
-    .from('wishlist')
+    .from('wishlist_items')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })

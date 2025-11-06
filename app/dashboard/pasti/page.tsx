@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import PastoForm from './PastoForm'
-import PastoItem from './PastoItem'
+import PastiList from './PastiList'
 
 export default async function PastiPage() {
   const supabase = await createClient()
@@ -15,31 +15,21 @@ export default async function PastiPage() {
     redirect('/login')
   }
 
-  // Fetch pasti (last 30 days)
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  // Fetch all pasti (last 365 days for filtering)
+  const oneYearAgo = new Date()
+  oneYearAgo.setDate(oneYearAgo.getDate() - 365)
 
   const { data: pasti, error } = await supabase
     .from('pasti')
     .select('*')
     .eq('user_id', user.id)
-    .gte('data', thirtyDaysAgo.toISOString().split('T')[0])
+    .gte('data', oneYearAgo.toISOString().split('T')[0])
     .order('data', { ascending: false })
     .order('created_at', { ascending: false })
 
   if (error) {
     console.error('Error fetching pasti:', error)
   }
-
-  // Group by date
-  const pastiByDate: { [key: string]: typeof pasti } = {}
-  pasti?.forEach((pasto) => {
-    const date = pasto.data
-    if (!pastiByDate[date]) {
-      pastiByDate[date] = []
-    }
-    pastiByDate[date].push(pasto)
-  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -70,37 +60,7 @@ export default async function PastiPage() {
 
           {/* List Section */}
           <div className="lg:col-span-2">
-            <div className="space-y-6">
-              {Object.keys(pastiByDate).length > 0 ? (
-                Object.entries(pastiByDate).map(([date, pastiGiorno]) => (
-                  <div key={date}>
-                    <h3 className="text-lg font-bold text-gray-800 mb-3">
-                      📅 {new Date(date + 'T00:00:00').toLocaleDateString('it-IT', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </h3>
-                    <div className="space-y-3">
-                      {pastiGiorno.map((pasto) => (
-                        <PastoItem key={pasto.id} pasto={pasto} />
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                  <div className="text-6xl mb-4">🍽️</div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    Nessun pasto registrato
-                  </h3>
-                  <p className="text-gray-600">
-                    Inizia a tracciare la tua alimentazione!
-                  </p>
-                </div>
-              )}
-            </div>
+            <PastiList initialPasti={pasti || []} />
           </div>
         </div>
       </main>

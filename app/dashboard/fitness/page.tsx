@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import WorkoutSessionForm from './WorkoutSessionForm'
-import WorkoutSessionList from './WorkoutSessionList'
+import FitnessList from './FitnessList'
 
 export default async function FitnessPage() {
   const supabase = await createClient()
@@ -15,9 +15,9 @@ export default async function FitnessPage() {
     redirect('/login')
   }
 
-  // Fetch workout sessions (last 60 days)
-  const sixtyDaysAgo = new Date()
-  sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60)
+  // Fetch workout sessions (last 365 days for filtering)
+  const oneYearAgo = new Date()
+  oneYearAgo.setDate(oneYearAgo.getDate() - 365)
 
   const { data: sessions, error } = await supabase
     .from('workout_sessions')
@@ -26,7 +26,7 @@ export default async function FitnessPage() {
       workout_exercises (*)
     `)
     .eq('user_id', user.id)
-    .gte('data', sixtyDaysAgo.toISOString().split('T')[0])
+    .gte('data', oneYearAgo.toISOString().split('T')[0])
     .order('data', { ascending: false })
     .order('created_at', { ascending: false })
 
@@ -63,7 +63,7 @@ export default async function FitnessPage() {
 
           {/* List Section */}
           <div className="lg:col-span-2">
-            <WorkoutSessionList sessions={sessions || []} />
+            <FitnessList initialSessions={sessions || []} />
           </div>
         </div>
       </main>

@@ -123,7 +123,7 @@ export default function WorkoutSessionForm() {
           {
             user_id: user.id,
             data,
-            tipo_scheda: tipoScheda,
+            workout_type: tipoScheda,
             note,
           },
         ])
@@ -140,18 +140,18 @@ export default function WorkoutSessionForm() {
         if (hasPesiCrescenti(ex.ripetizioni)) {
           const repsArray = ex.ripetizioni.split('-')
           return ex.pesi.map((peso, idx) => ({
-            workout_session_id: session.id,
-            nome: ex.nome,
-            serie: `${idx + 1}`,
-            ripetizioni: repsArray[idx] || repsArray[0],
+            session_id: session.id,
+            esercizio: ex.nome,
+            serie_numero: idx + 1,
+            ripetizioni: parseInt(repsArray[idx] || repsArray[0]) || null,
             peso: peso,
           }))
         } else {
           return [{
-            workout_session_id: session.id,
-            nome: ex.nome,
-            serie: ex.serie,
-            ripetizioni: ex.ripetizioni,
+            session_id: session.id,
+            esercizio: ex.nome,
+            serie_numero: parseInt(ex.serie) || null,
+            ripetizioni: parseInt(ex.ripetizioni) || null,
             peso: ex.pesi[0],
           }]
         }
