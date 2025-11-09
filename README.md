@@ -27,9 +27,21 @@ Lista desideri condivisibile.
 
 ## 🛠️ Installazione
 
+### Setup Automatico per Claude Code
+```bash
+gh repo clone Matteo-Zaramella/my-hub
+cd my-hub
+npm install
+npm run setup-claude
+npm run dev
+```
+
+### Setup Manuale
 ```bash
 # Installa dipendenze
 npm install
+
+# Crea .env.local (vedi SETUP_RAPIDO.md)
 
 # Avvia in sviluppo
 npm run dev
