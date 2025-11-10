@@ -112,6 +112,22 @@ export default async function DashboardPage() {
               </p>
             </div>
           </Link>
+
+          {/* Profile Settings Module */}
+          <Link href="/dashboard/profile">
+            <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition cursor-pointer border-2 border-purple-200">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="text-4xl">👤</div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800">Profilo</h2>
+                  <p className="text-sm text-gray-500">Impostazioni account</p>
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Gestisci email, password e impostazioni del tuo profilo.
+              </p>
+            </div>
+          </Link>
         </div>
       </main>
     </div>
