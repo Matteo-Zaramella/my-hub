@@ -68,6 +68,30 @@ export default function GameArea({ gameConfig, challenges, leaderboard, user }: 
               ← Esci
             </Link>
           </div>
+
+          {/* Management Links */}
+          {user && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/dashboard/game-management/participants"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition text-white font-medium flex items-center gap-2"
+              >
+                👥 Partecipanti
+              </Link>
+              <button
+                disabled
+                className="px-4 py-2 bg-white/10 rounded-lg text-white/50 font-medium flex items-center gap-2 cursor-not-allowed"
+              >
+                🎪 Cerimonia Apertura
+              </button>
+              <button
+                disabled
+                className="px-4 py-2 bg-white/10 rounded-lg text-white/50 font-medium flex items-center gap-2 cursor-not-allowed"
+              >
+                📅 Sfide Mensili
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

@@ -16,7 +16,7 @@ export default async function GamePage({
 
   // Verify password (for now, we'll set a temporary password)
   // TODO: Store the game password in database or environment variable
-  const GAME_PASSWORD = 'thegame2026' // This will be revealed at the ceremony
+  const GAME_PASSWORD = 'EVOLUZIONE' // This will be revealed at the ceremony
 
   const password = searchParams.password
 
