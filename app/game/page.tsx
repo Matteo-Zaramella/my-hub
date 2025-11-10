@@ -43,7 +43,7 @@ export default async function GamePage({
     .select(`
       user_id,
       points,
-      users (username)
+      users!inner (username)
     `)
     .order('points', { ascending: false })
     .limit(10)
@@ -52,7 +52,7 @@ export default async function GamePage({
     <GameArea
       gameConfig={gameConfig}
       challenges={challenges || []}
-      leaderboard={leaderboard || []}
+      leaderboard={(leaderboard as any) || []}
       user={user}
     />
   )
