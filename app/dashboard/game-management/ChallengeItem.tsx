@@ -40,6 +40,7 @@ export default function ChallengeItem({ challenge, onClose }: ChallengeItemProps
   const [instructions, setInstructions] = useState(challenge.instructions)
   const [clues, setClues] = useState<Clue[]>(challenge.game_clues || [])
   const [newClueText, setNewClueText] = useState('')
+  const [newClueRevealDate, setNewClueRevealDate] = useState('')
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -49,6 +50,19 @@ export default function ChallengeItem({ challenge, onClose }: ChallengeItemProps
   })
 
   const supabase = createClient()
+
+  // Update state when challenge changes
+  useEffect(() => {
+    setTitle(challenge.title)
+    setDescription(challenge.description)
+    setPoints(challenge.points)
+    setStartDate(challenge.start_date.split('T')[0])
+    setEndDate(challenge.end_date.split('T')[0])
+    setLocation(challenge.location)
+    setInstructions(challenge.instructions)
+    setClues(challenge.game_clues || [])
+    setIsEditing(false)
+  }, [challenge])
 
   // Countdown to challenge start
   useEffect(() => {
@@ -109,6 +123,7 @@ export default function ChallengeItem({ challenge, onClose }: ChallengeItemProps
           challenge_id: challenge.id,
           clue_number: clues.length + 1,
           clue_text: newClueText,
+          revealed_date: newClueRevealDate || null,
         },
       ])
 
@@ -116,6 +131,7 @@ export default function ChallengeItem({ challenge, onClose }: ChallengeItemProps
       console.error('Error adding clue:', error)
     } else {
       setNewClueText('')
+      setNewClueRevealDate('')
       window.location.reload()
     }
   }
@@ -298,20 +314,29 @@ export default function ChallengeItem({ challenge, onClose }: ChallengeItemProps
             </div>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="space-y-2">
           <input
             type="text"
             value={newClueText}
             onChange={(e) => setNewClueText(e.target.value)}
-            placeholder="Nuovo indizio..."
-            className="flex-1 bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40"
+            placeholder="Testo indizio..."
+            className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40"
           />
-          <button
-            onClick={handleAddClue}
-            className="px-4 py-2 bg-white text-black rounded hover:bg-white/90 transition"
-          >
-            Aggiungi
-          </button>
+          <div className="flex gap-2">
+            <input
+              type="datetime-local"
+              value={newClueRevealDate}
+              onChange={(e) => setNewClueRevealDate(e.target.value)}
+              placeholder="Data rivelazione..."
+              className="flex-1 bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40"
+            />
+            <button
+              onClick={handleAddClue}
+              className="px-4 py-2 bg-white text-black rounded hover:bg-white/90 transition"
+            >
+              Aggiungi
+            </button>
+          </div>
         </div>
       </div>
 

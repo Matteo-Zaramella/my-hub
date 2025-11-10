@@ -13,6 +13,8 @@ interface Participant {
   category: string | null
   participant_code: string
   notes: string | null
+  partner_name: string | null
+  is_couple: boolean
 }
 
 interface ParticipantsManagementProps {
@@ -31,6 +33,8 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
   const [category, setCategory] = useState<string>('Amici')
   const [code, setCode] = useState('')
   const [notes, setNotes] = useState('')
+  const [partnerName, setPartnerName] = useState('')
+  const [isCouple, setIsCouple] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -56,6 +60,8 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
     setCategory('Amici')
     setCode('')
     setNotes('')
+    setPartnerName('')
+    setIsCouple(false)
     setEditingId(null)
     setShowForm(false)
     setError('')
@@ -69,6 +75,8 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
     setCategory(participant.category || 'Amici')
     setCode(participant.participant_code)
     setNotes(participant.notes || '')
+    setPartnerName(participant.partner_name || '')
+    setIsCouple(participant.is_couple || false)
     setShowForm(true)
   }
 
@@ -101,6 +109,8 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
             category: category || null,
             participant_code: code,
             notes: notes || null,
+            partner_name: partnerName || null,
+            is_couple: isCouple,
           })
           .eq('id', editingId)
           .eq('user_id', userId)
@@ -118,6 +128,8 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
             category: category || null,
             participant_code: code,
             notes: notes || null,
+            partner_name: partnerName || null,
+            is_couple: isCouple,
           }])
 
         if (insertError) throw insertError
@@ -322,6 +334,37 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
               />
             </div>
 
+            {/* Couple Toggle */}
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isCouple}
+                  onChange={(e) => setIsCouple(e.target.checked)}
+                  className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  💑 In coppia
+                </span>
+              </label>
+            </div>
+
+            {/* Partner Name (conditional) */}
+            {isCouple && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ❤️ Nome Partner
+                </label>
+                <input
+                  type="text"
+                  value={partnerName}
+                  onChange={(e) => setPartnerName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-gray-900"
+                  placeholder="Nome del partner"
+                />
+              </div>
+            )}
+
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                 {error}
@@ -395,6 +438,12 @@ export default function ParticipantsManagement({ initialParticipants, userId }: 
                           <div className="flex items-center gap-1">
                             <span>📝</span>
                             <span className="text-xs italic">{participant.notes}</span>
+                          </div>
+                        )}
+                        {participant.is_couple && participant.partner_name && (
+                          <div className="flex items-center gap-1">
+                            <span>❤️</span>
+                            <span className="text-sm font-medium text-pink-600">In coppia con {participant.partner_name}</span>
                           </div>
                         )}
                       </div>

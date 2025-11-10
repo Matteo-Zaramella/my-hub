@@ -20,7 +20,7 @@ export default function LandingPage() {
   const [ceremonyClues, setCeremonyClues] = useState<string[]>([])
 
   // Final password to access game area (revealed when all 10 clues are found)
-  const GAME_PASSWORD = 'thegame2026'
+  const GAME_PASSWORD = 'EVOLUZIONE'
 
   // Load clues configuration and progress from localStorage
   useEffect(() => {
@@ -101,7 +101,18 @@ export default function LandingPage() {
     e.preventDefault()
     const input = gamePassword.trim()
 
+    console.log('Input:', input)
+    console.log('Expected password:', GAME_PASSWORD)
+    console.log('Match:', input === GAME_PASSWORD)
+
     if (!input) return
+
+    // First check if input is the final password
+    if (input === GAME_PASSWORD) {
+      console.log('Password correct! Redirecting...')
+      router.push('/game?password=' + encodeURIComponent(input))
+      return
+    }
 
     // If event is active and not all clues found, check if input is a clue
     if (isEventActive && cluesFound < 10) {
@@ -116,10 +127,10 @@ export default function LandingPage() {
       return
     }
 
-    // If all clues found or event ended, check if input is the final password
-    if (input === GAME_PASSWORD) {
-      router.push('/game?password=' + encodeURIComponent(input))
-    }
+    // If password is wrong and no clue match, close modal
+    console.log('Password incorrect, closing modal')
+    setShowGamePassword(false)
+    setGamePassword('')
   }
 
   return (

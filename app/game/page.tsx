@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import GameArea from './GameArea'
+import PasswordSuccess from './PasswordSuccess'
 
 export default async function GamePage({
   searchParams,
 }: {
-  searchParams: { password?: string }
+  searchParams: Promise<{ password?: string }>
 }) {
   const supabase = await createClient()
 
@@ -18,42 +19,24 @@ export default async function GamePage({
   // TODO: Store the game password in database or environment variable
   const GAME_PASSWORD = 'EVOLUZIONE' // This will be revealed at the ceremony
 
-  const password = searchParams.password
+  const params = await searchParams
+  const password = params.password
 
-  if (!password || password !== GAME_PASSWORD) {
-    // Redirect back to home if password is wrong
+  console.log('Game page - password received:', password)
+
+  if (!password) {
+    // Redirect back to home if no password provided
+    console.log('No password, redirecting to home')
     redirect('/')
   }
 
-  // Fetch game configuration
-  const { data: gameConfig } = await supabase
-    .from('game_prize_config')
-    .select('*')
-    .single()
+  // If password is correct, show success page
+  if (password === GAME_PASSWORD) {
+    console.log('Password correct, showing success page')
+    return <PasswordSuccess />
+  }
 
-  // Fetch all challenges
-  const { data: challenges } = await supabase
-    .from('game_challenges')
-    .select('*')
-    .order('challenge_number', { ascending: true })
-
-  // Fetch leaderboard
-  const { data: leaderboard } = await supabase
-    .from('game_user_scores')
-    .select(`
-      user_id,
-      points,
-      users!inner (username)
-    `)
-    .order('points', { ascending: false })
-    .limit(10)
-
-  return (
-    <GameArea
-      gameConfig={gameConfig}
-      challenges={challenges || []}
-      leaderboard={(leaderboard as any) || []}
-      user={user}
-    />
-  )
+  // If password is wrong, redirect back to home
+  console.log('Password incorrect, redirecting to home')
+  redirect('/')
 }

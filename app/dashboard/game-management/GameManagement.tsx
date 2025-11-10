@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import OpeningCeremonyClues from './OpeningCeremonyClues'
 import ChallengesManagement from './ChallengesManagement'
+import ParticipantsTab from './ParticipantsTab'
 
 interface GameConfig {
   id: number
@@ -40,7 +41,7 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants'>('ceremony')
 
   return (
     <div className="space-y-6">
@@ -95,11 +96,22 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         >
           🎯 Sfide Mensili
         </button>
+        <button
+          onClick={() => setActiveTab('participants')}
+          className={`px-6 py-3 font-medium transition ${
+            activeTab === 'participants'
+              ? 'text-white border-b-2 border-white'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          👥 Partecipanti
+        </button>
       </div>
 
       {/* Content */}
       {activeTab === 'ceremony' && <OpeningCeremonyClues />}
       {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
+      {activeTab === 'participants' && <ParticipantsTab />}
     </div>
   )
 }

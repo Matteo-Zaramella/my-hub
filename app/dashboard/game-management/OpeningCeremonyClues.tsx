@@ -120,12 +120,25 @@ export default function OpeningCeremonyClues() {
         </p>
       </div>
 
+      {/* Final Password */}
+      <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6">
+        <h3 className="text-lg font-bold text-white mb-2">🔐 Password Finale</h3>
+        <div className="bg-black/30 rounded-lg p-4 inline-block">
+          <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+            EVOLUZIONE
+          </span>
+        </div>
+        <p className="text-sm text-white/60 mt-3">
+          Questa è la password che i partecipanti devono indovinare per vincere <span className="text-green-400 font-bold">+100 punti</span>
+        </p>
+      </div>
+
       {/* Clues List */}
       <div className="bg-white/5 border border-white/10 rounded-xl p-6">
         <div className="mb-4">
           <h3 className="text-lg font-bold text-white">🔍 Indizi (10 totali)</h3>
           <p className="text-sm text-white/60 mt-1">
-            Se tutti i 10 indizi vengono trovati durante la festa, ogni partecipante ottiene <span className="text-green-400 font-bold">+50 punti bonus</span>!
+            Se tutti i 10 indizi vengono trovati durante la festa, ogni partecipante ottiene <span className="text-green-400 font-bold">+100 punti bonus</span>!
           </p>
         </div>
         <div className="space-y-4">
@@ -210,7 +223,7 @@ export default function OpeningCeremonyClues() {
             📱 <span className="font-bold">Storia Instagram:</span> Indovinello/frase da pubblicare nelle storie se i partecipanti non trovano gli indizi durante la festa
           </p>
           <p className="text-xs text-green-400/80">
-            🎁 <span className="font-bold">Bonus:</span> Se tutti i 10 indizi vengono completati durante la festa, ogni partecipante riceve +50 punti
+            🎁 <span className="font-bold">Bonus:</span> Se tutti i 10 indizi vengono completati durante la festa, ogni partecipante riceve +100 punti
           </p>
         </div>
       </div>

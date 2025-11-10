@@ -1,10 +1,11 @@
 # Import Game Participants
 
 ## Overview
-This directory contains the script to import the initial 53 participants for The Game.
+This directory contains scripts to import participants for The Game.
 
 ## Files
-- `import_participants.py` - Python script that generates SQL INSERT statements with unique codes
+- `import_participants.py` - Original v2.0 script (53 participants)
+- `import_participants_v2.1.py` - Updated v2.1 script (51 participants with couples support)
 
 ## How to Use
 
@@ -43,24 +44,41 @@ Each participant has:
 - **Category** (Arcella, Mare, Severi, Mortise, Famiglia, Colleghi, Amici)
 - **Unique Code** (6-character alphanumeric, auto-generated)
 - **Notes** (optional)
+- **Partner Name** (optional) - NEW in v2.1
+- **Is Couple** (boolean) - NEW in v2.1
 
-## Statistics
+## Statistics (v2.1)
 
-Total: **53 participants**
+Total: **51 participants** (removed Laura Rettore, Paolo Milanesi from v2.0)
 
 By Category:
-- Arcella: 10
-- Mare: 6
-- Severi: 9
+- Arcella: 9
+- Mare: 5
+- Severi: 8
 - Mortise: 4
-- Famiglia: 6
-- Colleghi: 2
+- Famiglia: 5
+- Colleghi: 1
 - Amici: 1
-- No category: 15
+- No category: 18
+
+Relationships:
+- **12 couples** identified (24 people in relationships)
 
 ## Notes
 
-- 51 participants have phone numbers
+- 49 participants have phone numbers (was 51 in v2.0)
 - 2 participants (Riccardo Barnaba, Marco Bortolami) only have Instagram
 - All codes are unique and randomly generated
 - Codes can be shared with participants for game access
+- Couples are bidirectionally linked (both partners have each other's name)
+
+## Changes from v2.0 to v2.1
+
+**Removed:**
+- Laura Rettore
+- Paolo Milanesi
+
+**Added Features:**
+- Couples relationship tracking
+- Partner name field
+- 12 couples identified in the group
