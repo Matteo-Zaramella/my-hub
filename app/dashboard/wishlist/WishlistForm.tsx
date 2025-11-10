@@ -56,7 +56,7 @@ export default function WishlistForm() {
         setLoading(false)
 
         // Refresh page
-        router.refresh()
+        window.location.reload()
       }
     } catch (err) {
       setError('Errore durante il salvataggio')

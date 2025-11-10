@@ -54,3 +54,4 @@ backups/
 # Claude specific
 .claude.json
 \!.env.example
+.tsx

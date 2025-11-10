@@ -4,25 +4,22 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-// Pasti predefiniti basati sul piano nutrizionale
-const PASTI_FISSI = {
-  colazione: 'Caffè, banana 150g, uova e albumi 150g, pane 90g con cioccolato fondente 20g',
-  colazione_integratori: 'Caffè, banana 150g, uova e albumi 150g, pane 90g con cioccolato fondente 20g + proteine 40g e creatina 10g',
-  spuntino_mattina: 'Frutto 150g + yogurt greco',
-  pranzo_allenamento: 'Carotine 100g, riso integrale 90g, pesce (sgombro/salmone) 150g, verdure miste 200g, olio EVO 2 cucchiai',
-  pranzo_riposo: 'Carotine 100g, riso integrale 70g, legumi (fagioli/lenticchie) 200g cotti, verdure miste 200g, olio EVO 2 cucchiai',
-  pranzo_riposo_tortellini: 'Carotine 100g, tortellini di carne 125g crudi, verdure miste 200g, olio EVO 2 cucchiai',
-  spuntino_pomeriggio: 'Cracker integrali + frutta secca 15-20g',
-  cena_allenamento: 'Pomodoro crudo 100g, pollo 250g, taralli 50g, verdure cotte 200g, olio EVO 2 cucchiai',
-  cena_riposo: 'Pomodoro crudo 100g, legumi 350g cotti, taralli 40g, verdure cotte 200g, olio EVO 2 cucchiai',
-  pizza: 'Mezza pizza con mozzarella + verdura abbondante prima',
+interface MealPreset {
+  id: number
+  meal_type: string
+  day_type: string | null
+  description: string
 }
 
-export default function PastoForm() {
+interface PastoFormProps {
+  presets: MealPreset[]
+}
+
+export default function PastoForm({ presets }: PastoFormProps) {
   const today = new Date().toISOString().split('T')[0]
 
   const [data, setData] = useState(today)
-  const [tipoPasto, setTipoPasto] = useState('pranzo')
+  const [tipoPasto, setTipoPasto] = useState('colazione')
   const [tipoGiorno, setTipoGiorno] = useState<'allenamento' | 'riposo'>('allenamento')
   const [usaManuale, setUsaManuale] = useState(false)
   const [descrizioneManuale, setDescrizioneManuale] = useState('')
@@ -51,19 +48,19 @@ export default function PastoForm() {
       if (usaManuale) {
         descrizione = descrizioneManuale
       } else {
-        // Genera automaticamente la descrizione dal preset
-        if (tipoPasto === 'colazione') {
-          descrizione = tipoGiorno === 'allenamento' ? PASTI_FISSI.colazione_integratori : PASTI_FISSI.colazione
-        } else if (tipoPasto === 'spuntino_mattina') {
-          descrizione = PASTI_FISSI.spuntino_mattina
-        } else if (tipoPasto === 'pranzo') {
-          descrizione = tipoGiorno === 'allenamento' ? PASTI_FISSI.pranzo_allenamento : PASTI_FISSI.pranzo_riposo
-        } else if (tipoPasto === 'spuntino_pomeriggio') {
-          descrizione = PASTI_FISSI.spuntino_pomeriggio
-        } else if (tipoPasto === 'cena') {
-          descrizione = tipoGiorno === 'allenamento' ? PASTI_FISSI.cena_allenamento : PASTI_FISSI.cena_riposo
-        } else if (tipoPasto === 'pizza') {
-          descrizione = PASTI_FISSI.pizza
+        // Find preset from database
+        const needsDayType = ['colazione', 'pranzo', 'cena'].includes(tipoPasto)
+        const matchingPreset = presets.find(p =>
+          p.meal_type === tipoPasto &&
+          (!needsDayType || p.day_type === tipoGiorno)
+        )
+
+        if (matchingPreset) {
+          descrizione = matchingPreset.description
+        } else {
+          setError('Nessun preset configurato per questo pasto. Vai su "Gestisci Preset" o usa modalità Manuale.')
+          setLoading(false)
+          return
         }
       }
 
@@ -73,19 +70,13 @@ export default function PastoForm() {
         return
       }
 
-      // Converti tipo pasto per il database
-      let tipoDb = tipoPasto
-      if (tipoPasto === 'spuntino_mattina' || tipoPasto === 'spuntino_pomeriggio') {
-        tipoDb = 'snack'
-      }
-
       const { error: insertError } = await supabase
         .from('pasti')
         .insert([
           {
             user_id: user.id,
             data,
-            tipo_pasto: tipoDb,
+            tipo_pasto: tipoPasto,
             descrizione,
           },
         ])
@@ -97,7 +88,7 @@ export default function PastoForm() {
         // Reset form
         setDescrizioneManuale('')
         setData(today)
-        setTipoPasto('pranzo')
+        setTipoPasto('colazione')
         setTipoGiorno('allenamento')
         setUsaManuale(false)
         setLoading(false)
@@ -111,22 +102,19 @@ export default function PastoForm() {
     }
   }
 
-  // Anteprima del pasto selezionato
+  // Get preview of selected preset
   const getAnteprimaPasto = () => {
-    if (tipoPasto === 'colazione') {
-      return tipoGiorno === 'allenamento' ? PASTI_FISSI.colazione_integratori : PASTI_FISSI.colazione
-    } else if (tipoPasto === 'spuntino_mattina') {
-      return PASTI_FISSI.spuntino_mattina
-    } else if (tipoPasto === 'pranzo') {
-      return tipoGiorno === 'allenamento' ? PASTI_FISSI.pranzo_allenamento : PASTI_FISSI.pranzo_riposo
-    } else if (tipoPasto === 'spuntino_pomeriggio') {
-      return PASTI_FISSI.spuntino_pomeriggio
-    } else if (tipoPasto === 'cena') {
-      return tipoGiorno === 'allenamento' ? PASTI_FISSI.cena_allenamento : PASTI_FISSI.cena_riposo
-    } else if (tipoPasto === 'pizza') {
-      return PASTI_FISSI.pizza
+    const needsDayType = ['colazione', 'pranzo', 'cena'].includes(tipoPasto)
+    const matchingPreset = presets.find(p =>
+      p.meal_type === tipoPasto &&
+      (!needsDayType || p.day_type === tipoGiorno)
+    )
+
+    if (matchingPreset) {
+      return matchingPreset.description
     }
-    return ''
+
+    return 'Nessun preset configurato. Configura i preset o usa modalità Manuale.'
   }
 
   const mostraSelezioneTipoGiorno = ['colazione', 'pranzo', 'cena'].includes(tipoPasto)
@@ -142,7 +130,7 @@ export default function PastoForm() {
           type="date"
           value={data}
           onChange={(e) => setData(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 text-sm"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 text-sm"
           required
         />
       </div>
@@ -155,18 +143,19 @@ export default function PastoForm() {
         <select
           value={tipoPasto}
           onChange={(e) => setTipoPasto(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 text-sm"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 text-sm"
         >
           <option value="colazione">☕ Colazione</option>
           <option value="spuntino_mattina">🍎 Spuntino Mattina</option>
           <option value="pranzo">🍝 Pranzo</option>
           <option value="spuntino_pomeriggio">🥨 Spuntino Pomeriggio</option>
           <option value="cena">🍖 Cena</option>
+          <option value="snack">🍪 Snack</option>
           <option value="pizza">🍕 Pizza</option>
         </select>
       </div>
 
-      {/* Tipo Giorno (solo per colazione, pranzo, cena) */}
+      {/* Tipo Giorno */}
       {mostraSelezioneTipoGiorno && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -199,7 +188,7 @@ export default function PastoForm() {
         </div>
       )}
 
-      {/* Toggle Preset / Manuale */}
+      {/* Toggle Auto/Manuale */}
       <div className="flex gap-2 pt-2">
         <button
           type="button"
@@ -225,7 +214,7 @@ export default function PastoForm() {
         </button>
       </div>
 
-      {/* Anteprima o campo manuale */}
+      {/* Preview or Manual Input */}
       {!usaManuale ? (
         <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
           <p className="text-xs font-medium text-gray-700 mb-1">📋 Pasto Automatico:</p>
@@ -239,7 +228,7 @@ export default function PastoForm() {
           <textarea
             value={descrizioneManuale}
             onChange={(e) => setDescrizioneManuale(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-gray-900 text-sm"
             rows={3}
             required={usaManuale}
             placeholder="Descrivi cosa hai mangiato..."
@@ -256,7 +245,7 @@ export default function PastoForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm shadow-md"
+        className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg hover:bg-orange-700 transition disabled:opacity-50 font-medium text-sm shadow-md"
       >
         {loading ? 'Salvataggio...' : '✅ Registra Pasto'}
       </button>

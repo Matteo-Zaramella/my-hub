@@ -43,11 +43,11 @@ export default function PastiList({ initialPasti }: PastiListProps) {
     const doc = new jsPDF()
 
     // Title
-    doc.setFontSize(20)
+    // doc.setFontSize(20)
     doc.text('Riepilogo Alimentazione', 20, 20)
 
     // Date range
-    doc.setFontSize(12)
+    // doc.setFontSize(12)
     const startFormatted = new Date(startDate + 'T00:00:00').toLocaleDateString('it-IT')
     const endFormatted = new Date(endDate + 'T00:00:00').toLocaleDateString('it-IT')
     doc.text(`Periodo: ${startFormatted} - ${endFormatted}`, 20, 30)
@@ -63,8 +63,8 @@ export default function PastiList({ initialPasti }: PastiListProps) {
       }
 
       // Date header
-      doc.setFontSize(14)
-      doc.setFont('helvetica', 'bold')
+      // doc.setFontSize(14)
+      // doc.setFont('helvetica', 'bold')
       const dateFormatted = new Date(date + 'T00:00:00').toLocaleDateString('it-IT', {
         weekday: 'long',
         year: 'numeric',
@@ -75,8 +75,8 @@ export default function PastiList({ initialPasti }: PastiListProps) {
       yPosition += 8
 
       // Meals
-      doc.setFontSize(11)
-      doc.setFont('helvetica', 'normal')
+      // doc.setFontSize(11)
+      // doc.setFont('helvetica', 'normal')
       pastiGiorno.forEach((pasto) => {
         if (yPosition > 270) {
           doc.addPage()
