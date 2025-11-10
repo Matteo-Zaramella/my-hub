@@ -49,18 +49,18 @@ export default async function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Game Prize Module */}
-          <Link href="/dashboard/game-prize">
+          {/* Game Management Module */}
+          <Link href="/dashboard/game-management">
             <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition cursor-pointer border-2 border-purple-200">
               <div className="flex items-center gap-4 mb-4">
-                <div className="text-4xl">🏆</div>
+                <div className="text-4xl">🎮</div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">Game Prize</h2>
-                  <p className="text-sm text-gray-500">Sfide e premi</p>
+                  <h2 className="text-xl font-bold text-gray-800">The Game</h2>
+                  <p className="text-sm text-gray-500">Gestione sfide</p>
                 </div>
               </div>
               <p className="text-gray-600 text-sm">
-                Partecipa alle sfide, accumula punti e vinci premi!
+                Gestisci indizi, sfide e montepremi del gioco.
               </p>
             </div>
           </Link>
