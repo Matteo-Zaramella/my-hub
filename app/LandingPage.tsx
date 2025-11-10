@@ -136,7 +136,7 @@ export default function LandingPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
       {/* Circle Background Grid */}
-      <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 gap-0 p-8">
+      <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 gap-0 p-2 sm:p-4 md:p-6 lg:p-8">
         {Array.from({ length: totalCircles }, (_, index) => {
           // Calculate row and column
           const row = Math.floor(index / gridSize)
@@ -170,39 +170,39 @@ export default function LandingPage() {
               }}
               className="flex items-center justify-center"
             >
-              <div className={`w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full border-2 border-white ${circleFill} transition-colors duration-500`}></div>
+              <div className={`w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 xl:w-20 xl:h-20 rounded-full border border-white sm:border-2 ${circleFill} transition-colors duration-500`}></div>
             </button>
           )
         })}
       </div>
 
       {/* Countdown Timer - Center (4x4 circles area) */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="grid grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-12">
           {/* Days */}
           <div className="flex flex-col items-center">
-            <div className="text-5xl md:text-7xl lg:text-8xl font-bold text-white">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white">
               {String(timeLeft.days).padStart(3, '0')}
             </div>
           </div>
 
           {/* Hours */}
           <div className="flex flex-col items-center">
-            <div className="text-5xl md:text-7xl lg:text-8xl font-bold text-white">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white">
               {String(timeLeft.hours).padStart(2, '0')}
             </div>
           </div>
 
           {/* Minutes */}
           <div className="flex flex-col items-center">
-            <div className="text-5xl md:text-7xl lg:text-8xl font-bold text-white">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white">
               {String(timeLeft.minutes).padStart(2, '0')}
             </div>
           </div>
 
           {/* Seconds */}
           <div className="flex flex-col items-center">
-            <div className="text-5xl md:text-7xl lg:text-8xl font-bold text-white">
+            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold text-white">
               {String(timeLeft.seconds).padStart(2, '0')}
             </div>
           </div>

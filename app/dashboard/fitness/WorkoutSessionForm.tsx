@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -51,6 +51,8 @@ interface EsercizioConPeso extends EsercizioPreset {
   pesi: number[]
 }
 
+const LOCALSTORAGE_KEY = 'workout_draft'
+
 export default function WorkoutSessionForm() {
   const today = new Date().toISOString().split('T')[0]
 
@@ -60,9 +62,41 @@ export default function WorkoutSessionForm() {
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [draftRestored, setDraftRestored] = useState(false)
 
   const router = useRouter()
   const supabase = createClient()
+
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(LOCALSTORAGE_KEY)
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        setData(draft.data || today)
+        setTipoScheda(draft.tipoScheda || 'A')
+        setEserciziConPeso(draft.eserciziConPeso || [])
+        setNote(draft.note || '')
+        setDraftRestored(true)
+      } catch (e) {
+        console.error('Error loading draft:', e)
+      }
+    }
+  }, [])
+
+  // Auto-save to localStorage whenever data changes
+  useEffect(() => {
+    if (draftRestored || eserciziConPeso.length > 0) {
+      const draft = {
+        data,
+        tipoScheda,
+        eserciziConPeso,
+        note,
+        timestamp: new Date().toISOString()
+      }
+      localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(draft))
+    }
+  }, [data, tipoScheda, eserciziConPeso, note, draftRestored])
 
   const hasPesiCrescenti = (ripetizioni: string) => {
     return ripetizioni.includes('-') && !ripetizioni.includes('x')
@@ -165,10 +199,14 @@ export default function WorkoutSessionForm() {
         setError(exercisesError.message)
         setLoading(false)
       } else {
+        // Clear draft from localStorage after successful save
+        localStorage.removeItem(LOCALSTORAGE_KEY)
+
         setData(today)
         setTipoScheda('A')
         setEserciziConPeso([])
         setNote('')
+        setDraftRestored(false)
         setLoading(false)
         router.refresh()
       }
@@ -178,8 +216,37 @@ export default function WorkoutSessionForm() {
     }
   }
 
+  const clearDraft = () => {
+    if (confirm('Vuoi eliminare la bozza salvata?')) {
+      localStorage.removeItem(LOCALSTORAGE_KEY)
+      setData(today)
+      setTipoScheda('A')
+      setEserciziConPeso([])
+      setNote('')
+      setDraftRestored(false)
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4" suppressHydrationWarning>
+      {draftRestored && (
+        <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-blue-600">💾</span>
+            <p className="text-xs text-blue-700 font-medium">
+              Bozza ripristinata automaticamente
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={clearDraft}
+            className="text-xs text-blue-600 hover:text-blue-800 underline"
+          >
+            Elimina
+          </button>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           📅 Data

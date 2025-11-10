@@ -4,6 +4,7 @@ import { useState } from 'react'
 import OpeningCeremonyClues from './OpeningCeremonyClues'
 import ChallengesManagement from './ChallengesManagement'
 import ParticipantsTab from './ParticipantsTab'
+import ChecklistTab from './ChecklistTab'
 
 interface GameConfig {
   id: number
@@ -41,7 +42,7 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist'>('ceremony')
 
   return (
     <div className="space-y-6">
@@ -75,10 +76,10 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
       )}
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/10">
+      <div className="flex gap-2 border-b border-white/10 overflow-x-auto">
         <button
           onClick={() => setActiveTab('ceremony')}
-          className={`px-6 py-3 font-medium transition ${
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
             activeTab === 'ceremony'
               ? 'text-white border-b-2 border-white'
               : 'text-white/60 hover:text-white'
@@ -88,7 +89,7 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         </button>
         <button
           onClick={() => setActiveTab('challenges')}
-          className={`px-6 py-3 font-medium transition ${
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
             activeTab === 'challenges'
               ? 'text-white border-b-2 border-white'
               : 'text-white/60 hover:text-white'
@@ -98,7 +99,7 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         </button>
         <button
           onClick={() => setActiveTab('participants')}
-          className={`px-6 py-3 font-medium transition ${
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
             activeTab === 'participants'
               ? 'text-white border-b-2 border-white'
               : 'text-white/60 hover:text-white'
@@ -106,12 +107,23 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         >
           👥 Partecipanti
         </button>
+        <button
+          onClick={() => setActiveTab('checklist')}
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
+            activeTab === 'checklist'
+              ? 'text-white border-b-2 border-white'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          ✅ Checklist
+        </button>
       </div>
 
       {/* Content */}
       {activeTab === 'ceremony' && <OpeningCeremonyClues />}
       {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
       {activeTab === 'participants' && <ParticipantsTab />}
+      {activeTab === 'checklist' && <ChecklistTab />}
     </div>
   )
 }
