@@ -13,6 +13,14 @@ Hub personale per la gestione di attività, fitness, alimentazione e giochi.
 
 ## 📦 Moduli Disponibili
 
+### 🎮 The Game (NEW!)
+Sistema di gioco con:
+- **💬 Chat di Gruppo** - Real-time messaging tra partecipanti
+- **🔍 Indizi** - Sistema indizi con rivelazione programmata
+- **🔒 Privato** - Sezione esclusiva con countdown
+- **Login con codici** - Autenticazione tramite codici partecipante
+- **Date activation** - Attivazione automatica 26/01/2026
+
 ### 🏆 Game Prize
 Sistema di sfide e premi per il compleanno.
 
@@ -68,10 +76,13 @@ Database Supabase con tabelle per:
 ## 📝 Script
 
 ```bash
-npm run dev    # Sviluppo
+npm run dev    # Sviluppo (localhost:3000)
 npm run build  # Build produzione
 npm start      # Avvio produzione
 npm run lint   # Lint
+
+# Script utili The Game
+node scripts/check-chat-table.mjs  # Verifica tabella chat
 ```
 
 ## 🚀 Deploy su Vercel
@@ -87,4 +98,25 @@ npm run lint   # Lint
 
 ---
 
-**Versione**: 1.0.0 | **Data**: Novembre 2025
+## 🎮 The Game - Quick Start
+
+### Setup Chat Database (Obbligatorio)
+
+Per far funzionare la chat:
+
+1. Apri: https://supabase.com/dashboard/project/wuvuapmjclahbmngntku/sql
+2. Esegui lo script: `database/chat_messages_v2.sql`
+3. Verifica: `node scripts/check-chat-table.mjs`
+
+### Testing
+
+1. Vai su: http://localhost:3000/game?password=EVOLUZIONE
+2. Clicca "Accedi all'Area Game"
+3. Usa codice: **VHLZX5** (Alberto Faraldi)
+4. Testa le 3 sezioni: Chat, Indizi, Privato
+
+📚 **Docs:** `README_QUICK_START.md` | `MODIFICHE_COMPLETATE.md`
+
+---
+
+**Versione**: 2.0.0 | **Data**: 11 Novembre 2025
