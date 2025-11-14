@@ -15,8 +15,6 @@ interface Participant {
   partner_name: string | null
   is_couple: boolean
   current_points: number
-  present_at_opening: boolean
-  opening_bonus_awarded: boolean
 }
 
 interface EditingData {
@@ -120,24 +118,18 @@ export default function ParticipantsTab() {
   }
 
   const generateParticipantCode = (name: string) => {
-    // Generate 6-character random code: 3 letters + 3 numbers
-    // Example: ABC123, XYZ789
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    const numbers = '0123456789'
-
+    // Generate code from name initials + random number
+    const parts = name.trim().split(' ')
     let code = ''
 
-    // First 3 characters: random letters
-    for (let i = 0; i < 3; i++) {
-      code += letters.charAt(Math.floor(Math.random() * letters.length))
-    }
+    parts.forEach(part => {
+      if (part.length > 0) code += part[0].toUpperCase()
+    })
 
-    // Last 3 characters: random numbers
-    for (let i = 0; i < 3; i++) {
-      code += numbers.charAt(Math.floor(Math.random() * numbers.length))
-    }
+    // Add random 2 digits
+    code += Math.floor(10 + Math.random() * 90)
 
-    return code
+    return code.substring(0, 6)
   }
 
   const handleAddParticipant = async () => {
@@ -542,8 +534,6 @@ export default function ParticipantsTab() {
                     Punteggio {getSortIcon('current_points')}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-center text-sm font-semibold text-white">Iscritto</th>
-                <th className="px-4 py-3 text-center text-sm font-semibold text-white">Presente</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Azioni</th>
               </tr>
             </thead>
@@ -652,40 +642,6 @@ export default function ParticipantsTab() {
                       🏆 {participant.current_points}
                     </span>
                   </td>
-
-                  {/* Iscritto - Pallino verde/rosso */}
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex justify-center">
-                      <div className={`w-4 h-4 rounded-full ${participant.registration_completed ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    </div>
-                  </td>
-
-                  {/* Presente alla serata apertura */}
-                  <td className="px-4 py-3 text-center">
-                    <input
-                      type="checkbox"
-                      checked={participant.present_at_opening}
-                      onChange={async (e) => {
-                        const newValue = e.target.checked
-                        // Aggiorna immediatamente nel database
-                        const { error } = await supabase
-                          .from('game_participants')
-                          .update({ present_at_opening: newValue })
-                          .eq('id', participant.id)
-
-                        if (!error) {
-                          // Aggiorna stato locale
-                          setParticipants(participants.map(p =>
-                            p.id === participant.id ? { ...p, present_at_opening: newValue } : p
-                          ))
-                        } else {
-                          console.error('Error updating presence:', error)
-                        }
-                      }}
-                      className="w-5 h-5 cursor-pointer accent-green-500"
-                    />
-                  </td>
-
                   <td className="px-4 py-3">
                     {isEditing ? (
                       <div className="flex gap-1">

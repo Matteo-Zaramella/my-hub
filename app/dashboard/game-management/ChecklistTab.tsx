@@ -7,54 +7,63 @@ interface ChecklistItem {
   text: string
   completed: boolean
   category: string
+  priority?: 'urgent' | 'high' | 'medium' | 'low'
+  deadline?: string
 }
 
 const CHECKLIST_DATA: ChecklistItem[] = [
-  // Pre-Evento
-  { id: '1', text: 'Confermare location della festa', completed: false, category: 'Location' },
-  { id: '2', text: 'Verificare WiFi e sistema audio', completed: false, category: 'Location' },
-  { id: '3', text: 'Preparare 10 indizi fisici', completed: false, category: 'Location' },
+  // ✅ COMPLETATI
+  { id: '0', text: '✅ Fix generazione codici partecipanti (3 lettere + 3 numeri)', completed: true, category: 'Tecnico' },
+  { id: '00', text: '✅ Aggiornamento codici 5 partecipanti (Gaia, Tommaso, Enrico, Marta, Francesca)', completed: true, category: 'Tecnico' },
 
-  // Partecipanti
-  { id: '4', text: 'Verificare contatti tutti i 52 partecipanti', completed: false, category: 'Partecipanti' },
-  { id: '5', text: 'Aggiungere numeri partner mancanti (13 persone)', completed: false, category: 'Partecipanti' },
-  { id: '6', text: 'Inviare inviti formali (entro 15/01)', completed: false, category: 'Partecipanti' },
-  { id: '7', text: 'Confermare presenze', completed: false, category: 'Partecipanti' },
+  // 🔴 URGENTE - Scadenza: 16/11/2025
+  { id: '1', text: 'Confermare location festa a Padova', completed: false, category: 'Location', priority: 'urgent', deadline: '16/11' },
+  { id: '8', text: 'Creare 9 indizi anagramma EVOLUZIONE mancanti (1/10 fatto)', completed: false, category: 'Cerimonia', priority: 'urgent', deadline: '20/11' },
+  { id: '35', text: 'Setup sistema email automatiche (Resend + template)', completed: false, category: 'Tecnico', priority: 'urgent', deadline: '20/11' },
+  { id: '36', text: 'Creare form raccolta dati partecipanti (Google Forms)', completed: false, category: 'Partecipanti', priority: 'urgent', deadline: '22/11' },
 
-  // Contenuti Cerimonia
-  { id: '8', text: 'Completare 10 parole anagramma EVOLUZIONE', completed: false, category: 'Cerimonia' },
-  { id: '9', text: 'Scrivere regolamento cerimonia', completed: false, category: 'Cerimonia' },
-  { id: '10', text: 'Preparare speech introduttivo', completed: false, category: 'Cerimonia' },
+  // 🟡 ALTA PRIORITÀ - Scadenza: 30/11/2025
+  { id: '11', text: 'Sfida Febbraio: definire tipo, location, 3 indizi (21-22/02)', completed: false, category: 'Sfide', priority: 'high', deadline: '30/11' },
+  { id: '12', text: 'Sfida Marzo: definire tipo, location, 3 indizi (21-22/03)', completed: false, category: 'Sfide', priority: 'high', deadline: '05/12' },
+  { id: '24', text: 'Chat di gruppo - Miglioramenti (moderazione, reactions, online users)', completed: false, category: 'Tecnico', priority: 'high', deadline: '10/12' },
+  { id: '25', text: 'Sistema notifiche push (Web Push API)', completed: false, category: 'Tecnico', priority: 'high', deadline: '15/12' },
 
-  // Sfide Mensili
-  { id: '11', text: 'Sfida Febbraio: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '12', text: 'Sfida Marzo: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '13', text: 'Sfida Aprile: definire tipo, location, 4 indizi', completed: false, category: 'Sfide' },
-  { id: '14', text: 'Sfida Maggio: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '15', text: 'Sfida Giugno: definire tipo, location, 4 indizi', completed: false, category: 'Sfide' },
-  { id: '16', text: 'Sfida Luglio: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '17', text: 'Sfida Agosto: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '18', text: 'Sfida Settembre: definire tipo, location, 4 indizi', completed: false, category: 'Sfide' },
-  { id: '19', text: 'Sfida Ottobre: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '20', text: 'Sfida Novembre: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '21', text: 'Sfida Dicembre: definire tipo, location, 4 indizi', completed: false, category: 'Sfide' },
-  { id: '22', text: 'Sfida Gennaio 2027: definire tipo, location, 3 indizi', completed: false, category: 'Sfide' },
-  { id: '23', text: 'Sfida Finale: definire format e soglia punteggio', completed: false, category: 'Sfide' },
+  // 🟢 MEDIA PRIORITÀ - Dicembre 2025
+  { id: '3', text: 'Stampare e preparare 10 indizi fisici (formato A5)', completed: false, category: 'Location', priority: 'medium', deadline: '20/12' },
+  { id: '13', text: 'Sfida Aprile: definire tipo, location, 4 indizi (25-26/04)', completed: false, category: 'Sfide', priority: 'medium', deadline: '31/12' },
+  { id: '14', text: 'Sfida Maggio: definire tipo, location, 3 indizi (23-24/05)', completed: false, category: 'Sfide', priority: 'medium', deadline: '31/12' },
+  { id: '15', text: 'Sfida Giugno: definire tipo, location, 4 indizi (27-28/06)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '16', text: 'Sfida Luglio: definire tipo, location, 3 indizi (25-26/07)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '17', text: 'Sfida Agosto: definire tipo, location, 3 indizi (22-23/08)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '18', text: 'Sfida Settembre: definire tipo, location, 4 indizi (26-27/09)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '19', text: 'Sfida Ottobre: definire tipo, location, 3 indizi (24-25/10)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '20', text: 'Sfida Novembre: definire tipo, location, 3 indizi (21-22/11)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '21', text: 'Sfida Dicembre: definire tipo, location, 4 indizi (26-27/12)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '23', text: 'Sfida Finale: definire format e soglia punteggio (24/01/27)', completed: false, category: 'Sfide', priority: 'medium' },
+  { id: '26', text: 'Cron jobs: rivelazione indizi automatica (sabato 00:00)', completed: false, category: 'Tecnico', priority: 'medium', deadline: '15/01' },
+  { id: '37', text: 'Vercel Edge Functions: reveal-clue, send-notification, calculate-leaderboard', completed: false, category: 'Tecnico', priority: 'medium', deadline: '15/01' },
 
-  // Sviluppo Tecnico
-  { id: '24', text: 'Implementare chat di gruppo (attiva dal 26/01)', completed: false, category: 'Tecnico' },
-  { id: '25', text: 'Sistema notifiche push', completed: false, category: 'Tecnico' },
-  { id: '26', text: 'Automazione rivelazione indizi (sabato 00:00)', completed: false, category: 'Tecnico' },
-  { id: '27', text: 'Sistema iscrizioni future partecipanti', completed: false, category: 'Tecnico' },
-  { id: '28', text: 'Classifica pubblica (visibile dopo 6 mesi)', completed: false, category: 'Tecnico' },
-  { id: '29', text: 'Archivio sfide e soluzioni (dopo 6 mesi)', completed: false, category: 'Tecnico' },
+  // 🔵 TEST - Gennaio 2026
+  { id: '30', text: 'Test responsive su iPhone/Android/iPad/Desktop', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
+  { id: '31', text: 'Test sistema password EVOLUZIONE', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
+  { id: '32', text: 'Test carico chat con 50+ utenti simultanei', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
+  { id: '33', text: 'Test rivelazione automatica indizi', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
+  { id: '34', text: 'Test deployment e stabilità su Vercel', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
 
-  // Testing
-  { id: '30', text: 'Test responsive su iPhone/Android', completed: false, category: 'Testing' },
-  { id: '31', text: 'Test sistema password EVOLUZIONE', completed: false, category: 'Testing' },
-  { id: '32', text: 'Test chat con 50+ utenti simultanei', completed: false, category: 'Testing' },
-  { id: '33', text: 'Test rivelazione automatica indizi', completed: false, category: 'Testing' },
-  { id: '34', text: 'Test deployment su Vercel', completed: false, category: 'Testing' },
+  // ⚪ BASSA PRIORITÀ - Gennaio 2026
+  { id: '2', text: 'Setup location: verifica WiFi, sistema audio, spazi indizi', completed: false, category: 'Location', priority: 'low', deadline: '20/01' },
+  { id: '4', text: 'Raccolta dati: verifica email di tutti i 52 partecipanti', completed: false, category: 'Partecipanti', priority: 'low', deadline: '15/01' },
+  { id: '5', text: 'Raccolta dati: 13 partecipanti prioritari senza contatti', completed: false, category: 'Partecipanti', priority: 'high', deadline: '15/01' },
+  { id: '6', text: 'Inviare inviti formali con dettagli evento', completed: false, category: 'Partecipanti', priority: 'low', deadline: '15/01' },
+  { id: '7', text: 'Confermare presenze finali', completed: false, category: 'Partecipanti', priority: 'low', deadline: '20/01' },
+  { id: '9', text: 'Scrivere regolamento cerimonia e stamparlo', completed: false, category: 'Cerimonia', priority: 'low', deadline: '20/01' },
+  { id: '10', text: 'Preparare speech introduttivo cerimonia apertura', completed: false, category: 'Cerimonia', priority: 'low', deadline: '22/01' },
+  { id: '27', text: 'Sistema iscrizioni future partecipanti post-cerimonia', completed: false, category: 'Tecnico', priority: 'low' },
+  { id: '28', text: 'Classifica pubblica (visibile dopo 6 mesi - 26/07/26)', completed: false, category: 'Tecnico', priority: 'low' },
+  { id: '29', text: 'Archivio sfide e soluzioni (visibile dopo 6 mesi)', completed: false, category: 'Tecnico', priority: 'low' },
+  { id: '38', text: 'Dashboard admin: moderazione chat, statistiche, export dati', completed: false, category: 'Tecnico', priority: 'low', deadline: '20/01' },
+  { id: '39', text: 'Miglioramenti UX/UI: animazioni, loading states, dark mode', completed: false, category: 'Tecnico', priority: 'low', deadline: '22/01' },
+  { id: '40', text: 'Security: rate limiting, sanitizzazione input, backup automatici', completed: false, category: 'Tecnico', priority: 'low', deadline: '23/01' },
 ]
 
 export default function ChecklistTab() {
@@ -173,9 +182,29 @@ export default function ChecklistTab() {
                 <p className={`text-sm ${item.completed ? 'text-white/60 line-through' : 'text-white'}`}>
                   {item.text}
                 </p>
-                <span className={`text-xs ${item.completed ? 'text-green-400' : 'text-white/40'}`}>
-                  {item.category}
-                </span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`text-xs ${item.completed ? 'text-green-400' : 'text-white/40'}`}>
+                    {item.category}
+                  </span>
+                  {item.priority && (
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      item.priority === 'urgent' ? 'bg-red-500/20 text-red-300' :
+                      item.priority === 'high' ? 'bg-orange-500/20 text-orange-300' :
+                      item.priority === 'medium' ? 'bg-blue-500/20 text-blue-300' :
+                      'bg-gray-500/20 text-gray-300'
+                    }`}>
+                      {item.priority === 'urgent' ? '🔴 URGENTE' :
+                       item.priority === 'high' ? '🟡 ALTA' :
+                       item.priority === 'medium' ? '🟢 MEDIA' :
+                       '⚪ BASSA'}
+                    </span>
+                  )}
+                  {item.deadline && (
+                    <span className="text-xs text-yellow-400">
+                      ⏰ {item.deadline}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ))}

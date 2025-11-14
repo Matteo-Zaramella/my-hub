@@ -3,6 +3,158 @@
 import { useState, useEffect } from 'react'
 import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
+import { createClient } from '@/lib/supabase/client'
+
+// Componente per mostrare indizi cerimonia apertura
+function CeremonyCluesSection({ participantCode }: { participantCode: string }) {
+  const supabase = createClient()
+  const [foundClues, setFoundClues] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const allClues = [
+    'ENIGMA',
+    'VULCANO',
+    'OBELISCO',
+    'LABIRINTO',
+    'UNIVERSO',
+    'ZAFFIRO',
+    'IPNOSI',
+    'ORCHESTRA',
+    'NEBULOSA',
+    'ECLISSI',
+  ]
+
+  useEffect(() => {
+    loadFoundClues()
+  }, [participantCode])
+
+  async function loadFoundClues() {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('ceremony_clues_found')
+      .select('clue_word')
+      .eq('participant_code', participantCode)
+
+    if (error) {
+      console.error('Error loading clues:', error)
+      setLoading(false)
+      return
+    }
+
+    if (data) {
+      setFoundClues(data.map((row) => row.clue_word))
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          🔍 Indizi Cerimonia di Apertura
+        </h2>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin text-4xl mb-4">⏳</div>
+            <p className="text-white/60">Caricamento...</p>
+          </div>
+        ) : (
+          <>
+            {/* Progresso */}
+            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-white/80 font-semibold">Progresso Indizi</span>
+                <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                  {foundClues.length}/10
+                </span>
+              </div>
+
+              {/* Barra progresso */}
+              <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                  style={{ width: `${(foundClues.length / 10) * 100}%` }}
+                ></div>
+              </div>
+
+              {foundClues.length === 10 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-center text-green-400 font-bold text-lg">
+                    🎉 Hai trovato tutti gli indizi!
+                  </p>
+                  <p className="text-center text-purple-300 text-sm">
+                    💡 Le prime lettere formano: <span className="font-bold">EVOLUZIONE</span>
+                  </p>
+                  <p className="text-center text-white/70 text-xs">
+                    Inserisci EVOLUZIONE nella homepage per ricevere +100 punti!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Lista indizi */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {allClues.map((clue, index) => {
+                const isFound = foundClues.includes(clue)
+                return (
+                  <div
+                    key={clue}
+                    className={`
+                      p-4 rounded-lg border-2 transition-all
+                      ${
+                        isFound
+                          ? 'bg-green-500/20 border-green-500/50'
+                          : 'bg-white/5 border-white/10'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-white/60 font-mono text-sm">#{index + 1}</span>
+                        {isFound ? (
+                          <>
+                            <span className="text-2xl">✅</span>
+                            <span className="font-bold text-white">{clue}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-2xl">⬜</span>
+                            <span className="text-white/40">???</span>
+                          </>
+                        )}
+                      </div>
+                      {isFound && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-purple-400 text-lg font-bold">{clue[0]}</span>
+                          <span className="text-green-400 text-xs">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Info */}
+            <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
+              <p className="text-sm text-white/70">
+                💡 <span className="font-bold">Come funziona:</span> Trova gli sticker nascosti all'<span className="text-purple-300">Oste Divino</span> durante la festa.
+                Ogni sticker contiene una parola. Inserisci la parola in MAIUSCOLO nella homepage - i cerchi si illumineranno per confermare!
+              </p>
+              <p className="text-sm text-purple-300">
+                🎯 <span className="font-bold">Obiettivo:</span> Le prime lettere dei 10 indizi formano <span className="font-bold">EVOLUZIONE</span>
+              </p>
+              <p className="text-sm text-green-300">
+                🏆 <span className="font-bold">Premio:</span> Indovina EVOLUZIONE → <span className="font-bold">+100 punti</span> + accesso area di gioco!
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
 
 // Componente sezione privata con countdown
 function PrivateSection() {
@@ -198,20 +350,7 @@ export default function GameAreaWithChat() {
 
         {/* Clues Tab */}
         {activeTab === 'clues' && (
-          <div className="space-y-6">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                🔍 Indizi Disponibili
-              </h2>
-              <div className="text-center py-12 text-white/50">
-                <span className="text-6xl mb-4 block">📜</span>
-                <p className="text-lg">Nessun indizio ancora disponibile</p>
-                <p className="text-sm mt-2">
-                  Gli indizi verranno rivelati ogni sabato alle 00:00
-                </p>
-              </div>
-            </div>
-          </div>
+          <CeremonyCluesSection participantCode={participant.participant_code} />
         )}
 
         {/* Private Tab */}

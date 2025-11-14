@@ -41,6 +41,9 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
       // Salva il partecipante in localStorage per persistenza
       localStorage.setItem('game_participant', JSON.stringify(participant))
 
+      // Salva anche il codice partecipante separatamente per sincronizzazione indizi
+      localStorage.setItem('participantCode', participant.participant_code)
+
       // Callback di successo
       onLoginSuccess(participant)
     } catch (error) {

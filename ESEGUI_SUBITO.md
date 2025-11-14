@@ -99,3 +99,89 @@ Dopo aver eseguito questi 3 script, potrai:
 ---
 
 **Nota:** Per modificare le categorie dei partecipanti esistenti, usa il filtro e la ricerca per trovarli, poi modifica manualmente usando il pulsante edit (prossima funzionalità) oppure eseguendo SQL diretti.
+
+---
+
+## Script 4: Crea Tabella Indizi Cerimonia Apertura
+
+```sql
+-- Tabella per tracciare quali indizi ogni partecipante ha trovato
+CREATE TABLE IF NOT EXISTS ceremony_clues_found (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  participant_code TEXT NOT NULL REFERENCES game_participants(participant_code) ON DELETE CASCADE,
+  clue_word TEXT NOT NULL, -- Es: ENIGMA, VULCANO, etc.
+  found_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(participant_code, clue_word)
+);
+
+-- Indici per performance
+CREATE INDEX IF NOT EXISTS idx_ceremony_clues_participant ON ceremony_clues_found(participant_code);
+CREATE INDEX IF NOT EXISTS idx_ceremony_clues_word ON ceremony_clues_found(clue_word);
+CREATE INDEX IF NOT EXISTS idx_ceremony_clues_found_at ON ceremony_clues_found(found_at);
+
+-- RLS Policy
+ALTER TABLE ceremony_clues_found ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Chiunque autenticato può leggere
+CREATE POLICY "Anyone can read ceremony clues" ON ceremony_clues_found
+  FOR SELECT USING (true);
+
+-- Policy: Chiunque autenticato può inserire (trovare indizi)
+CREATE POLICY "Anyone can insert ceremony clues" ON ceremony_clues_found
+  FOR INSERT WITH CHECK (true);
+```
+
+**Clicca "Run"**
+
+**Cosa fa:**
+- Crea tabella `ceremony_clues_found` per tracciare indizi trovati
+- Ogni riga = 1 indizio trovato da 1 partecipante
+- UNIQUE constraint impedisce duplicati (stesso partecipante non può trovare stesso indizio 2 volte)
+- Timestamp per sapere quando è stato trovato
+- RLS abilitato per sicurezza
+
+---
+
+## Script 5: Aggiungi Campo Presenza Serata Apertura
+
+```sql
+-- Aggiungi campo per tracciare chi era presente alla serata di apertura
+ALTER TABLE game_participants
+ADD COLUMN IF NOT EXISTS present_at_opening BOOLEAN DEFAULT false NOT NULL;
+
+-- Indice per query veloci sui presenti
+CREATE INDEX IF NOT EXISTS idx_game_participants_present_opening ON game_participants(present_at_opening);
+
+-- Aggiungi campo per tracciare se ha ricevuto i punti bonus serata apertura
+ALTER TABLE game_participants
+ADD COLUMN IF NOT EXISTS opening_bonus_awarded BOOLEAN DEFAULT false NOT NULL;
+```
+
+**Clicca "Run"**
+
+**Cosa fa:**
+- Aggiunge campo `present_at_opening` (default: false) per marcare chi era alla festa
+- Aggiunge campo `opening_bonus_awarded` per evitare duplicati punti
+- Crea indice per performance query
+
+---
+
+## Script 6: Aggiungi Campo Iscrizione Completata
+
+```sql
+-- Aggiungi campo per tracciare chi ha completato il form di iscrizione
+ALTER TABLE game_participants
+ADD COLUMN IF NOT EXISTS registration_completed BOOLEAN DEFAULT false NOT NULL;
+
+-- Indice per query veloci sugli iscritti
+CREATE INDEX IF NOT EXISTS idx_game_participants_registration ON game_participants(registration_completed);
+```
+
+**Clicca "Run"**
+
+**Cosa fa:**
+- Aggiunge campo `registration_completed` (default: false)
+- Quando il partecipante compila il form → diventa true
+- Il cerchio rosso sulla homepage diventa bianco quando tutti hanno completato
+
+---

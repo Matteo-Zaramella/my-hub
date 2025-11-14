@@ -9,16 +9,16 @@ interface ClueData {
 
 export default function OpeningCeremonyClues() {
   const [clues, setClues] = useState<ClueData[]>([
-    { solution: 'indizio1', instagramHint: '' },
-    { solution: 'indizio2', instagramHint: '' },
-    { solution: 'indizio3', instagramHint: '' },
-    { solution: 'indizio4', instagramHint: '' },
-    { solution: 'indizio5', instagramHint: '' },
-    { solution: 'indizio6', instagramHint: '' },
-    { solution: 'indizio7', instagramHint: '' },
-    { solution: 'indizio8', instagramHint: '' },
-    { solution: 'indizio9', instagramHint: '' },
-    { solution: 'indizio10', instagramHint: '' },
+    { solution: 'ENIGMA', instagramHint: '' },
+    { solution: 'VULCANO', instagramHint: '' },
+    { solution: 'OBELISCO', instagramHint: '' },
+    { solution: 'LABIRINTO', instagramHint: '' },
+    { solution: 'UNIVERSO', instagramHint: '' },
+    { solution: 'ZAFFIRO', instagramHint: '' },
+    { solution: 'IPNOSI', instagramHint: '' },
+    { solution: 'ORCHESTRA', instagramHint: '' },
+    { solution: 'NEBULOSA', instagramHint: '' },
+    { solution: 'ECLISSI', instagramHint: '' },
   ])
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editSolution, setEditSolution] = useState('')
@@ -129,7 +129,7 @@ export default function OpeningCeremonyClues() {
           </span>
         </div>
         <p className="text-sm text-white/60 mt-3">
-          Questa è la password che i partecipanti devono indovinare per vincere <span className="text-green-400 font-bold">+100 punti</span>
+          Le prime lettere dei 10 indizi formano questa password. Chi la indovina riceve <span className="text-green-400 font-bold">+100 punti</span> e accede all'area di gioco
         </p>
       </div>
 
@@ -138,7 +138,7 @@ export default function OpeningCeremonyClues() {
         <div className="mb-4">
           <h3 className="text-lg font-bold text-white">🔍 Indizi (10 totali)</h3>
           <p className="text-sm text-white/60 mt-1">
-            Se tutti i 10 indizi vengono trovati durante la festa, ogni partecipante ottiene <span className="text-green-400 font-bold">+100 punti bonus</span>!
+            I partecipanti trovano gli sticker e inseriscono le parole. I cerchi sulla homepage si illuminano per confermare che l'indizio è corretto. Le prime lettere formano EVOLUZIONE!
           </p>
         </div>
         <div className="space-y-4">
@@ -160,16 +160,6 @@ export default function OpeningCeremonyClues() {
                           autoFocus
                         />
                       </div>
-                      <div>
-                        <label className="text-xs text-white/60 block mb-1">Frase per storia Instagram (emergenza)</label>
-                        <input
-                          type="text"
-                          value={editInstagramHint}
-                          onChange={(e) => setEditInstagramHint(e.target.value)}
-                          placeholder="es: Trova la parola nascosta nel giardino..."
-                          className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40"
-                        />
-                      </div>
                     </div>
                   ) : (
                     <div className="flex-1">
@@ -177,38 +167,7 @@ export default function OpeningCeremonyClues() {
                         <span className="text-xs text-white/60">Soluzione:</span>
                         <span className="text-white font-mono ml-2">{clue.solution}</span>
                       </div>
-                      {clue.instagramHint && (
-                        <div>
-                          <span className="text-xs text-white/60">Storia Instagram:</span>
-                          <span className="text-white/80 text-sm ml-2 italic">{clue.instagramHint}</span>
-                        </div>
-                      )}
                     </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  {editingIndex === index ? (
-                    <>
-                      <button
-                        onClick={() => handleSave(index)}
-                        className="px-4 py-2 bg-white text-black rounded hover:bg-white/90 transition text-sm"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="px-4 py-2 border border-white/20 text-white rounded hover:bg-white/10 transition text-sm"
-                      >
-                        ✕
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleEdit(index)}
-                      className="px-4 py-2 border border-white/20 text-white rounded hover:bg-white/10 transition text-sm"
-                    >
-                      Modifica
-                    </button>
                   )}
                 </div>
               </div>
@@ -217,13 +176,13 @@ export default function OpeningCeremonyClues() {
         </div>
         <div className="mt-4 space-y-2">
           <p className="text-xs text-white/60">
-            ℹ️ <span className="font-bold">Soluzione:</span> La parola esatta che i partecipanti devono inserire (case-sensitive)
-          </p>
-          <p className="text-xs text-white/60">
-            📱 <span className="font-bold">Storia Instagram:</span> Indovinello/frase da pubblicare nelle storie se i partecipanti non trovano gli indizi durante la festa
+            ℹ️ <span className="font-bold">Soluzione:</span> La parola esatta che i partecipanti devono inserire nell'app (MAIUSCOLO)
           </p>
           <p className="text-xs text-green-400/80">
-            🎁 <span className="font-bold">Bonus:</span> Se tutti i 10 indizi vengono completati durante la festa, ogni partecipante riceve +100 punti
+            🎯 <span className="font-bold">Obiettivo:</span> Trovando tutti i 10 indizi, le prime lettere formano EVOLUZIONE (password finale per +100 punti)
+          </p>
+          <p className="text-xs text-purple-400/80">
+            🖼️ <span className="font-bold">Sticker:</span> Stampa 10 immagini (5x5cm) che rappresentano queste parole e nascondile all'Oste Divino
           </p>
         </div>
       </div>

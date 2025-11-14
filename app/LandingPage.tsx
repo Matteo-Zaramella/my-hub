@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import RegistrationForm from './RegistrationForm'
 
 export default function LandingPage() {
   const router = useRouter()
   const [showGamePassword, setShowGamePassword] = useState(false)
   const [gamePassword, setGamePassword] = useState('')
   const [cluesFound, setCluesFound] = useState(0)
+  const [foundClueWords, setFoundClueWords] = useState<string[]>([]) // Traccia quali parole sono state trovate
   const [isEventActive, setIsEventActive] = useState(false)
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -15,6 +18,9 @@ export default function LandingPage() {
     minutes: 0,
     seconds: 0,
   })
+  const [participantCode, setParticipantCode] = useState<string | null>(null)
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false)
+  const [userRegistered, setUserRegistered] = useState(false) // Registrazione personale dell'utente
 
   // Load ceremony clues from admin panel
   const [ceremonyClues, setCeremonyClues] = useState<string[]>([])
@@ -22,12 +28,22 @@ export default function LandingPage() {
   // Final password to access game area (revealed when all 10 clues are found)
   const GAME_PASSWORD = 'EVOLUZIONE'
 
-  // Load clues configuration and progress from localStorage
+  const supabase = createClient()
+
+  // Load participant code and clues from database
   useEffect(() => {
-    // Load clues found progress
-    const savedProgress = localStorage.getItem('cluesFound')
-    if (savedProgress) {
-      setCluesFound(parseInt(savedProgress))
+    // Load participant code from localStorage (set after login)
+    const savedCode = localStorage.getItem('participantCode')
+    setParticipantCode(savedCode)
+
+    // Check se la registrazione è stata completata (salvato dopo form registrazione)
+    const registrationCode = localStorage.getItem('registrationCompleted')
+    if (registrationCode) {
+      // Verifica che la registrazione sia ancora valida nel database
+      checkUserRegistration(registrationCode)
+    } else if (savedCode) {
+      // Se loggato ma non ha il flag registrationCompleted, verifica comunque
+      checkUserRegistration(savedCode)
     }
 
     // Load ceremony clues solutions from admin panel
@@ -40,19 +56,61 @@ export default function LandingPage() {
     } else {
       // Default clues if not set
       setCeremonyClues([
-        'indizio1',
-        'indizio2',
-        'indizio3',
-        'indizio4',
-        'indizio5',
-        'indizio6',
-        'indizio7',
-        'indizio8',
-        'indizio9',
-        'indizio10',
+        'ENIGMA',
+        'VULCANO',
+        'OBELISCO',
+        'LABIRINTO',
+        'UNIVERSO',
+        'ZAFFIRO',
+        'IPNOSI',
+        'ORCHESTRA',
+        'NEBULOSA',
+        'ECLISSI',
       ])
     }
+
+    // Load found clues from database if participant logged in
+    if (savedCode) {
+      loadFoundClues(savedCode)
+    }
   }, [])
+
+  // Check if current user completed registration
+  async function checkUserRegistration(code: string) {
+    const { data, error } = await supabase
+      .from('game_participants')
+      .select('registration_completed')
+      .eq('participant_code', code)
+      .single()
+
+    if (error) {
+      console.error('Error checking user registration:', error)
+      return
+    }
+
+    if (data) {
+      setUserRegistered(data.registration_completed === true)
+    }
+  }
+
+  // Load found clues from database
+  async function loadFoundClues(code: string) {
+    const { data, error } = await supabase
+      .from('ceremony_clues_found')
+      .select('clue_word')
+      .eq('participant_code', code)
+
+    if (error) {
+      console.error('Error loading found clues:', error)
+      return
+    }
+
+    if (data) {
+      const words = data.map((row) => row.clue_word)
+      setFoundClueWords(words)
+      setCluesFound(words.length)
+    }
+  }
 
   // Countdown to 25/01/2026 00:00
   useEffect(() => {
@@ -97,9 +155,9 @@ export default function LandingPage() {
     setShowGamePassword(true)
   }
 
-  const handleGamePasswordSubmit = (e: React.FormEvent) => {
+  const handleGamePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const input = gamePassword.trim()
+    const input = gamePassword.trim().toUpperCase() // Converti in MAIUSCOLO
 
     console.log('Input:', input)
     console.log('Expected password:', GAME_PASSWORD)
@@ -109,20 +167,87 @@ export default function LandingPage() {
 
     // First check if input is the final password
     if (input === GAME_PASSWORD) {
-      console.log('Password correct! Redirecting...')
+      console.log('Password correct! Assigning points to all present participants...')
+
+      // Assegna +100 punti a TUTTI i partecipanti presenti alla serata
+      try {
+        // 1. Trova tutti i partecipanti presenti che non hanno ancora ricevuto il bonus
+        const { data: presentParticipants, error: fetchError } = await supabase
+          .from('game_participants')
+          .select('id, current_points, participant_code')
+          .eq('present_at_opening', true)
+          .eq('opening_bonus_awarded', false)
+
+        if (fetchError) {
+          console.error('Error fetching present participants:', fetchError)
+        } else if (presentParticipants && presentParticipants.length > 0) {
+          // 2. Aggiorna i punti per tutti i presenti
+          for (const participant of presentParticipants) {
+            const { error: updateError } = await supabase
+              .from('game_participants')
+              .update({
+                current_points: participant.current_points + 100,
+                opening_bonus_awarded: true
+              })
+              .eq('id', participant.id)
+
+            if (updateError) {
+              console.error(`Error updating points for ${participant.participant_code}:`, updateError)
+            } else {
+              console.log(`✅ +100 points to ${participant.participant_code}`)
+            }
+          }
+
+          console.log(`🎉 Awarded +100 points to ${presentParticipants.length} participants!`)
+        }
+      } catch (error) {
+        console.error('Error in bonus assignment:', error)
+      }
+
+      // Redirect all'area di gioco
       router.push('/game?password=' + encodeURIComponent(input))
       return
     }
 
     // If event is active and not all clues found, check if input is a clue
     if (isEventActive && cluesFound < 10) {
-      if (ceremonyClues.includes(input)) {
-        const newCluesFound = cluesFound + 1
-        setCluesFound(newCluesFound)
-        localStorage.setItem('cluesFound', newCluesFound.toString())
+      // Verifica se l'indizio è valido E non è già stato trovato
+      if (ceremonyClues.includes(input) && !foundClueWords.includes(input)) {
+        // Salva nel database se partecipante loggato
+        if (participantCode) {
+          const { error } = await supabase
+            .from('ceremony_clues_found')
+            .insert({
+              participant_code: participantCode,
+              clue_word: input,
+            })
+
+          if (error) {
+            console.error('Error saving clue:', error)
+            // Se errore UNIQUE constraint = già trovato, ignora silenziosamente
+            if (error.code === '23505') {
+              setGamePassword('')
+              return
+            }
+            // Altri errori - ignora silenziosamente
+            return
+          }
+        }
+
+        // Aggiorna stato locale
+        const newFoundWords = [...foundClueWords, input]
+        setFoundClueWords(newFoundWords)
+        setCluesFound(newFoundWords.length)
         setGamePassword('') // Clear input after correct clue
         return
       }
+
+      // Indizio già trovato - non mostrare nulla, solo chiudi
+      if (foundClueWords.includes(input)) {
+        setGamePassword('')
+        return
+      }
+
       // Wrong clue - do nothing, don't clear input
       return
     }
@@ -142,6 +267,8 @@ export default function LandingPage() {
           const row = Math.floor(index / gridSize)
           const col = index % gridSize
 
+          // Top left corner (position 0) - Registration form
+          const isRegistration = index === 0
           // Top right corner (position 9) - Admin access
           const isAdmin = index === 9
           // Bottom right corner (position 99) - Game access
@@ -156,7 +283,11 @@ export default function LandingPage() {
 
           // Determine circle fill based on clues found
           let circleFill = ''
-          if (isEventActive && col < cluesFound) {
+
+          // Cerchio iscrizione (posizione 0) - rosso se l'utente NON ha completato la registrazione
+          if (isRegistration && !userRegistered) {
+            circleFill = 'bg-red-500'
+          } else if (isEventActive && col < cluesFound) {
             // Columns with found clues are filled white
             circleFill = 'bg-white'
           }
@@ -165,6 +296,7 @@ export default function LandingPage() {
             <button
               key={index}
               onClick={() => {
+                if (isRegistration) setShowRegistrationForm(true)
                 if (isAdmin) handleAdminAccess()
                 if (isGame) handleGameAccess()
               }}
@@ -228,6 +360,20 @@ export default function LandingPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Registration Form Modal */}
+      {showRegistrationForm && (
+        <RegistrationForm
+          onClose={() => setShowRegistrationForm(false)}
+          onSuccess={() => {
+            setUserRegistered(true)
+            if (participantCode) {
+              checkUserRegistration(participantCode)
+            }
+          }}
+          participantCode={participantCode}
+        />
       )}
     </div>
   )
