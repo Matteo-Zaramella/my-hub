@@ -141,19 +141,29 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
   }
 
   return (
-    <div className="absolute inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="w-full max-w-lg bg-gradient-to-br from-purple-900/80 to-pink-900/80 border-2 border-red-500 rounded-2xl p-6 md:p-8 my-8">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+    <div className="absolute inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto" style={{ backgroundColor: '#0a2818' }}>
+      {/* Sfondo Fenice Verde - Posizionata a Sinistra */}
+      <div
+        className="absolute inset-y-0 left-0 bg-contain bg-left bg-no-repeat opacity-30"
+        style={{
+          backgroundImage: 'url(/fenice-verde-full.jpg)',
+          width: '50%',
+          maxWidth: '800px'
+        }}
+      />
+
+      <div className="relative w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-lg p-8 my-8">
+        {/* Header Minimale */}
+        <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white">📝 Iscrizione</h2>
-            <p className="text-white/60 text-sm mt-1">
+            <h2 className="text-xl font-bold text-white">📝 Iscrizione</h2>
+            <p className="text-white/40 text-sm mt-1">
               {step === 'identity' ? 'Step 1/2: Verifica identità' : 'Step 2/2: I tuoi dati'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white text-2xl"
+            className="text-white/40 hover:text-white text-xl transition-colors"
           >
             ✕
           </button>
@@ -161,14 +171,14 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
 
         {/* Step 1: Verifica Identità */}
         {step === 'identity' && (
-          <form onSubmit={handleIdentitySubmit} className="space-y-4">
-            <p className="text-white/80 text-sm mb-4">
+          <form onSubmit={handleIdentitySubmit} className="space-y-6">
+            <p className="text-white/60 text-sm">
               Inserisci il tuo nome come registrato per verificare la tua identità:
             </p>
 
             {/* Nome */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-xs text-white/40 mb-2">
                 Nome *
               </label>
               <input
@@ -177,37 +187,43 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Mario"
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
               />
             </div>
 
             {/* Secondo Nome */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
-                Secondo Nome <span className="text-white/40">(se presente)</span>
+              <label className="block text-xs text-white/40 mb-2">
+                Secondo Nome <span className="text-white/30">(solo se hai un doppio nome)</span>
               </label>
               <input
                 type="text"
                 value={middleName}
                 onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="Giovanni"
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="es: Francesco"
+                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
               />
+              <p className="text-xs text-white/30 mt-1">
+                💡 Es: Giovanni Francesco Rossi → secondo nome = "Francesco"
+              </p>
             </div>
 
             {/* Cognome */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
-                Cognome *
+              <label className="block text-xs text-white/40 mb-2">
+                Cognome Completo *
               </label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Rossi"
+                placeholder="es: De Sandre"
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
               />
+              <p className="text-xs text-white/30 mt-1">
+                💡 Includi "De", "Della", "Di" ecc. nel cognome
+              </p>
             </div>
 
             {/* Error */}
@@ -221,7 +237,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
             <button
               type="submit"
               disabled={loading || !firstName || !lastName}
-              className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="w-full bg-white text-black px-6 py-3 rounded-lg font-medium hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Verifica in corso...' : 'Continua →'}
             </button>
@@ -230,21 +246,21 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
 
         {/* Step 2: Inserimento Dati */}
         {step === 'data' && foundParticipant && (
-          <form onSubmit={handleDataSubmit} className="space-y-4">
+          <form onSubmit={handleDataSubmit} className="space-y-6">
             {/* Conferma identità */}
-            <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 mb-4">
-              <p className="text-green-300 font-semibold">
-                ✅ Identità verificata: {foundParticipant.participant_name}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+              <p className="text-white/80 text-sm">
+                ✅ Identità verificata: <span className="font-semibold">{foundParticipant.participant_name}</span>
               </p>
             </div>
 
-            <p className="text-white/80 text-sm mb-4">
+            <p className="text-white/60 text-sm">
               Inserisci i tuoi dati di contatto:
             </p>
 
             {/* Telefono */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-xs text-white/40 mb-2">
                 Numero di Cellulare *
               </label>
               <input
@@ -253,17 +269,17 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+39 123 456 7890"
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
               />
             </div>
 
             {/* Instagram */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-xs text-white/40 mb-2">
                 Username Instagram *
               </label>
               <div className="flex">
-                <span className="inline-flex items-center px-3 bg-white/5 border border-r-0 border-white/20 rounded-l-lg text-white/60">
+                <span className="inline-flex items-center px-3 bg-transparent border border-r-0 border-white/20 rounded-l-lg text-white/40">
                   @
                 </span>
                 <input
@@ -272,14 +288,14 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
                   onChange={(e) => setInstagram(e.target.value)}
                   placeholder="username"
                   required
-                  className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-r-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="flex-1 px-4 py-3 bg-transparent border border-white/20 rounded-r-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-xs text-white/40 mb-2">
                 Indirizzo Email *
               </label>
               <input
@@ -288,7 +304,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="nome@email.com"
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
               />
             </div>
 

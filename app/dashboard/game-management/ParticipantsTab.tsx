@@ -47,6 +47,16 @@ export default function ParticipantsTab() {
   const [sortField, setSortField] = useState<SortField>('current_points')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
+  // Advanced edit modal
+  const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
+  const [advancedEditParticipant, setAdvancedEditParticipant] = useState<Participant | null>(null)
+  const [advancedEditData, setAdvancedEditData] = useState({
+    name: '',
+    code: '',
+    notes: ''
+  })
+  const [savingAdvanced, setSavingAdvanced] = useState(false)
+
   // New participant form
   const [showAddForm, setShowAddForm] = useState(false)
   const [newParticipant, setNewParticipant] = useState({
@@ -117,6 +127,98 @@ export default function ParticipantsTab() {
       category: '',
       partnerName: ''
     })
+  }
+
+  const handleResetRegistration = async (participantId: number, participantName: string) => {
+    if (!confirm(`Sei sicuro di voler resettare i dati di registrazione di ${participantName}?\n\nVerranno cancellati:\n- Email\n- Telefono\n- Instagram\n- Flag registrazione completata`)) return
+
+    try {
+      const { error } = await supabase
+        .from('game_participants')
+        .update({
+          email: null,
+          phone_number: null,
+          instagram_handle: null,
+          registration_completed: false
+        })
+        .eq('id', participantId)
+
+      if (error) throw error
+
+      alert('✅ Dati di registrazione resettati con successo!')
+      fetchParticipants()
+    } catch (err: any) {
+      console.error('Error resetting registration:', err)
+      alert('❌ Errore durante il reset: ' + err.message)
+    }
+  }
+
+  const handleDelete = async (participantId: number, participantName: string) => {
+    if (!confirm(`⚠️ ATTENZIONE!\n\nSei sicuro di voler eliminare definitivamente ${participantName}?\n\nQuesta azione NON può essere annullata.`)) return
+
+    try {
+      const { error } = await supabase
+        .from('game_participants')
+        .delete()
+        .eq('id', participantId)
+
+      if (error) throw error
+
+      alert('✅ Partecipante eliminato con successo')
+      fetchParticipants()
+    } catch (err: any) {
+      console.error('Error deleting participant:', err)
+      alert('❌ Errore durante l\'eliminazione: ' + err.message)
+    }
+  }
+
+  const handleOpenAdvancedEdit = (participant: Participant) => {
+    setAdvancedEditParticipant(participant)
+    setAdvancedEditData({
+      name: participant.participant_name,
+      code: participant.participant_code,
+      notes: participant.notes || ''
+    })
+    setShowAdvancedEdit(true)
+  }
+
+  const handleSaveAdvancedEdit = async () => {
+    if (!advancedEditParticipant) return
+
+    if (!advancedEditData.name.trim()) {
+      alert('Il nome è obbligatorio')
+      return
+    }
+
+    if (!advancedEditData.code.trim()) {
+      alert('Il codice è obbligatorio')
+      return
+    }
+
+    setSavingAdvanced(true)
+
+    try {
+      const { error } = await supabase
+        .from('game_participants')
+        .update({
+          participant_name: advancedEditData.name.trim(),
+          participant_code: advancedEditData.code.trim().toUpperCase(),
+          notes: advancedEditData.notes.trim() || null
+        })
+        .eq('id', advancedEditParticipant.id)
+
+      if (error) throw error
+
+      alert('✅ Modifiche salvate con successo!')
+      setShowAdvancedEdit(false)
+      setAdvancedEditParticipant(null)
+      fetchParticipants()
+    } catch (err: any) {
+      console.error('Error saving advanced edit:', err)
+      alert('❌ Errore durante il salvataggio: ' + err.message)
+    } finally {
+      setSavingAdvanced(false)
+    }
   }
 
   const generateParticipantCode = (name: string) => {
@@ -703,12 +805,38 @@ export default function ParticipantsTab() {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => handleEdit(participant)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 font-semibold"
-                      >
-                        ✏️ Modifica
-                      </button>
+                      <div className="flex flex-wrap gap-1">
+                        <button
+                          onClick={() => handleEdit(participant)}
+                          className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 font-semibold"
+                          title="Modifica rapida"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleOpenAdvancedEdit(participant)}
+                          className="px-3 py-1 bg-purple-600 text-white rounded text-xs hover:bg-purple-700 font-semibold"
+                          title="Modifica avanzata (Nome, Codice, Note)"
+                        >
+                          ⚙️
+                        </button>
+                        {participant.registration_completed && (
+                          <button
+                            onClick={() => handleResetRegistration(participant.id, participant.participant_name)}
+                            className="px-3 py-1 bg-orange-600 text-white rounded text-xs hover:bg-orange-700 font-semibold"
+                            title="Reset Registrazione"
+                          >
+                            🔄
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(participant.id, participant.participant_name)}
+                          className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 font-semibold"
+                          title="Elimina partecipante"
+                        >
+                          🗑️
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -717,6 +845,95 @@ export default function ParticipantsTab() {
           </table>
         </div>
       </div>
+
+      {/* Advanced Edit Modal */}
+      {showAdvancedEdit && advancedEditParticipant && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-purple-500/30 rounded-xl p-6 max-w-lg w-full shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-white">⚙️ Modifica Avanzata</h3>
+              <button
+                onClick={() => setShowAdvancedEdit(false)}
+                className="text-white/60 hover:text-white text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Nome */}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  👤 Nome Completo *
+                </label>
+                <input
+                  type="text"
+                  value={advancedEditData.name}
+                  onChange={(e) => setAdvancedEditData({ ...advancedEditData, name: e.target.value })}
+                  placeholder="Mario Rossi"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  disabled={savingAdvanced}
+                />
+              </div>
+
+              {/* Codice */}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  🔑 Codice Partecipante *
+                </label>
+                <input
+                  type="text"
+                  value={advancedEditData.code}
+                  onChange={(e) => setAdvancedEditData({ ...advancedEditData, code: e.target.value.toUpperCase() })}
+                  placeholder="ABC123"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
+                  disabled={savingAdvanced}
+                />
+              </div>
+
+              {/* Note */}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  📝 Note
+                </label>
+                <textarea
+                  value={advancedEditData.notes}
+                  onChange={(e) => setAdvancedEditData({ ...advancedEditData, notes: e.target.value })}
+                  placeholder="Note aggiuntive..."
+                  rows={3}
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  disabled={savingAdvanced}
+                />
+              </div>
+
+              {/* Warning */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                <p className="text-yellow-300 text-xs">
+                  ⚠️ <span className="font-semibold">Attenzione:</span> Modificare nome o codice può causare problemi se il partecipante ha già completato la registrazione.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowAdvancedEdit(false)}
+                  disabled={savingAdvanced}
+                  className="flex-1 px-4 py-3 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition disabled:opacity-50"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={handleSaveAdvancedEdit}
+                  disabled={savingAdvanced}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                >
+                  {savingAdvanced ? 'Salvataggio...' : '💾 Salva Modifiche'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -5,6 +5,7 @@ import OpeningCeremonyClues from './OpeningCeremonyClues'
 import ChallengesManagement from './ChallengesManagement'
 import ParticipantsTab from './ParticipantsTab'
 import ChecklistTab from './ChecklistTab'
+import GamePhasesTab from './GamePhasesTab'
 
 interface GameConfig {
   id: number
@@ -42,7 +43,7 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases'>('ceremony')
 
   return (
     <div className="space-y-6">
@@ -117,6 +118,16 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         >
           ✅ Checklist
         </button>
+        <button
+          onClick={() => setActiveTab('phases')}
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
+            activeTab === 'phases'
+              ? 'text-white border-b-2 border-white'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          🎯 Fasi del Gioco
+        </button>
       </div>
 
       {/* Content */}
@@ -124,6 +135,7 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
       {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
       {activeTab === 'participants' && <ParticipantsTab />}
       {activeTab === 'checklist' && <ChecklistTab />}
+      {activeTab === 'phases' && <GamePhasesTab />}
     </div>
   )
 }
