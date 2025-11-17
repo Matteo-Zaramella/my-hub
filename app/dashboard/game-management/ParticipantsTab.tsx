@@ -17,6 +17,7 @@ interface Participant {
   current_points: number
   present_at_opening: boolean
   opening_bonus_awarded: boolean
+  registration_completed: boolean
 }
 
 interface EditingData {

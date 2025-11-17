@@ -62,19 +62,19 @@ export default function GamePhasesTab() {
           const isLast = index === phases.length - 1
 
           // Determina il colore in base alla fase
-          const getPhaseColor = (phaseNum: number) => {
+          const getPhaseColors = (phaseNum: number) => {
             switch(phaseNum) {
-              case 0: return 'blue'
-              case 1: return 'green'
-              case 2: return 'yellow'
-              case 3: return 'orange'
-              case 4: return 'red'
-              case 5: return 'purple'
-              default: return 'gray'
+              case 0: return { bg: 'bg-blue-500/5', border: 'border-blue-500/20', badge: 'bg-blue-500' }
+              case 1: return { bg: 'bg-green-500/5', border: 'border-green-500/20', badge: 'bg-green-500' }
+              case 2: return { bg: 'bg-yellow-500/5', border: 'border-yellow-500/20', badge: 'bg-yellow-500' }
+              case 3: return { bg: 'bg-orange-500/5', border: 'border-orange-500/20', badge: 'bg-orange-500' }
+              case 4: return { bg: 'bg-red-500/5', border: 'border-red-500/20', badge: 'bg-red-500' }
+              case 5: return { bg: 'bg-purple-500/5', border: 'border-purple-500/20', badge: 'bg-purple-500' }
+              default: return { bg: 'bg-gray-500/5', border: 'border-gray-500/20', badge: 'bg-gray-500' }
             }
           }
 
-          const color = getPhaseColor(phase.phase_number)
+          const colors = getPhaseColors(phase.phase_number)
 
           return (
             <div key={phase.id} className="relative">
@@ -84,9 +84,9 @@ export default function GamePhasesTab() {
               )}
 
               {/* Card Fase */}
-              <div className={`bg-${color}-500/5 border border-${color}-500/20 rounded-xl p-6 relative`}>
+              <div className={`${colors.bg} ${colors.border} border rounded-xl p-6 relative`}>
                 {/* Numero Fase */}
-                <div className={`absolute -left-3 top-6 w-12 h-12 bg-${color}-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
+                <div className={`absolute -left-3 top-6 w-12 h-12 ${colors.badge} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
                   {phase.phase_number}
                 </div>
 
