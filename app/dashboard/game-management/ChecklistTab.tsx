@@ -18,15 +18,18 @@ const CHECKLIST_DATA: ChecklistItem[] = [
   { id: '8', text: '✅ Creati 10 indizi anagramma EVOLUZIONE', completed: true, category: 'Cerimonia' },
   { id: '35', text: '✅ Setup sistema email automatiche (Resend + template)', completed: true, category: 'Tecnico' },
   { id: '36', text: '✅ Form registrazione partecipanti integrato', completed: true, category: 'Partecipanti' },
+  { id: '24', text: '✅ Chat di gruppo - Miglioramenti (reactions, online users, rate limit)', completed: true, category: 'Tecnico' },
+  { id: '26', text: '✅ Cron jobs: rivelazione indizi automatica (sabato 00:00)', completed: true, category: 'Tecnico' },
 
-  // 🔴 URGENTE - Scadenza: 16/11/2025
+  // 🔴 URGENTE - IMMEDIATO
+  { id: 'cron_secret', text: 'Aggiungere CRON_SECRET nelle variabili Vercel', completed: false, category: 'Tecnico', priority: 'urgent', deadline: 'IMMEDIATO' },
+
+  // 🔴 ALTA PRIORITÀ
   { id: '1', text: 'Confermare location festa a Padova (in attesa - preparazione invariata)', completed: false, category: 'Location', priority: 'low', deadline: '20/01' },
 
   // 🟡 ALTA PRIORITÀ - Scadenza: 30/11/2025
   { id: '11', text: 'Sfida Febbraio: definire tipo, location, 3 indizi (21-22/02)', completed: false, category: 'Sfide', priority: 'high', deadline: '30/11' },
   { id: '12', text: 'Sfida Marzo: definire tipo, location, 3 indizi (21-22/03)', completed: false, category: 'Sfide', priority: 'high', deadline: '05/12' },
-  { id: '24', text: 'Chat di gruppo - Miglioramenti (moderazione, reactions, online users)', completed: false, category: 'Tecnico', priority: 'high', deadline: '10/12' },
-  { id: '25', text: 'Sistema notifiche push (Web Push API)', completed: false, category: 'Tecnico', priority: 'high', deadline: '15/12' },
 
   // 🟢 MEDIA PRIORITÀ - Dicembre 2025
   { id: '3', text: 'Stampare e preparare 10 indizi fisici (formato A5)', completed: false, category: 'Location', priority: 'medium', deadline: '20/12' },
@@ -40,8 +43,6 @@ const CHECKLIST_DATA: ChecklistItem[] = [
   { id: '20', text: 'Sfida Novembre: definire tipo, location, 3 indizi (21-22/11)', completed: false, category: 'Sfide', priority: 'medium' },
   { id: '21', text: 'Sfida Dicembre: definire tipo, location, 4 indizi (26-27/12)', completed: false, category: 'Sfide', priority: 'medium' },
   { id: '23', text: 'Sfida Finale: definire format e soglia punteggio (24/01/27)', completed: false, category: 'Sfide', priority: 'medium' },
-  { id: '26', text: 'Cron jobs: rivelazione indizi automatica (sabato 00:00)', completed: false, category: 'Tecnico', priority: 'medium', deadline: '15/01' },
-  { id: '37', text: 'Vercel Edge Functions: reveal-clue, send-notification, calculate-leaderboard', completed: false, category: 'Tecnico', priority: 'medium', deadline: '15/01' },
 
   // 🔵 TEST - Gennaio 2026
   { id: '30', text: 'Test responsive su iPhone/Android/iPad/Desktop', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
