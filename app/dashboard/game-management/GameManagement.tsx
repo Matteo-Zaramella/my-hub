@@ -6,6 +6,7 @@ import ChallengesManagement from './ChallengesManagement'
 import ParticipantsTab from './ParticipantsTab'
 import ChecklistTab from './ChecklistTab'
 import GamePhasesTab from './GamePhasesTab'
+import SettingsTab from './SettingsTab'
 
 interface GameConfig {
   id: number
@@ -43,7 +44,7 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases' | 'settings'>('ceremony')
 
   return (
     <div className="space-y-6">
@@ -128,6 +129,16 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         >
           🎯 Fasi del Gioco
         </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
+            activeTab === 'settings'
+              ? 'text-white border-b-2 border-white'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          ⚙️ Impostazioni
+        </button>
       </div>
 
       {/* Content */}
@@ -136,6 +147,7 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
       {activeTab === 'participants' && <ParticipantsTab />}
       {activeTab === 'checklist' && <ChecklistTab />}
       {activeTab === 'phases' && <GamePhasesTab />}
+      {activeTab === 'settings' && <SettingsTab />}
     </div>
   )
 }

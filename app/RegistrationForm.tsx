@@ -24,11 +24,39 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
   const [email, setEmail] = useState('')
 
   // Stati
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // Inizia come loading per check settings
   const [error, setError] = useState('')
   const [foundParticipant, setFoundParticipant] = useState<any>(null)
   const [countdown, setCountdown] = useState(10) // Timer 10 secondi
   const [canSubmit, setCanSubmit] = useState(false) // Può inviare solo dopo 10 secondi
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
+
+  // Check se la registrazione è abilitata
+  useEffect(() => {
+    checkRegistrationStatus()
+  }, [])
+
+  async function checkRegistrationStatus() {
+    try {
+      const { data, error } = await supabase
+        .from('game_settings')
+        .select('setting_value')
+        .eq('setting_key', 'registration_enabled')
+        .single()
+
+      if (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      } else {
+        setRegistrationEnabled(data?.setting_value || false)
+      }
+    } catch (err) {
+      console.error('Error:', err)
+      setRegistrationEnabled(false)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Timer countdown quando si arriva allo step 2
   useEffect(() => {
@@ -126,7 +154,23 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
         return
       }
 
-      // Successo! Salva il codice partecipante in localStorage
+      // Successo! Invia email di conferma
+      try {
+        await fetch('/api/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email.trim(),
+            name: foundParticipant.participant_name,
+            participantCode: foundParticipant.participant_code
+          })
+        })
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError)
+        // Non bloccare la registrazione se l'email fallisce
+      }
+
+      // Salva il codice partecipante in localStorage
       if (foundParticipant?.participant_code) {
         localStorage.setItem('registrationCompleted', foundParticipant.participant_code)
       }
@@ -138,6 +182,56 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
       setError('Errore nel salvare i dati. Riprova.')
       setLoading(false)
     }
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center z-50" style={{ backgroundColor: '#0a2818' }}>
+        <div className="text-white/60">Caricamento...</div>
+      </div>
+    )
+  }
+
+  // Registrazione disabilitata
+  if (!registrationEnabled) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: '#0a2818' }}>
+        {/* Sfondo Fenice Verde */}
+        <div
+          className="absolute inset-y-0 left-0 bg-contain bg-left bg-no-repeat opacity-30"
+          style={{
+            backgroundImage: 'url(/fenice-verde-full.jpg)',
+            width: '50%',
+            maxWidth: '800px'
+          }}
+        />
+
+        <div className="relative w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-lg p-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-white">⏸️ Registrazione Non Disponibile</h2>
+            <button
+              onClick={onClose}
+              className="text-white/40 hover:text-white text-xl transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-4 text-center">
+            <p className="text-white/70">
+              La registrazione non è ancora aperta.
+            </p>
+            <p className="text-white/50 text-sm">
+              Riceverai un link quando sarà possibile registrarsi per The Game.
+            </p>
+            <p className="text-green-400/70 text-sm font-medium mt-6">
+              Resta sintonizzato! 🎮
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

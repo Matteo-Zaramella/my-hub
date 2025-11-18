@@ -130,6 +130,40 @@ export default function ParticipantsTab() {
     })
   }
 
+  const handleResendEmail = async (participant: Participant) => {
+    if (!participant.email) {
+      alert('❌ Questo partecipante non ha un indirizzo email registrato.')
+      return
+    }
+
+    if (!confirm(`Vuoi inviare l'email di conferma a:\n\n${participant.participant_name}\n${participant.email}\n\nCodice: ${participant.participant_code}`)) {
+      return
+    }
+
+    try {
+      const emailResponse = await fetch('/api/send-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: participant.email,
+          name: participant.participant_name,
+          participantCode: participant.participant_code
+        })
+      })
+
+      const emailResult = await emailResponse.json()
+
+      if (!emailResponse.ok) {
+        throw new Error(emailResult.error || 'Errore sconosciuto')
+      }
+
+      alert(`✅ Email inviata con successo a ${participant.email}!`)
+    } catch (error: any) {
+      console.error('Error sending email:', error)
+      alert(`❌ Errore durante l'invio dell'email:\n${error.message}`)
+    }
+  }
+
   const handleResetRegistration = async (participantId: number, participantName: string) => {
     if (!confirm(`Sei sicuro di voler resettare i dati di registrazione di ${participantName}?\n\nVerranno cancellati:\n- Email\n- Telefono\n- Instagram\n- Flag registrazione completata`)) return
 
@@ -278,6 +312,35 @@ export default function ParticipantsTab() {
 
       if (error) throw error
 
+      // Send confirmation email if email is provided
+      if (newParticipant.email.trim()) {
+        try {
+          const emailResponse = await fetch('/api/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: newParticipant.email.trim(),
+              name: newParticipant.name.trim(),
+              participantCode: participantCode
+            })
+          })
+
+          const emailResult = await emailResponse.json()
+
+          if (!emailResponse.ok) {
+            console.error('Email error:', emailResult.error)
+            alert(`⚠️ Partecipante aggiunto ma email non inviata.\nCodice: ${participantCode}\nErrore email: ${emailResult.error}`)
+          } else {
+            alert(`✅ Partecipante aggiunto!\nCodice: ${participantCode}\n📧 Email di conferma inviata a ${newParticipant.email}`)
+          }
+        } catch (emailError) {
+          console.error('Email sending failed:', emailError)
+          alert(`⚠️ Partecipante aggiunto ma email non inviata.\nCodice: ${participantCode}`)
+        }
+      } else {
+        alert(`✅ Partecipante aggiunto!\nCodice: ${participantCode}\n📋 Nessuna email fornita - notifica non inviata`)
+      }
+
       // Reset form
       setNewParticipant({
         name: '',
@@ -292,8 +355,6 @@ export default function ParticipantsTab() {
 
       // Refresh list
       fetchParticipants()
-
-      alert(`✅ Partecipante aggiunto!\nCodice: ${participantCode}`)
     } catch (error: any) {
       console.error('Error adding participant:', error)
       if (error.code === '23505') {
@@ -821,6 +882,15 @@ export default function ParticipantsTab() {
                         >
                           ⚙️
                         </button>
+                        {participant.email && (
+                          <button
+                            onClick={() => handleResendEmail(participant)}
+                            className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 font-semibold"
+                            title="Invia/Reinvia Email Conferma"
+                          >
+                            📧
+                          </button>
+                        )}
                         {participant.registration_completed && (
                           <button
                             onClick={() => handleResetRegistration(participant.id, participant.participant_name)}

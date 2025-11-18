@@ -21,6 +21,10 @@ export default function LandingPage() {
   const [participantCode, setParticipantCode] = useState<string | null>(null)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
   const [userRegistered, setUserRegistered] = useState(false) // Registrazione personale dell'utente
+  const [ceremonyActive, setCeremonyActive] = useState(false) // Controllo se la cerimonia è attiva
+  const [registrationFormEnabled, setRegistrationFormEnabled] = useState(false) // Form registrazione homepage
+  const [wishlistEnabled, setWishlistEnabled] = useState(true) // Wishlist pubblica
+  const [passwordInputEnabled, setPasswordInputEnabled] = useState(false) // Barra inserimento password
 
   // Load ceremony clues from admin panel
   const [ceremonyClues, setCeremonyClues] = useState<{ word: string; order: number }[]>([])
@@ -47,6 +51,9 @@ export default function LandingPage() {
         await checkUserRegistration(savedCode)
       }
 
+      // Check if ceremony is active
+      await checkCeremonyStatus()
+
       // Load ceremony clues from database FIRST
       await loadCeremonyClues()
 
@@ -56,6 +63,42 @@ export default function LandingPage() {
 
     initializeData()
   }, [])
+
+  // Check all game settings from database
+  async function checkCeremonyStatus() {
+    try {
+      const { data, error } = await supabase
+        .from('game_settings')
+        .select('setting_key, setting_value')
+
+      if (error) {
+        console.error('Error checking game settings:', error)
+        return
+      }
+
+      if (data) {
+        // Imposta tutti i settings in base ai valori dal database
+        data.forEach(setting => {
+          switch(setting.setting_key) {
+            case 'ceremony_active':
+              setCeremonyActive(setting.setting_value || false)
+              break
+            case 'registration_form_enabled':
+              setRegistrationFormEnabled(setting.setting_value || false)
+              break
+            case 'wishlist_enabled':
+              setWishlistEnabled(setting.setting_value !== false) // default true
+              break
+            case 'password_input_enabled':
+              setPasswordInputEnabled(setting.setting_value || false)
+              break
+          }
+        })
+      }
+    } catch (err) {
+      console.error('Error:', err)
+    }
+  }
 
   // Load ceremony clues from database
   async function loadCeremonyClues() {
@@ -247,6 +290,8 @@ export default function LandingPage() {
 
             // Top left corner (position 0) - Registration form
             const isRegistration = index === 0
+            // Position 1 (below registration) - Public Wishlist
+            const isWishlist = index === 10
             // Top right corner (position 9) - Admin access
             const isAdmin = index === 9
             // Bottom right corner (position 99) - Game access
@@ -263,11 +308,14 @@ export default function LandingPage() {
           // Determine circle fill based on clues found
           let circleFill = ''
 
-          // Cerchio iscrizione (posizione 0) - rosso se l'utente NON ha completato la registrazione
-          if (isRegistration && !userRegistered) {
+          // Cerchio iscrizione (posizione 0) - rosso SOLO se form abilitato E utente NON registrato
+          if (isRegistration && !userRegistered && registrationFormEnabled) {
             circleFill = 'bg-red-500'
-          } else {
-            // Illumina le colonne in base all'ordine degli indizi trovati
+          } else if (isWishlist && wishlistEnabled) {
+            // Cerchio wishlist (posizione 10) - blu SOLO se abilitato
+            circleFill = 'bg-blue-500'
+          } else if (ceremonyActive) {
+            // Illumina le colonne SOLO se la cerimonia è attiva
             // Per ogni parola trovata, trova il suo order_number e illumina quella colonna
             const foundOrders = foundClueWords
               .map(word => {
@@ -286,9 +334,10 @@ export default function LandingPage() {
               <button
                 key={index}
                 onClick={() => {
-                  if (isRegistration) setShowRegistrationForm(true)
+                  if (isRegistration && registrationFormEnabled) setShowRegistrationForm(true)
+                  if (isWishlist && wishlistEnabled) router.push('/wishlist-public')
                   if (isAdmin) handleAdminAccess()
-                  if (isGame) handleGameAccess()
+                  if (isGame && passwordInputEnabled) handleGameAccess()
                 }}
                 className="flex items-center justify-center w-full h-full p-0.5 sm:p-1 md:p-1.5 lg:p-2"
               >
@@ -356,8 +405,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Game Password Modal - Mostrato solo quando non sono stati trovati tutti gli indizi */}
-      {showGamePassword && cluesFound < 10 && (
+      {/* Game Password Modal - Mostrato solo quando non sono stati trovati tutti gli indizi E password_input è abilitato */}
+      {showGamePassword && cluesFound < 10 && passwordInputEnabled && (
         <div className="absolute inset-0 bg-black flex items-center justify-center z-50">
           <div className="w-full max-w-md mx-4">
             <form onSubmit={handleGamePasswordSubmit} className="flex gap-3">

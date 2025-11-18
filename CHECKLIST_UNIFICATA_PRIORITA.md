@@ -39,52 +39,68 @@
 
 ---
 
-### 2. 📝 Creare 9 Indizi Mancanti (Anagramma EVOLUZIONE)
+### 2. 📝 Creare 10 Indizi Cerimonia (EVOLUZIONE) ✅ COMPLETATO
 **Priorità:** MASSIMA
 **Scadenza:** 20/11/2025
 **Tempo stimato:** 3-4 ore
-**Status:** ⚠️ 1/10 completato (ENTOMOLOGIA)
+**Status:** ✅ COMPLETATO
+**Data completamento:** 14/11/2025
 
-**Azioni:**
-- [x] Indizio 1: ENTOMOLOGIA ✅
-- [ ] Indizio 2: _____________
-- [ ] Indizio 3: _____________
-- [ ] Indizio 4: _____________
-- [ ] Indizio 5: _____________
-- [ ] Indizio 6: _____________
-- [ ] Indizio 7: _____________
-- [ ] Indizio 8: _____________
-- [ ] Indizio 9: _____________
-- [ ] Indizio 10: _____________
+**Indizi Completati (prime lettere formano EVOLUZIONE):**
+- [x] Indizio 1: **ENIGMA** (E) ✅
+- [x] Indizio 2: **VULCANO** (V) ✅
+- [x] Indizio 3: **OBELISCO** (O) ✅
+- [x] Indizio 4: **LABIRINTO** (L) ✅
+- [x] Indizio 5: **UNIVERSO** (U) ✅
+- [x] Indizio 6: **ZAFFIRO** (Z) ✅
+- [x] Indizio 7: **IPNOSI** (I) ✅
+- [x] Indizio 8: **ORCHESTRA** (O) ✅
+- [x] Indizio 9: **NEBULOSA** (N) ✅
+- [x] Indizio 10: **ECLISSI** (E) ✅
 
-**Tutti gli indizi devono essere anagrammi della parola EVOLUZIONE**
+**Sistema implementato:**
+- ✅ Tabella `ceremony_clues` per indizi globali
+- ✅ Tabella `ceremony_clues_found` per tracciamento partecipanti
+- ✅ Password "EVOLUZIONE" assegna +100 punti a TUTTI i presenti
+- ✅ Griglia 10x10 cerchi con illuminazione progressiva
+- ✅ Stato globale condiviso (no dipendenza da login)
 
-**Blocca:** Preparazione materiali cerimonia, test password
+**Blocca:** Preparazione materiali cerimonia, test password - ORA SBLOCCATO ✅
 
 ---
 
-### 3. 📧 Sistema Email Automatiche - Setup Base
+### 3. 📧 Sistema Email Automatiche - Setup Base ✅ COMPLETATO
 **Priorità:** ALTA
 **Scadenza:** 20/11/2025
 **Tempo stimato:** 2-3 ore
-**Status:** ❌ NON INIZIATO
+**Status:** ✅ COMPLETATO
+**Data completamento:** 18/11/2025
 
-**Riferimento:** `SISTEMA_EMAIL_AUTOMATICHE.md`
+**Riferimento:** `SISTEMA_EMAIL_AUTOMATICHE.md`, `EMAIL_INTEGRATION_COMPLETE.md`
 
 **Azioni:**
-- [ ] Registrare account Resend (100 email/giorno gratis)
-- [ ] Verificare dominio email
-- [ ] Creare template email benvenuto con codice partecipante
-- [ ] Implementare API route `/api/send-participant-code`
-- [ ] Testare invio email a te stesso
-- [ ] Creare funzione in dashboard per inviare codici
+- [x] Registrare account Resend (100 email/giorno gratis) ✅
+- [x] Configurare API key in `.env.local` ✅
+- [x] Creare template email benvenuto con codice partecipante ✅
+- [x] Implementare API route `/api/send-confirmation` ✅
+- [x] Testare invio email (ID: a5d2cd4f-a7d6-4f49-8bf8-eaf6d7f4e06c) ✅
+- [x] Integrare invio automatico nel form aggiungi partecipante ✅
+- [x] Creare pulsante 📧 reinvio email per partecipanti esistenti ✅
+- [x] Test completo end-to-end: email ricevuta correttamente ✅
+
+**Risultati:**
+- ✅ Resend configurato (free tier: 3.000 email/mese)
+- ✅ Template email professionale (gradiente nero/verde)
+- ✅ Invio automatico su registrazione partecipante
+- ✅ Sistema reinvio email funzionante
+- ✅ Email ricevuta e verificata: codice TQQ927
 
 **Benefici:**
 - Elimina necessità cartoncini fisici
 - Invio automatico codici ai partecipanti
 - Base per future notifiche automatiche
 
-**Blocca:** Comunicazioni pre-evento ai partecipanti
+**Blocca:** Comunicazioni pre-evento ai partecipanti - ORA SBLOCCATO ✅
 
 ---
 
@@ -186,7 +202,53 @@
 
 ---
 
-### 8. 🔔 Sistema Notifiche Push
+### 8. 📝 Sistema Registrazione Partecipanti ✅ COMPLETATO
+**Priorità:** ALTA
+**Scadenza:** 15/12/2025
+**Tempo stimato:** 4-5 ore
+**Status:** ✅ COMPLETATO
+**Data completamento:** 14/11/2025
+
+**Funzionalità implementate:**
+- [x] Form registrazione 2-step (verifica identità + dati contatto) ✅
+- [x] Campi: telefono, Instagram, email ✅
+- [x] Timer 10 secondi pre-conferma con avviso ✅
+- [x] Blocco modifica post-registrazione ✅
+- [x] Persistenza localStorage ✅
+- [x] Pallino rosso/verde stato registrazione per ogni utente ✅
+- [x] Colonna "Iscritto" in area privata admin ✅
+- [x] Campo `registration_completed` nel database ✅
+
+**Assets aggiunti:**
+- [x] Immagine fenice-verde-full.jpg per form ✅
+
+---
+
+### 9. 🎮 Sistema Fasi del Gioco ✅ COMPLETATO
+**Priorità:** MEDIA
+**Scadenza:** 15/12/2025
+**Tempo stimato:** 3-4 ore
+**Status:** ✅ COMPLETATO
+**Data completamento:** 17/11/2025
+
+**Fasi implementate (6 totali):**
+- [x] Fase 0: Registrazione (fino 24/01/2026) ✅
+- [x] Fase 1: Cerimonia Apertura (24/01/2026) ✅
+- [x] Fase 2: Sfide Mensili (26/01 - 25/07/2026) ✅
+- [x] Fase 3: Presentazione Classifica (26/07/2026) ✅
+- [x] Fase 4: Plot Twist Valigetta (26/07/2026 sera) ✅
+- [x] Fase 5: Festa Finale con Caccia (31/01/2027) ✅
+
+**Features:**
+- [x] Tabella `game_phases` con tutte le fasi ✅
+- [x] Tab GamePhasesTab con timeline visiva ✅
+- [x] Sistema punteggi dettagliato (indizi: 1000pt, sfide: 1200pt) ✅
+- [x] Plot twist valigetta con immagine Ezekiel ✅
+- [x] Asset ezekiel-valigetta.png aggiunto ✅
+
+---
+
+### 10. 🔔 Sistema Notifiche Push
 **Priorità:** MEDIA
 **Scadenza:** 15/12/2025
 **Tempo stimato:** 4-5 ore
@@ -402,29 +464,36 @@
 
 ## 📊 STATISTICHE AVANZAMENTO
 
-**Task Totali:** 15 macro-task
-**Completati:** 1 (Fix codici partecipanti) ✅
+**Task Totali:** 17 macro-task (2 aggiunti dopo analisi)
+**Completati:** 7 ✅
+  1. Fix codici partecipanti
+  2. Location festa confermata (Oste Divino)
+  3. Sistema email automatiche
+  4. 10 Indizi Cerimonia EVOLUZIONE
+  5. Sistema registrazione partecipanti
+  6. Sistema fasi del gioco
+  7. Chat di gruppo (base)
 **In Corso:** 0
-**Non Iniziati:** 14
+**Non Iniziati:** 10
 
-**Progress:** 6.7% completato
+**Progress:** 41% completato (era 20%)
 
-**Tempo Rimanente:** 73 giorni alla cerimonia
-**Tempo Stimato Totale:** ~60-80 ore lavoro
-**Media Richiesta:** ~1 ora/giorno
+**Tempo Rimanente:** 67 giorni alla cerimonia (24/01/2026)
+**Tempo Stimato Totale:** ~40-50 ore lavoro rimanenti
+**Media Richiesta:** ~40 min/giorno
 
 ---
 
 ## 🎯 TOP 3 PRIORITÀ IMMEDIATE
 
-### 🥇 #1 - Location Festa (16/11)
-**BLOCCA TUTTO** - Senza location non si può procedere
+### 🥇 #1 - Form Raccolta Dati Partecipanti (22/11)
+**BLOCCA COMUNICAZIONI** - Necessario per avere email/contatti di tutti i 52 partecipanti
 
-### 🥈 #2 - 9 Indizi Anagramma (20/11)
-**BLOCCA CERIMONIA** - Sono il cuore dell'evento
+### 🥈 #2 - Definire Sfida Febbraio 2026 (30/11)
+**BLOCCA PRIMA SFIDA** - Prima sfida mensile dopo la cerimonia
 
-### 🥉 #3 - Sistema Email (20/11)
-**BLOCCA COMUNICAZIONI** - Necessario per inviare codici
+### 🥉 #3 - Miglioramenti Chat di Gruppo (10/12)
+**MIGLIORA UX** - Moderazione, notifiche, reazioni
 
 ---
 
@@ -441,24 +510,86 @@
 
 ## ✅ COMPLETAMENTI RECENTI
 
+- ✅ 18/11/2025 - **Sistema Email Automatiche COMPLETATO**
+  - Resend configurato (API key + free tier 3.000/mese)
+  - Template email professionale (gradiente nero/verde)
+  - Invio automatico su registrazione partecipante
+  - Pulsante reinvio email 📧 implementato
+  - Test end-to-end: email ricevuta e verificata (codice TQQ927)
+  - Documentazione: `EMAIL_INTEGRATION_COMPLETE.md`, `TEST_EMAIL_INSTRUCTIONS.md`, `CRON_VS_ZAPIER.md`
+
+- ✅ 17/11/2025 - **Sistema Fasi del Gioco COMPLETATO**
+  - 6 fasi implementate (Registrazione → Festa Finale)
+  - Tabella `game_phases` creata
+  - Tab GamePhasesTab con timeline visiva
+  - Plot twist valigetta Ezekiel
+  - Sistema punteggi dettagliato (2.200 pt totali)
+  - Assets: ezekiel-valigetta.png
+
+- ✅ 17/11/2025 - **Ceremony Clues Sistema Globale**
+  - Stato condiviso globale (no dipendenza login)
+  - Fix persistenza colonne illuminate dopo refresh
+  - Griglia nascosta quando 10/10 indizi trovati
+  - Countdown nascosto quando finito
+  - Barra finale password EVOLUZIONE
+
+- ✅ 14/11/2025 - **10 Indizi Cerimonia COMPLETATI**
+  - ENIGMA, VULCANO, OBELISCO, LABIRINTO, UNIVERSO
+  - ZAFFIRO, IPNOSI, ORCHESTRA, NEBULOSA, ECLISSI
+  - Prime lettere formano "EVOLUZIONE"
+  - Password assegna +100pt a TUTTI i presenti
+  - Tracciamento per partecipante
+  - Griglia 10x10 illuminazione progressiva
+
+- ✅ 14/11/2025 - **Sistema Registrazione Partecipanti COMPLETATO**
+  - Form 2-step (identità + contatti)
+  - Campi: telefono, Instagram, email
+  - Timer 10 sec pre-conferma
+  - Blocco modifica post-registrazione
+  - Persistenza localStorage
+  - Pallini rosso/verde stato registrazione
+  - Asset: fenice-verde-full.jpg
+
+- ✅ 14/11/2025 - **Location festa confermata**
+  - Oste Divino, Caselle di Selvazzano
+  - €200 per 40 persone (caraffe + cicchetti)
+  - Data: 24 Gennaio 2026, ore 22:00-01:00
+
+- ✅ 14/11/2025 - **Gestione Partecipanti**
+  - Rimossi: Giulia, Francesco Colonna
+  - Aggiunto: Andrea Zotta (partner Silvia)
+  - Totale: 52 partecipanti
+
 - ✅ 12/11/2025 - Fix generazione codici partecipanti (3 lettere + 3 numeri)
 - ✅ 12/11/2025 - Aggiornamento codici per 5 partecipanti
-  - Gaia Zordan: GZ83 → BRW391
-  - Tommaso: T31 → KMQ576
-  - Enrico Geron: EG3341 → XPL824
-  - Marta Geron: MG0156 → CNV419
-  - Francesca Gasparin: FG4827 → DTH265
-- ✅ 11/11/2025 - Esecuzione script SQL su Supabase (colonne + categorie)
-- ✅ 11/11/2025 - Implementazione base chat di gruppo real-time
+- ✅ 11/11/2025 - Chat di gruppo real-time implementata
 - ✅ 11/11/2025 - Sistema login partecipanti con codici
-- ✅ 10/11/2025 - Dashboard gestione partecipanti completa
+- ✅ 10/11/2025 - Dashboard gestione partecipanti
+- ✅ 10/11/2025 - Sistema sfide mensili (13 sfide + 40 indizi)
 
 ---
 
-**📌 PROSSIMA AZIONE:** Usare `PROMPT_RICERCA_LOCALE_PADOVA.md` con Claude AI per trovare e confermare location festa entro 16/11/2025
+**📌 PROSSIMA AZIONE:** Creare Form Raccolta Dati Partecipanti entro 22/11/2025
 
 ---
 
 *Documento generato: 12 Novembre 2025*
-*Ultima modifica: 12 Novembre 2025*
+*Ultima modifica: 18 Novembre 2025 - Aggiornamento completo dopo checkup*
 *Responsabile: Matteo Zaramella*
+
+---
+
+## 📝 AGGIORNAMENTI DOCUMENTAZIONE (18/11/2025)
+
+**Checkup completo eseguito:**
+- ✅ Analizzati 10 commit GitHub (10-17 novembre)
+- ✅ Estratti tutti i completamenti non documentati
+- ✅ Aggiornate statistiche: 20% → 41% completato
+- ✅ Aggiunti 4 nuovi task completati:
+  - 10 Indizi Cerimonia EVOLUZIONE
+  - Sistema Registrazione Partecipanti
+  - Sistema Fasi del Gioco
+  - Ceremony Clues Sistema Globale
+- ✅ Aggiornate priorità immediate
+- ✅ Corretti task totali: 15 → 17
+- ✅ Aggiornati completamenti recenti (dal 10 al 18 novembre)
