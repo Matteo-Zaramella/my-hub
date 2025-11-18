@@ -160,35 +160,90 @@ export default function LandingPage() {
     }
   }
 
-  // Countdown to 25/01/2026 00:00
+  // Dynamic countdown - always points to next deadline
   useEffect(() => {
-    const targetDate = new Date('2026-01-25T00:00:00').getTime()
-    const eventStartDate = new Date('2026-01-24T00:00:00').getTime() // Event starts 24/01/2026 00:00
+    async function initializeCountdown() {
+      // Carica tutte le sfide dal database
+      const { data: challenges, error } = await supabase
+        .from('game_challenges')
+        .select('challenge_number, title, start_date, end_date')
+        .order('challenge_number', { ascending: true })
 
-    const updateCountdown = () => {
-      const now = new Date().getTime()
-      const distance = targetDate - now
-
-      // Check if event is active (between 24/01 00:00 and 25/01 00:00)
-      setIsEventActive(now >= eventStartDate && now < targetDate)
-
-      if (distance < 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      if (error) {
+        console.error('Error loading challenges:', error)
         return
       }
 
-      setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000),
-      })
+      const updateCountdown = () => {
+        const now = new Date()
+
+        // Cerimonia di apertura: 24/01/2026 → 26/01/2026 23:59
+        const ceremonyStart = new Date('2026-01-24T00:00:00')
+        const ceremonyEnd = new Date('2026-01-26T23:59:59')
+
+        let targetDate: Date | null = null
+        let eventStartDate: Date | null = null
+
+        // Se non è ancora iniziata la cerimonia
+        if (now < ceremonyStart) {
+          targetDate = ceremonyEnd
+          eventStartDate = ceremonyStart
+        }
+        // Se la cerimonia è in corso
+        else if (now >= ceremonyStart && now <= ceremonyEnd) {
+          targetDate = ceremonyEnd
+          eventStartDate = ceremonyStart
+          setIsEventActive(true)
+        }
+        // Cerimonia finita - cerca la prossima sfida
+        else {
+          // Trova la prossima sfida che deve ancora finire
+          const nextChallenge = challenges?.find(ch => {
+            const endDate = new Date(ch.end_date)
+            return now < endDate
+          })
+
+          if (nextChallenge) {
+            targetDate = new Date(nextChallenge.end_date)
+            eventStartDate = new Date(nextChallenge.start_date)
+
+            // Check if this challenge is currently active
+            setIsEventActive(now >= eventStartDate && now <= targetDate)
+          } else {
+            // Tutte le sfide sono finite
+            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+            setIsEventActive(false)
+            return
+          }
+        }
+
+        if (!targetDate) {
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+          return
+        }
+
+        const distance = targetDate.getTime() - now.getTime()
+
+        if (distance < 0) {
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+          return
+        }
+
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        })
+      }
+
+      updateCountdown()
+      const interval = setInterval(updateCountdown, 1000)
+
+      return () => clearInterval(interval)
     }
 
-    updateCountdown()
-    const interval = setInterval(updateCountdown, 1000)
-
-    return () => clearInterval(interval)
+    initializeCountdown()
   }, [])
 
   // Create grid of circles (10x10)

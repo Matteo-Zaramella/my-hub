@@ -342,7 +342,7 @@ export default function GameAreaWithChat() {
         {/* Chat Tab */}
         {activeTab === 'chat' && (
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden">
-            <div className="h-[calc(100vh-280px)] md:h-[600px] flex flex-col">
+            <div className="h-[calc(100vh-200px)] md:h-[700px] lg:h-[750px] flex flex-col">
               <GroupChat participant={participant} />
             </div>
           </div>

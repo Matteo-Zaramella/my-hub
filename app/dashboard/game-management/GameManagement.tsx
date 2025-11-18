@@ -7,6 +7,7 @@ import ParticipantsTab from './ParticipantsTab'
 import ChecklistTab from './ChecklistTab'
 import GamePhasesTab from './GamePhasesTab'
 import SettingsTab from './SettingsTab'
+import GameAreaControlTab from './GameAreaControlTab'
 
 interface GameConfig {
   id: number
@@ -44,7 +45,18 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases' | 'settings'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases' | 'settings' | 'gamearea'>('ceremony')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const menuItems = [
+    { id: 'ceremony' as const, icon: '🎉', label: 'Cerimonia Apertura' },
+    { id: 'challenges' as const, icon: '🎯', label: 'Sfide Mensili' },
+    { id: 'participants' as const, icon: '👥', label: 'Partecipanti' },
+    { id: 'checklist' as const, icon: '✅', label: 'Checklist' },
+    { id: 'phases' as const, icon: '🎯', label: 'Fasi del Gioco' },
+    { id: 'settings' as const, icon: '⚙️', label: 'Impostazioni' },
+    { id: 'gamearea' as const, icon: '🎮', label: 'Area di Gioco' },
+  ]
 
   return (
     <div className="space-y-6">
@@ -77,77 +89,69 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/10 overflow-x-auto">
+      {/* Main Layout with Sidebar */}
+      <div className="flex gap-6 relative">
+        {/* Mobile Menu Toggle */}
         <button
-          onClick={() => setActiveTab('ceremony')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'ceremony'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="lg:hidden fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition"
         >
-          🎉 Cerimonia Apertura
+          {sidebarOpen ? '✕' : '☰'}
         </button>
-        <button
-          onClick={() => setActiveTab('challenges')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'challenges'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
-        >
-          🎯 Sfide Mensili
-        </button>
-        <button
-          onClick={() => setActiveTab('participants')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'participants'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
-        >
-          👥 Partecipanti
-        </button>
-        <button
-          onClick={() => setActiveTab('checklist')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'checklist'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
-        >
-          ✅ Checklist
-        </button>
-        <button
-          onClick={() => setActiveTab('phases')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'phases'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
-        >
-          🎯 Fasi del Gioco
-        </button>
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`px-6 py-3 font-medium transition whitespace-nowrap ${
-            activeTab === 'settings'
-              ? 'text-white border-b-2 border-white'
-              : 'text-white/60 hover:text-white'
-          }`}
-        >
-          ⚙️ Impostazioni
-        </button>
-      </div>
 
-      {/* Content */}
-      {activeTab === 'ceremony' && <OpeningCeremonyClues />}
-      {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
-      {activeTab === 'participants' && <ParticipantsTab />}
-      {activeTab === 'checklist' && <ChecklistTab />}
-      {activeTab === 'phases' && <GamePhasesTab />}
-      {activeTab === 'settings' && <SettingsTab />}
+        {/* Sidebar */}
+        <aside
+          className={`
+            fixed lg:sticky top-0 left-0 h-screen lg:h-auto
+            w-64 bg-white/5 border border-white/10 rounded-xl p-4
+            transition-transform duration-300 z-40
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}
+        >
+          <nav className="space-y-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setSidebarOpen(false)
+                }}
+                className={`
+                  w-full flex items-center gap-3 px-4 py-3 rounded-lg
+                  font-medium transition text-left
+                  ${
+                    activeTab === item.id
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
+                      : 'text-white/60 hover:bg-white/10 hover:text-white'
+                  }
+                `}
+              >
+                <span className="text-xl">{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Backdrop for mobile */}
+        {sidebarOpen && (
+          <div
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          />
+        )}
+
+        {/* Content */}
+        <main className="flex-1 min-w-0">
+          {activeTab === 'ceremony' && <OpeningCeremonyClues />}
+          {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
+          {activeTab === 'participants' && <ParticipantsTab />}
+          {activeTab === 'checklist' && <ChecklistTab />}
+          {activeTab === 'phases' && <GamePhasesTab />}
+          {activeTab === 'settings' && <SettingsTab />}
+          {activeTab === 'gamearea' && <GameAreaControlTab />}
+        </main>
+      </div>
     </div>
   )
 }

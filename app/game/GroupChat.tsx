@@ -133,27 +133,8 @@ export default function GroupChat({ participant }: GroupChatProps) {
       )
       .subscribe()
 
-    // Setup presence channel for online users
-    presenceChannelRef.current = supabase
-      .channel('game-chat-presence')
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannelRef.current?.presenceState()
-        const count = state ? Object.keys(state).length : 0
-        setOnlineCount(count)
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannelRef.current?.track({
-            participant_id: participant.id,
-            participant_code: participant.participant_code,
-            participant_name: participant.participant_name,
-            online_at: new Date().toISOString(),
-          })
-        }
-      })
-
-    // Update presence every 30 seconds
-    heartbeatIntervalRef.current = setInterval(async () => {
+    // Update presence every 30 seconds in database
+    const updatePresence = async () => {
       await supabase
         .from('game_chat_presence')
         .upsert({
@@ -162,7 +143,48 @@ export default function GroupChat({ participant }: GroupChatProps) {
           participant_name: participant.participant_name,
           last_seen_at: new Date().toISOString(),
         })
-    }, 30000)
+    }
+
+    // Initial presence update
+    updatePresence()
+
+    // Update presence every 30 seconds
+    heartbeatIntervalRef.current = setInterval(updatePresence, 30000)
+
+    // Count unique online users from database (last seen < 2 minutes)
+    const updateOnlineCount = async () => {
+      const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+      const { data, error } = await supabase
+        .from('game_chat_presence')
+        .select('participant_id', { count: 'exact', head: false })
+        .gte('last_seen_at', twoMinutesAgo)
+
+      if (!error && data) {
+        setOnlineCount(data.length)
+      }
+    }
+
+    // Initial count
+    updateOnlineCount()
+
+    // Update count every 10 seconds
+    const countInterval = setInterval(updateOnlineCount, 10000)
+
+    // Subscribe to presence changes
+    presenceChannelRef.current = supabase
+      .channel('game-chat-presence-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'game_chat_presence',
+        },
+        () => {
+          updateOnlineCount()
+        }
+      )
+      .subscribe()
 
     return () => {
       channelRef.current?.unsubscribe()
@@ -170,6 +192,7 @@ export default function GroupChat({ participant }: GroupChatProps) {
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current)
       }
+      clearInterval(countInterval)
     }
   }, [])
 
@@ -331,6 +354,11 @@ export default function GroupChat({ participant }: GroupChatProps) {
     )
   }
 
+  // Get latest system message
+  const latestSystemMessage = messages
+    .filter(m => m.is_system_message)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+
   return (
     <div className="flex flex-col h-full">
       {/* Header with online users */}
@@ -351,28 +379,51 @@ export default function GroupChat({ participant }: GroupChatProps) {
         </div>
       </div>
 
+      {/* Pinned System Message */}
+      {latestSystemMessage && (
+        <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b border-blue-500/30 p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 mt-1">
+              <div className="w-8 h-8 rounded-full bg-blue-500/30 border border-blue-400/50 flex items-center justify-center">
+                📢
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-semibold text-blue-300 uppercase tracking-wide">
+                  Messaggio di Sistema
+                </span>
+                <span className="text-xs text-white/40">
+                  {formatTime(latestSystemMessage.created_at)}
+                </span>
+              </div>
+              <p className="text-white/90 text-sm leading-relaxed break-words">
+                {latestSystemMessage.message}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
+        {messages.filter(m => !m.is_system_message).length === 0 ? (
           <div className="text-center text-white/50 py-8">
             <p className="text-lg">Nessun messaggio ancora.</p>
             <p className="text-sm mt-2">Sii il primo a scrivere!</p>
           </div>
         ) : (
-          messages.map((msg) => {
+          messages
+            .filter(m => !m.is_system_message) // Show only user messages
+            .map((msg) => {
             const isOwnMessage = msg.participant_id === participant.id
-            const isSystemMessage = msg.is_system_message
 
             return (
               <div
                 key={msg.id}
-                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} ${isSystemMessage ? 'justify-center' : ''}`}
+                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
               >
-                {isSystemMessage ? (
-                  <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg px-4 py-2 text-sm text-blue-300 text-center max-w-md">
-                    {msg.message}
-                  </div>
-                ) : (
+                {(
                   <div className="flex flex-col gap-1">
                     <div
                       className={`max-w-xs md:max-w-md ${isOwnMessage ? 'bg-purple-600/80' : 'bg-white/10'} backdrop-blur-sm rounded-2xl px-4 py-3 border ${isOwnMessage ? 'border-purple-500/30' : 'border-white/20'}`}
