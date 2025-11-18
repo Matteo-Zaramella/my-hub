@@ -15,12 +15,12 @@ const CHECKLIST_DATA: ChecklistItem[] = [
   // ✅ COMPLETATI
   { id: '0', text: '✅ Fix generazione codici partecipanti (3 lettere + 3 numeri)', completed: true, category: 'Tecnico' },
   { id: '00', text: '✅ Aggiornamento codici 5 partecipanti (Gaia, Tommaso, Enrico, Marta, Francesca)', completed: true, category: 'Tecnico' },
+  { id: '8', text: '✅ Creati 10 indizi anagramma EVOLUZIONE', completed: true, category: 'Cerimonia' },
+  { id: '35', text: '✅ Setup sistema email automatiche (Resend + template)', completed: true, category: 'Tecnico' },
+  { id: '36', text: '✅ Form registrazione partecipanti integrato', completed: true, category: 'Partecipanti' },
 
   // 🔴 URGENTE - Scadenza: 16/11/2025
-  { id: '1', text: 'Confermare location festa a Padova', completed: false, category: 'Location', priority: 'urgent', deadline: '16/11' },
-  { id: '8', text: 'Creare 9 indizi anagramma EVOLUZIONE mancanti (1/10 fatto)', completed: false, category: 'Cerimonia', priority: 'urgent', deadline: '20/11' },
-  { id: '35', text: 'Setup sistema email automatiche (Resend + template)', completed: false, category: 'Tecnico', priority: 'urgent', deadline: '20/11' },
-  { id: '36', text: 'Creare form raccolta dati partecipanti (Google Forms)', completed: false, category: 'Partecipanti', priority: 'urgent', deadline: '22/11' },
+  { id: '1', text: 'Confermare location festa a Padova (in attesa - preparazione invariata)', completed: false, category: 'Location', priority: 'low', deadline: '20/01' },
 
   // 🟡 ALTA PRIORITÀ - Scadenza: 30/11/2025
   { id: '11', text: 'Sfida Febbraio: definire tipo, location, 3 indizi (21-22/02)', completed: false, category: 'Sfide', priority: 'high', deadline: '30/11' },

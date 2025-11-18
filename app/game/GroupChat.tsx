@@ -14,6 +14,14 @@ interface Message {
   created_at: string
 }
 
+interface Reaction {
+  id: number
+  message_id: number
+  participant_id: number
+  participant_code: string
+  emoji: string
+}
+
 interface GroupChatProps {
   participant: {
     id: number
@@ -24,13 +32,21 @@ interface GroupChatProps {
 
 export default function GroupChat({ participant }: GroupChatProps) {
   const [messages, setMessages] = useState<Message[]>([])
+  const [reactions, setReactions] = useState<Reaction[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [onlineCount, setOnlineCount] = useState(0)
+  const [canSendMessage, setCanSendMessage] = useState(true)
+  const [cooldownSeconds, setCooldownSeconds] = useState(0)
+  const [showEmojiPicker, setShowEmojiPicker] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const channelRef = useRef<RealtimeChannel | null>(null)
+  const presenceChannelRef = useRef<RealtimeChannel | null>(null)
+  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const supabase = createClient()
+
+  const AVAILABLE_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👏']
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
@@ -41,26 +57,45 @@ export default function GroupChat({ participant }: GroupChatProps) {
     scrollToBottom()
   }, [messages])
 
-  // Load messages and setup realtime
+  // Load messages, reactions and setup realtime
   useEffect(() => {
-    const loadMessages = async () => {
-      const { data, error } = await supabase
+    const loadData = async () => {
+      // Load messages
+      const { data: messagesData, error: messagesError } = await supabase
         .from('game_chat_messages_v2')
         .select('*')
         .order('created_at', { ascending: true })
         .limit(100)
 
-      if (error) {
-        console.error('Error loading messages:', error)
-      } else if (data) {
-        setMessages(data)
+      if (messagesError) {
+        console.error('Error loading messages:', messagesError)
+      } else if (messagesData) {
+        setMessages(messagesData)
       }
+
+      // Load reactions
+      const { data: reactionsData, error: reactionsError } = await supabase
+        .from('game_chat_reactions')
+        .select('*')
+
+      if (reactionsError) {
+        console.error('Error loading reactions:', reactionsError)
+      } else if (reactionsData) {
+        setReactions(reactionsData)
+      }
+
+      // Check rate limit
+      await checkRateLimit()
+
+      // Run cleanup function
+      await supabase.rpc('cleanup_old_chat_messages')
+
       setLoading(false)
     }
 
-    loadMessages()
+    loadData()
 
-    // Setup realtime subscription
+    // Setup realtime subscription for messages
     channelRef.current = supabase
       .channel('game-chat-v2')
       .on(
@@ -74,20 +109,158 @@ export default function GroupChat({ participant }: GroupChatProps) {
           setMessages((prev) => [...prev, payload.new as Message])
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'game_chat_reactions',
+        },
+        (payload) => {
+          setReactions((prev) => [...prev, payload.new as Reaction])
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'game_chat_reactions',
+        },
+        (payload) => {
+          setReactions((prev) => prev.filter(r => r.id !== payload.old.id))
+        }
+      )
       .subscribe()
+
+    // Setup presence channel for online users
+    presenceChannelRef.current = supabase
+      .channel('game-chat-presence')
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannelRef.current?.presenceState()
+        const count = state ? Object.keys(state).length : 0
+        setOnlineCount(count)
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannelRef.current?.track({
+            participant_id: participant.id,
+            participant_code: participant.participant_code,
+            participant_name: participant.participant_name,
+            online_at: new Date().toISOString(),
+          })
+        }
+      })
+
+    // Update presence every 30 seconds
+    heartbeatIntervalRef.current = setInterval(async () => {
+      await supabase
+        .from('game_chat_presence')
+        .upsert({
+          participant_id: participant.id,
+          participant_code: participant.participant_code,
+          participant_name: participant.participant_name,
+          last_seen_at: new Date().toISOString(),
+        })
+    }, 30000)
 
     return () => {
       channelRef.current?.unsubscribe()
+      presenceChannelRef.current?.unsubscribe()
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current)
+      }
     }
   }, [])
 
+  // Check rate limit
+  const checkRateLimit = async () => {
+    const { data } = await supabase
+      .from('game_chat_rate_limit')
+      .select('last_message_at')
+      .eq('participant_id', participant.id)
+      .single()
+
+    if (data) {
+      const lastMessageTime = new Date(data.last_message_at).getTime()
+      const now = new Date().getTime()
+      const diffSeconds = Math.floor((now - lastMessageTime) / 1000)
+
+      if (diffSeconds < 10) {
+        setCanSendMessage(false)
+        setCooldownSeconds(10 - diffSeconds)
+
+        // Start countdown
+        const interval = setInterval(() => {
+          setCooldownSeconds((prev) => {
+            if (prev <= 1) {
+              clearInterval(interval)
+              setCanSendMessage(true)
+              return 0
+            }
+            return prev - 1
+          })
+        }, 1000)
+      }
+    }
+  }
+
+  // Add reaction to message
+  const addReaction = async (messageId: number, emoji: string) => {
+    // Check if user already reacted with this emoji
+    const existingReaction = reactions.find(
+      r => r.message_id === messageId &&
+           r.participant_id === participant.id &&
+           r.emoji === emoji
+    )
+
+    if (existingReaction) {
+      // Remove reaction
+      await supabase
+        .from('game_chat_reactions')
+        .delete()
+        .eq('id', existingReaction.id)
+    } else {
+      // Add reaction
+      await supabase
+        .from('game_chat_reactions')
+        .insert({
+          message_id: messageId,
+          participant_id: participant.id,
+          participant_code: participant.participant_code,
+          emoji,
+        })
+    }
+
+    setShowEmojiPicker(null)
+  }
+
+  // Get reactions for a message
+  const getMessageReactions = (messageId: number) => {
+    const messageReactions = reactions.filter(r => r.message_id === messageId)
+    const grouped = messageReactions.reduce((acc, reaction) => {
+      if (!acc[reaction.emoji]) {
+        acc[reaction.emoji] = []
+      }
+      acc[reaction.emoji].push(reaction)
+      return acc
+    }, {} as Record<string, Reaction[]>)
+
+    return Object.entries(grouped).map(([emoji, reactionsList]) => ({
+      emoji,
+      count: reactionsList.length,
+      hasReacted: reactionsList.some(r => r.participant_id === participant.id),
+    }))
+  }
+
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newMessage.trim() || sending) return
+    if (!newMessage.trim() || sending || !canSendMessage) return
 
     setSending(true)
 
     try {
+      // Insert message
       const { error } = await supabase.from('game_chat_messages_v2').insert({
         participant_id: participant.id,
         participant_name: participant.participant_name,
@@ -98,7 +271,30 @@ export default function GroupChat({ participant }: GroupChatProps) {
 
       if (error) throw error
 
+      // Update rate limit
+      await supabase
+        .from('game_chat_rate_limit')
+        .upsert({
+          participant_id: participant.id,
+          last_message_at: new Date().toISOString(),
+        })
+
       setNewMessage('')
+
+      // Start cooldown
+      setCanSendMessage(false)
+      setCooldownSeconds(10)
+
+      const interval = setInterval(() => {
+        setCooldownSeconds((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval)
+            setCanSendMessage(true)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
     } catch (error) {
       console.error('Error sending message:', error)
       alert('Errore durante l\'invio del messaggio')
@@ -143,9 +339,14 @@ export default function GroupChat({ participant }: GroupChatProps) {
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             💬 Chat di Gruppo
           </h2>
-          <div className="flex items-center gap-2 text-sm text-white/70">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>{messages.length} messaggi</span>
+          <div className="flex items-center gap-4 text-sm text-white/70">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>{onlineCount} online</span>
+            </div>
+            <div className="text-white/50">
+              {messages.length} messaggi
+            </div>
           </div>
         </div>
       </div>
@@ -172,20 +373,65 @@ export default function GroupChat({ participant }: GroupChatProps) {
                     {msg.message}
                   </div>
                 ) : (
-                  <div
-                    className={`max-w-xs md:max-w-md ${isOwnMessage ? 'bg-purple-600/80' : 'bg-white/10'} backdrop-blur-sm rounded-2xl px-4 py-3 border ${isOwnMessage ? 'border-purple-500/30' : 'border-white/20'}`}
-                  >
-                    {!isOwnMessage && (
-                      <div className="text-xs font-semibold text-white/70 mb-1">
-                        {msg.participant_name}
+                  <div className="flex flex-col gap-1">
+                    <div
+                      className={`max-w-xs md:max-w-md ${isOwnMessage ? 'bg-purple-600/80' : 'bg-white/10'} backdrop-blur-sm rounded-2xl px-4 py-3 border ${isOwnMessage ? 'border-purple-500/30' : 'border-white/20'}`}
+                    >
+                      {!isOwnMessage && (
+                        <div className="text-xs font-semibold text-white/70 mb-1">
+                          {msg.participant_name}
+                        </div>
+                      )}
+                      <div className="text-white break-words">{msg.message}</div>
+                      <div className="flex items-center justify-between mt-1">
+                        <div
+                          className={`text-xs ${isOwnMessage ? 'text-purple-200' : 'text-white/50'}`}
+                        >
+                          {formatTime(msg.created_at)}
+                        </div>
+                        <button
+                          onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                          className="text-xs text-white/40 hover:text-white/80 transition"
+                        >
+                          😀
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Reactions */}
+                    {getMessageReactions(msg.id).length > 0 && (
+                      <div className={`flex flex-wrap gap-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        {getMessageReactions(msg.id).map((reaction) => (
+                          <button
+                            key={reaction.emoji}
+                            onClick={() => addReaction(msg.id, reaction.emoji)}
+                            className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 transition ${
+                              reaction.hasReacted
+                                ? 'bg-purple-500/30 border border-purple-400/50'
+                                : 'bg-white/10 border border-white/20 hover:bg-white/20'
+                            }`}
+                          >
+                            <span>{reaction.emoji}</span>
+                            <span className="text-white/70">{reaction.count}</span>
+                          </button>
+                        ))}
                       </div>
                     )}
-                    <div className="text-white break-words">{msg.message}</div>
-                    <div
-                      className={`text-xs mt-1 ${isOwnMessage ? 'text-purple-200' : 'text-white/50'}`}
-                    >
-                      {formatTime(msg.created_at)}
-                    </div>
+
+                    {/* Emoji Picker */}
+                    {showEmojiPicker === msg.id && (
+                      <div className={`flex flex-wrap gap-1 p-2 bg-white/10 border border-white/20 rounded-lg ${isOwnMessage ? 'self-end' : 'self-start'}`}>
+                        {AVAILABLE_EMOJIS.map((emoji) => (
+                          <button
+                            key={emoji}
+                            onClick={() => addReaction(msg.id, emoji)}
+                            className="text-xl hover:scale-125 transition-transform"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -197,24 +443,32 @@ export default function GroupChat({ participant }: GroupChatProps) {
 
       {/* Input Form */}
       <div className="border-t border-white/10 p-4">
+        {!canSendMessage && cooldownSeconds > 0 && (
+          <div className="mb-2 text-center text-sm text-yellow-400">
+            ⏱️ Attendi {cooldownSeconds}s prima di inviare un altro messaggio
+          </div>
+        )}
         <form onSubmit={sendMessage} className="flex gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Scrivi un messaggio..."
-            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            disabled={sending}
+            placeholder={canSendMessage ? "Scrivi un messaggio..." : `Attendi ${cooldownSeconds}s...`}
+            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+            disabled={sending || !canSendMessage}
             maxLength={500}
           />
           <button
             type="submit"
-            disabled={!newMessage.trim() || sending}
+            disabled={!newMessage.trim() || sending || !canSendMessage}
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {sending ? '...' : '📤'}
+            {sending ? '...' : !canSendMessage ? `⏱️ ${cooldownSeconds}` : '📤'}
           </button>
         </form>
+        <div className="mt-2 text-xs text-white/40 text-center">
+          {newMessage.length}/500 caratteri
+        </div>
       </div>
     </div>
   )
