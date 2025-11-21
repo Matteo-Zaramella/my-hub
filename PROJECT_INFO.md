@@ -1,7 +1,7 @@
-# The Game - Project Information
+# Il Castello di Zara - Project Information
 
 ## Overview
-The Game è un gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027) con sfide mensili, indizi progressivi e una cerimonia di apertura speciale.
+Il Castello di Zara è un gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027) con sfide mensili, indizi progressivi e una cerimonia di apertura speciale.
 
 ## Key Dates
 
@@ -84,7 +84,7 @@ The Game è un gioco interattivo della durata di un anno (24/01/2026 - 24/01/202
 
 #### Struttura suggerita della cartella:
 ```
-/The Game 2026-2027
+/Il Castello di Zara 2026-2027
 ├── /Assets
 │   ├── /Immagini
 │   │   ├── /Cerimonia_Apertura

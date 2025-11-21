@@ -30,7 +30,7 @@ async function testEmail() {
     const { data, error } = await resend.emails.send({
       from: 'My Hub <onboarding@resend.dev>',
       to: 'matteo.zaramella2002@gmail.com',
-      subject: '🧪 Test Email - The Game',
+      subject: '🧪 Test Email - Il Castello di Zara',
       html: `
         <!DOCTYPE html>
         <html>
@@ -133,7 +133,7 @@ async function testEmail() {
               </p>
 
               <div class="footer">
-                <p>My Hub · The Game</p>
+                <p>My Hub · Il Castello di Zara</p>
                 <p>Email di test inviata il ${new Date().toLocaleString('it-IT')}</p>
               </div>
             </div>

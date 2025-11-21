@@ -362,7 +362,7 @@ git push
 ---
 
 **Creato da:** Claude Code
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Session Duration:** ~2 ore
 **Status:** ✅ Ottime basi gettate, pronto per esecuzione domani!
 

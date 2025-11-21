@@ -7,7 +7,7 @@
 
 ## 📝 Cosa fa questo script?
 
-Questo script completo configura tutto il database necessario per The Game:
+Questo script completo configura tutto il database necessario per Il Castello di Zara:
 
 ### Fix Critici
 - ✅ Aggiunge colonna `note` in `workout_sessions` (BLOCCANTE - il codice la richiede)
@@ -324,5 +324,5 @@ Fornisci queste informazioni per assistenza rapida.
 ---
 
 **Creato da:** Claude Code
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Database:** Supabase (wuvuapmjclahbmngntku)

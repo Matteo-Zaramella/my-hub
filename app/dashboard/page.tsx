@@ -55,7 +55,7 @@ export default async function DashboardPage() {
               <div className="flex items-center gap-4 mb-4">
                 <div className="text-4xl">🎮</div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">The Game</h2>
+                  <h2 className="text-xl font-bold text-gray-800">Il Castello di Zara</h2>
                   <p className="text-sm text-gray-500">Gestione sfide</p>
                 </div>
               </div>

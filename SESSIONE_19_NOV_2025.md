@@ -15,7 +15,7 @@
 **Contenuto completo:**
 - ✅ Struttura form con 8 domande (pronte per copia-incolla)
 - ✅ Validazioni e impostazioni form
-- ✅ Configurazione tema personalizzato (verde The Game)
+- ✅ Configurazione tema personalizzato (verde Il Castello di Zara)
 - ✅ Sistema tracking 13 partecipanti prioritari
 - ✅ Istruzioni export Google Sheets
 - ✅ Piano import dati in Supabase
@@ -408,4 +408,4 @@ Il gioco inizia tra 66 giorni. Ogni task completato è un passo verso il success
 
 ---
 
-✨ **THE GAME IS GETTING REAL** ✨
+✨ **IL CASTELLO DI ZARA IS GETTING REAL** ✨

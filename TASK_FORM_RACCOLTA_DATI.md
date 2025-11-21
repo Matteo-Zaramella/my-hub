@@ -8,7 +8,7 @@
 
 ## 🎯 Obiettivo
 
-Creare un modulo pubblico per raccogliere e confermare i dati di contatto dei partecipanti a "The Game", utilizzabile sia per i 52 partecipanti esistenti che per futuri nuovi iscritti.
+Creare un modulo pubblico per raccogliere e confermare i dati di contatto dei partecipanti a "Il Castello di Zara", utilizzabile sia per i 52 partecipanti esistenti che per futuri nuovi iscritti.
 
 ---
 
@@ -168,7 +168,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-bold mb-6">Conferma Partecipazione - The Game</h1>
+        <h1 className="text-2xl font-bold mb-6">Conferma Partecipazione - Il Castello di Zara</h1>
 
         {success ? (
           <div className="text-green-600">
@@ -202,11 +202,11 @@ export default function RegisterPage() {
 ### Email Template
 
 ```
-Oggetto: Conferma i tuoi dati per The Game 🎮
+Oggetto: Conferma i tuoi dati per Il Castello di Zara 🎮
 
 Ciao [Nome],
 
-Sei stato invitato a partecipare a "The Game", un gioco interattivo della durata di un anno con sfide mensili e premi!
+Sei stato invitato a partecipare a "Il Castello di Zara", un gioco interattivo della durata di un anno con sfide mensili e premi!
 
 🎯 PROSSIMI PASSI:
 

@@ -1,7 +1,7 @@
 # Import Game Participants
 
 ## Overview
-This directory contains scripts to import participants for The Game.
+This directory contains scripts to import participants for Il Castello di Zara.
 
 ## Files
 - `import_participants.py` - Original v2.0 script (53 participants)

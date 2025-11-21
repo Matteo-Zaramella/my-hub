@@ -353,7 +353,7 @@ Milestone prossima: Form Raccolta Dati (22/11)
 - [ ] Preparazione location fisica
 
 ### 24 Gennaio 2026 🎉
-- [ ] **CERIMONIA APERTURA THE GAME**
+- [ ] **CERIMONIA APERTURA IL CASTELLO DI ZARA**
 
 ---
 
@@ -385,4 +385,4 @@ Milestone prossima: Form Raccolta Dati (22/11)
 
 ---
 
-🎮 **THE GAME IS REAL. THE GAME IS READY.** 🎮
+🎮 **IL CASTELLO DI ZARA IS REAL. IL CASTELLO DI ZARA IS READY.** 🎮

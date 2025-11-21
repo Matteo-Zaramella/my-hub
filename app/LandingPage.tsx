@@ -279,7 +279,7 @@ export default function LandingPage() {
 
     // If event is active and not all clues found, check if input is a clue
     // TEMPORANEO: Rimossa restrizione temporale per testing
-    if (cluesFound < 10) {
+    if (cluesFound < 10 && ceremonyActive) {
       // Trova l'indizio corrispondente
       const foundClue = ceremonyClues.find(clue => clue.word === input)
 

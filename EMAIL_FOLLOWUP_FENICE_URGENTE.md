@@ -28,7 +28,7 @@ Comprendo che possiate essere molto impegnati, ma ho bisogno di alcune informazi
 
 📋 RIEPILOGO SITUAZIONE
 
-Evento: Cerimonia apertura "The Game"
+Evento: Cerimonia apertura "Il Castello di Zara"
 Data richiesta: Venerdì 24 Gennaio 2026
 Orario: 18:00 - 23:00 (uscita 01:30)
 Partecipanti: 50 persone (età 20-30 anni)

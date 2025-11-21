@@ -1,7 +1,7 @@
 # 📧 Email Template - Invio Form Conferma Partecipazione
 
 **Data:** 19 Novembre 2025
-**Destinatari:** 52 partecipanti The Game
+**Destinatari:** 52 partecipanti Il Castello di Zara
 **Scadenza risposta:** 15 Gennaio 2026
 
 ---
@@ -10,14 +10,14 @@
 
 ### Oggetto
 ```
-🎮 The Game - Conferma la tua partecipazione entro il 15/01
+🎮 Il Castello di Zara - Conferma la tua partecipazione entro il 15/01
 ```
 
 ### Corpo Email
 ```
 Ciao [NOME],
 
-Sei tra i 52 partecipanti selezionati per "The Game", il gioco interattivo della durata di un anno!
+Sei tra i 52 partecipanti selezionati per "Il Castello di Zara", il gioco interattivo della durata di un anno!
 
 🎯 COSA TI ASPETTA:
 • 12 sfide mensili dal Febbraio 2026 a Gennaio 2027
@@ -46,7 +46,7 @@ Sei tra i 52 partecipanti selezionati per "The Game", il gioco interattivo della
 ⏰ SCADENZA FORM: 15 Gennaio 2026
 
 💡 DETTAGLI SUL GIOCO:
-The Game è un'esperienza interattiva della durata di un anno dove ogni mese
+Il Castello di Zara è un'esperienza interattiva della durata di un anno dove ogni mese
 dovrai risolvere indizi nascosti in luoghi fisici della zona di Padova.
 Accumula punti trovando gli indizi e completando le sfide mensili.
 
@@ -61,7 +61,7 @@ Ci vediamo il 24 Gennaio per l'apertura ufficiale! 🎉
 
 A presto,
 Matteo Zaramella
-Organizzatore The Game
+Organizzatore Il Castello di Zara
 
 ---
 P.S. Condividi pure l'entusiasmo sui social, ma NON spoilerare indizi
@@ -74,14 +74,14 @@ o soluzioni quando il gioco inizierà! 😉
 
 ### Oggetto
 ```
-⏰ Reminder: Conferma partecipazione a The Game
+⏰ Reminder: Conferma partecipazione a Il Castello di Zara
 ```
 
 ### Corpo Email
 ```
 Ciao [NOME],
 
-Ti ricordo che mancano 50 giorni alla cerimonia di apertura di The Game
+Ti ricordo che mancano 50 giorni alla cerimonia di apertura di Il Castello di Zara
 e ho ancora bisogno della tua conferma!
 
 Se hai già compilato il form, ignora questo messaggio.
@@ -104,14 +104,14 @@ Matteo
 
 ### Oggetto
 ```
-🎮 The Game - Mancano 45 giorni! Conferma ora
+🎮 Il Castello di Zara - Mancano 45 giorni! Conferma ora
 ```
 
 ### Corpo Email
 ```
 Ciao [NOME],
 
-The Game sta per iniziare! Mancano solo 45 giorni alla cerimonia di apertura.
+Il Castello di Zara sta per iniziare! Mancano solo 45 giorni alla cerimonia di apertura.
 
 Ho notato che non hai ancora confermato la tua partecipazione.
 
@@ -132,7 +132,7 @@ Matteo
 
 ### Oggetto
 ```
-⚠️ URGENTE: The Game - Conferma entro il 15/01
+⚠️ URGENTE: Il Castello di Zara - Conferma entro il 15/01
 ```
 
 ### Corpo Email
@@ -140,7 +140,7 @@ Matteo
 Ciao [NOME],
 
 Questo è un reminder importante: mancano solo 19 giorni alla scadenza
-per confermare la tua partecipazione a The Game!
+per confermare la tua partecipazione a Il Castello di Zara!
 
 Dopo il 15 Gennaio non sarà più possibile iscriversi.
 
@@ -163,7 +163,7 @@ Matteo
 
 ### Oggetto
 ```
-🚨 ULTIMO APPELLO: The Game - 5 giorni alla scadenza!
+🚨 ULTIMO APPELLO: Il Castello di Zara - 5 giorni alla scadenza!
 ```
 
 ### Corpo Email
@@ -171,7 +171,7 @@ Matteo
 Ciao [NOME],
 
 ATTENZIONE: Mancano solo 5 GIORNI alla scadenza per confermare
-la tua partecipazione a The Game!
+la tua partecipazione a Il Castello di Zara!
 
 Dopo il 15 Gennaio (mercoledì prossimo) non sarà più possibile
 iscriversi e perderai l'opportunità di partecipare al gioco.
@@ -202,7 +202,7 @@ Matteo Zaramella
 ```
 Ciao [NOME]! 👋
 
-Sei invitato a The Game, un gioco interattivo di un anno con
+Sei invitato a Il Castello di Zara, un gioco interattivo di un anno con
 sfide mensili e premio finale da 1.000€!
 
 Cerimonia apertura: 24/01/2026 ore 22:00 a Selvazzano (PD)
@@ -224,7 +224,7 @@ Matteo
 ```
 Hey [NOME]! 🎮
 
-Ti ho aggiunto alla lista dei 52 partecipanti di The Game!
+Ti ho aggiunto alla lista dei 52 partecipanti di Il Castello di Zara!
 
 È un gioco interattivo che dura un anno con:
 ✨ Sfide mensili
@@ -301,7 +301,7 @@ Legenda:
 ### Testo Privacy da Aggiungere
 ```
 I tuoi dati (email, telefono, Instagram) saranno utilizzati
-ESCLUSIVAMENTE per la gestione di The Game e non saranno mai
+ESCLUSIVAMENTE per la gestione di Il Castello di Zara e non saranno mai
 condivisi con terze parti. Potrai richiedere la cancellazione
 in qualsiasi momento scrivendo a matteo.zaramella2002@gmail.com
 ```
@@ -366,7 +366,7 @@ in qualsiasi momento scrivendo a matteo.zaramella2002@gmail.com
 ## 📞 Script per Chiamata Telefonica (se necessario)
 
 ```
-"Ciao [NOME], sono Matteo! Ti ho inviato un'email su The Game,
+"Ciao [NOME], sono Matteo! Ti ho inviato un'email su Il Castello di Zara,
 un gioco interattivo che organizzo con 52 partecipanti.
 L'hai ricevuta?"
 

@@ -8,7 +8,7 @@
 
 ## 🎯 Obiettivo
 
-Implementare un sistema di chat di gruppo per "The Game" che si attiva automaticamente il **26 Gennaio 2026 alle ore 00:00**, permettendo ai 52 partecipanti di comunicare in tempo reale.
+Implementare un sistema di chat di gruppo per "Il Castello di Zara" che si attiva automaticamente il **26 Gennaio 2026 alle ore 00:00**, permettendo ai 52 partecipanti di comunicare in tempo reale.
 
 ---
 
@@ -70,8 +70,8 @@ Pagina successo password con:
 ### 3. Configurazione & Metadata
 
 #### **`app/layout.tsx`** (Aggiornato)
-- ✅ Titolo pagina: "The Game - Matteo Zaramella"
-- ✅ Description: "The Game 2026-2027 - Un anno di sfide, indizi e divertimento"
+- ✅ Titolo pagina: "Il Castello di Zara - Matteo Zaramella"
+- ✅ Description: "Il Castello di Zara 2026-2027 - Un anno di sfide, indizi e divertimento"
 
 ### 4. Documentazione - 4 File
 
@@ -385,7 +385,7 @@ app/
 
 **Implementato da:** Claude Code
 **Data:** 11 Novembre 2025
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Versione:** 1.0.0
 
 🚀 **Pronto per il test!** 🚀

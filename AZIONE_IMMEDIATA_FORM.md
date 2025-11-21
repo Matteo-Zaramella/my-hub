@@ -34,12 +34,12 @@ Usa la lista sotto - già pronta per copia-incolla
 
 ### Titolo Form
 ```
-The Game - Conferma Partecipazione
+Il Castello di Zara - Conferma Partecipazione
 ```
 
 ### Descrizione Form
 ```
-Benvenuto a The Game! 🎮
+Benvenuto a Il Castello di Zara! 🎮
 
 Sei stato invitato a partecipare al gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027).
 
@@ -93,7 +93,7 @@ Per confermare la tua partecipazione e ricevere il codice di accesso personale, 
 - Tipo: **Scelta multipla**
 - Obbligatorio: **SÌ**
 - Testo: `Conferma Partecipazione`
-- Opzione 1: `✅ Confermo la mia partecipazione a The Game`
+- Opzione 1: `✅ Confermo la mia partecipazione a Il Castello di Zara`
 - Opzione 2: `❌ Non posso partecipare`
 - Descrizione: `Confermando accetti di partecipare al gioco della durata di un anno`
 
@@ -175,7 +175,7 @@ Potrai richiedere la cancellazione in qualsiasi momento.
 
 ### Oggetto
 ```
-🎮 The Game - Conferma la tua partecipazione entro il 15/01
+🎮 Il Castello di Zara - Conferma la tua partecipazione entro il 15/01
 ```
 
 ### A: (metti te stesso)
@@ -192,7 +192,7 @@ matteo.zaramella2002@gmail.com
 ```
 Ciao!
 
-Sei tra i 52 partecipanti selezionati per "The Game", il gioco interattivo della durata di un anno!
+Sei tra i 52 partecipanti selezionati per "Il Castello di Zara", il gioco interattivo della durata di un anno!
 
 🎯 COSA TI ASPETTA:
 • 12 sfide mensili dal Febbraio 2026 a Gennaio 2027
@@ -217,7 +217,7 @@ Per domande, rispondi a questa email.
 Ci vediamo il 24 Gennaio! 🎉
 
 Matteo Zaramella
-Organizzatore The Game
+Organizzatore Il Castello di Zara
 ```
 
 ### Sostituisci [INCOLLA QUI IL LINK] con il link del form!
@@ -240,7 +240,7 @@ Organizzatore The Game
 1. Tab "Risposte"
 2. Clicca icona **Excel verde** (in alto a destra)
 3. Seleziona "Crea nuovo foglio di calcolo"
-4. Nome: `The Game - Risposte Partecipanti`
+4. Nome: `Il Castello di Zara - Risposte Partecipanti`
 5. Le risposte si aggiorneranno automaticamente! ✨
 
 ---

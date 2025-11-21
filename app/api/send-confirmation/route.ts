@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await resend.emails.send({
       from: 'My Hub <onboarding@resend.dev>', // Cambia con il tuo dominio quando configurato
       to: email,
-      subject: '✅ Iscrizione Confermata - The Game',
+      subject: '✅ Iscrizione Confermata - Il Castello di Zara',
       html: `
         <!DOCTYPE html>
         <html>
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
               </p>
 
               <p class="message">
-                La tua iscrizione a <strong>The Game</strong> è stata completata con successo!
+                La tua iscrizione a <strong>Il Castello di Zara</strong> è stata completata con successo!
               </p>
 
               <div class="code-box">
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
               </p>
 
               <div class="footer">
-                <p>My Hub · The Game</p>
+                <p>My Hub · Il Castello di Zara</p>
                 <p>Questa email è stata inviata automaticamente. Non rispondere a questo messaggio.</p>
               </div>
             </div>

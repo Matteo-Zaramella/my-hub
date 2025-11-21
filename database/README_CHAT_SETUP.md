@@ -1,4 +1,4 @@
-# 💬 Setup Chat System - The Game
+# 💬 Setup Chat System - Il Castello di Zara
 
 ## 📋 Prerequisiti
 - Accesso a Supabase Dashboard
@@ -183,5 +183,5 @@ Assicurati di essere autenticato come owner del progetto Supabase.
 ---
 
 **Creato il:** 11 Novembre 2025
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Database:** Supabase (wuvuapmjclahbmngntku)

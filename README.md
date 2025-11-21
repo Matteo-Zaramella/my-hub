@@ -13,7 +13,7 @@ Hub personale per la gestione di attività, fitness, alimentazione e giochi.
 
 ## 📦 Moduli Disponibili
 
-### 🎮 The Game (NEW!)
+### 🎮 Il Castello di Zara (NEW!)
 Sistema di gioco con:
 - **💬 Chat di Gruppo** - Real-time messaging tra partecipanti
 - **🔍 Indizi** - Sistema indizi con rivelazione programmata
@@ -81,7 +81,7 @@ npm run build  # Build produzione
 npm start      # Avvio produzione
 npm run lint   # Lint
 
-# Script utili The Game
+# Script utili Il Castello di Zara
 node scripts/check-chat-table.mjs  # Verifica tabella chat
 ```
 
@@ -98,7 +98,7 @@ node scripts/check-chat-table.mjs  # Verifica tabella chat
 
 ---
 
-## 🎮 The Game - Quick Start
+## 🎮 Il Castello di Zara - Quick Start
 
 ### Setup Chat Database (Obbligatorio)
 

@@ -65,14 +65,14 @@
 
 ### From Address
 - **Attuale:** `My Hub <onboarding@resend.dev>`
-- **TODO Futuro:** Configurare dominio personalizzato (es. `The Game <game@matteozaramella.com>`)
+- **TODO Futuro:** Configurare dominio personalizzato (es. `Il Castello di Zara <game@matteozaramella.com>`)
 
 ---
 
 ## 🔧 Come Funziona
 
 ### Scenario 1: Nuovo Partecipante
-1. Admin va su Dashboard → Gestione The Game → Tab Partecipanti
+1. Admin va su Dashboard → Gestione Il Castello di Zara → Tab Partecipanti
 2. Clicca "➕ Aggiungi Partecipante"
 3. Compila form (nome, email, categoria, etc.)
 4. Clicca "Aggiungi"
@@ -165,7 +165,7 @@ npx tsx test-email.ts
 - **3.000 email/mese**
 - **GRATIS per sempre**
 
-### Stima Uso The Game
+### Stima Uso Il Castello di Zara
 - **52 partecipanti**
 - **Email registrazione:** 52 (una tantum)
 - **Email settimanali indizi:** ~52 × 40 settimane = 2.080

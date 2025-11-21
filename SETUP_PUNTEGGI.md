@@ -17,7 +17,7 @@ ADD COLUMN IF NOT EXISTS current_points INTEGER DEFAULT 0 NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_game_participants_points ON game_participants(current_points DESC);
 
 -- Add comment
-COMMENT ON COLUMN game_participants.current_points IS 'Punteggio corrente del partecipante in The Game';
+COMMENT ON COLUMN game_participants.current_points IS 'Punteggio corrente del partecipante in Il Castello di Zara';
 ```
 
 **Clicca "Run"**

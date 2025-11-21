@@ -208,7 +208,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso la vostra location.
 
-Si tratta della cerimonia di apertura di "The Game", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026

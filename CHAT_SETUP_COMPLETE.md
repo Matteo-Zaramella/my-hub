@@ -336,7 +336,7 @@ Per problemi o domande:
 
 **Implementazione completata da:** Claude Code
 **Data:** 11 Novembre 2025
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Database:** Supabase (wuvuapmjclahbmngntku)
 
 🎉 **La chat è pronta per il lancio!** 🎉

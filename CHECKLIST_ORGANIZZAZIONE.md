@@ -1,4 +1,4 @@
-# 📋 Checklist Organizzazione The Game
+# 📋 Checklist Organizzazione Il Castello di Zara
 
 ## 🎯 Overview
 Checklist completa per l'organizzazione della Cerimonia di Apertura (24/01/2026) e lo sviluppo dell'app pubblica.

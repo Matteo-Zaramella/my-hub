@@ -1,6 +1,6 @@
 # 📧 Log Invii Email - Locali Padova
 
-**Evento:** The Game - Cerimonia Apertura
+**Evento:** Il Castello di Zara - Cerimonia Apertura
 **Data evento:** 24 Gennaio 2026
 **Scadenza conferma location:** 25 Novembre 2025
 

@@ -256,7 +256,7 @@ Prima di procedere, assicurati di:
 
 ## 📈 PROGRESSO COMPLESSIVO
 
-**Progetto:** The Game - My Hub
+**Progetto:** Il Castello di Zara - My Hub
 **Versione:** 2.0.0
 **Completamento:** ~85%
 

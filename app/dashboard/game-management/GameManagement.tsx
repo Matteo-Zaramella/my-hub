@@ -8,6 +8,7 @@ import ChecklistTab from './ChecklistTab'
 import GamePhasesTab from './GamePhasesTab'
 import SettingsTab from './SettingsTab'
 import GameAreaControlTab from './GameAreaControlTab'
+import TestingTab from './TestingTab'
 
 interface GameConfig {
   id: number

@@ -38,7 +38,7 @@ export default async function GameManagementPage() {
             <Link href="/dashboard" className="text-white/60 hover:text-white">
               ← Dashboard
             </Link>
-            <h1 className="text-2xl font-bold text-white">🎮 Gestione The Game</h1>
+            <h1 className="text-2xl font-bold text-white">🎮 Gestione Il Castello di Zara</h1>
           </div>
         </div>
       </header>

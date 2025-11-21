@@ -1,8 +1,8 @@
-# Sistema Chat di Gruppo - The Game
+# Sistema Chat di Gruppo - Il Castello di Zara
 
 ## 📋 Panoramica
 
-Sistema di chat di gruppo in tempo reale per "The Game", accessibile tramite codici partecipante univoci stampati su cartoncini fisici.
+Sistema di chat di gruppo in tempo reale per "Il Castello di Zara", accessibile tramite codici partecipante univoci stampati su cartoncini fisici.
 
 ## 🏗️ Architettura
 

@@ -15,7 +15,7 @@
    - Se non sei già loggato, fai login con il tuo account
 
 3. **Vai alla gestione partecipanti**
-   - Dashboard → "🎮 Gestione The Game"
+   - Dashboard → "🎮 Gestione Il Castello di Zara"
    - Oppure direttamente: http://localhost:3000/dashboard/game-management
    - Clicca sul tab "**👥 Partecipanti**"
 
