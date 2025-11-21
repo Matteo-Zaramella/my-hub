@@ -284,7 +284,7 @@ export default function GameAreaWithChat() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">🎮 Il Castello di Zara</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">🎮 A Tutto Reality: La Rivoluzione</h1>
               <p className="text-purple-200 text-sm md:text-base">
                 Ciao, {participant.participant_name}!
               </p>
@@ -372,7 +372,7 @@ export default function GameAreaWithChat() {
               )}
             </div>
             <div className="text-center md:text-right">
-              <p>Il Castello di Zara 2026-2027</p>
+              <p>A Tutto Reality: La Rivoluzione 2026-2027</p>
               <p className="mt-1">24/01/2026 - 24/01/2027</p>
             </div>
           </div>

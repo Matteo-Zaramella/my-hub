@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Il Castello di Zara - Matteo Zaramella",
-  description: "Il Castello di Zara 2026-2027 - Un anno di sfide, indizi e divertimento",
+  title: "A Tutto Reality: La Rivoluzione - Matteo Zaramella",
+  description: "A Tutto Reality: La Rivoluzione 2026-2027 - Un anno di sfide, indizi e divertimento",
 };
 
 export default function RootLayout({

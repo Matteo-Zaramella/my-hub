@@ -88,7 +88,7 @@ export default async function ProfilePage() {
             </div>
             <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-4 border border-purple-200">
               <div className="text-2xl mb-2">🎮</div>
-              <h4 className="font-semibold text-gray-800">Il Castello di Zara</h4>
+              <h4 className="font-semibold text-gray-800">A Tutto Reality: La Rivoluzione</h4>
               <p className="text-sm text-gray-600">Progressi e punteggi</p>
             </div>
           </div>

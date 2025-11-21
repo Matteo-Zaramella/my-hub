@@ -24,7 +24,7 @@ Dopo aver valutato diverse opzioni a Padova, il vostro Fenice Green Energy Park 
 
 📅 DETTAGLI EVENTO
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 • Data richiesta: **Venerdì 24 Gennaio 2026**
 • Orario: **18:00 - 23:00** (5 ore)

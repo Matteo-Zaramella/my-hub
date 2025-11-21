@@ -1,7 +1,7 @@
-# Il Castello di Zara - Project Information
+# A Tutto Reality: La Rivoluzione - Project Information
 
 ## Overview
-Il Castello di Zara è un gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027) con sfide mensili, indizi progressivi e una cerimonia di apertura speciale.
+A Tutto Reality: La Rivoluzione è un gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027) con sfide mensili, indizi progressivi e una cerimonia di apertura speciale.
 
 ## Key Dates
 
@@ -84,7 +84,7 @@ Il Castello di Zara è un gioco interattivo della durata di un anno (24/01/2026 
 
 #### Struttura suggerita della cartella:
 ```
-/Il Castello di Zara 2026-2027
+/A Tutto Reality: La Rivoluzione 2026-2027
 ├── /Assets
 │   ├── /Immagini
 │   │   ├── /Cerimonia_Apertura

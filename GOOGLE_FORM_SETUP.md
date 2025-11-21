@@ -1,4 +1,4 @@
-# 📋 Setup Google Form - Raccolta Dati Partecipanti "Il Castello di Zara"
+# 📋 Setup Google Form - Raccolta Dati Partecipanti "A Tutto Reality: La Rivoluzione"
 
 **Data creazione:** 19 Novembre 2025
 **Scadenza raccolta:** 15 Gennaio 2026
@@ -20,10 +20,10 @@ Raccogliere email, telefono e Instagram di tutti i 52 partecipanti per:
 ### Setup Iniziale
 1. Vai su https://forms.google.com
 2. Clicca "+ Nuovo" (Plus icon)
-3. Titolo form: **"Il Castello di Zara - Conferma Partecipazione"**
+3. Titolo form: **"A Tutto Reality: La Rivoluzione - Conferma Partecipazione"**
 4. Descrizione:
    ```
-   Benvenuto a Il Castello di Zara! 🎮
+   Benvenuto a A Tutto Reality: La Rivoluzione! 🎮
 
    Sei stato invitato a partecipare al gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027).
 
@@ -74,7 +74,7 @@ Raccogliere email, telefono e Instagram di tutti i 52 partecipanti per:
 - **Tipo:** Scelta multipla (obbligatoria)
 - **Obbligatoria:** ✅ Sì
 - **Opzioni:**
-  - ✅ Confermo la mia partecipazione a Il Castello di Zara
+  - ✅ Confermo la mia partecipazione a A Tutto Reality: La Rivoluzione
   - ❌ Non posso partecipare
 - **Descrizione:** "Confermando accetti di partecipare al gioco della durata di un anno"
 
@@ -129,7 +129,7 @@ Raccogliere email, telefono e Instagram di tutti i 52 partecipanti per:
 
 ### Tema e Design
 1. Clicca sull'icona 🎨 (Personalizza tema)
-2. **Colore intestazione:** Verde scuro (#1a4d2e) - tema Il Castello di Zara
+2. **Colore intestazione:** Verde scuro (#1a4d2e) - tema A Tutto Reality: La Rivoluzione
 3. **Stile sfondo:** Bianco/grigio chiaro
 4. **Stile testo:** Roboto/Arial
 
@@ -153,12 +153,12 @@ Salva il link in un posto sicuro:
 
 ## 📨 Email Template per Invio
 
-**Oggetto:** 🎮 Il Castello di Zara - Conferma la tua partecipazione entro il 15/01
+**Oggetto:** 🎮 A Tutto Reality: La Rivoluzione - Conferma la tua partecipazione entro il 15/01
 
 ```html
 Ciao [NOME],
 
-Sei tra i 52 partecipanti selezionati per "Il Castello di Zara", il gioco interattivo della durata di un anno!
+Sei tra i 52 partecipanti selezionati per "A Tutto Reality: La Rivoluzione", il gioco interattivo della durata di un anno!
 
 🎯 COSA TI ASPETTA:
 - 12 sfide mensili dal Febbraio 2026 a Gennaio 2027
@@ -189,7 +189,7 @@ Per qualsiasi domanda o dubbio, rispondi a questa email.
 Ci vediamo il 24 Gennaio! 🎮
 
 Matteo Zaramella
-Organizzatore Il Castello di Zara
+Organizzatore A Tutto Reality: La Rivoluzione
 ```
 
 ---
@@ -211,7 +211,7 @@ Organizzatore Il Castello di Zara
 4. Scegli:
    - **Nuovo foglio di calcolo** oppure
    - **Foglio di calcolo esistente**
-5. Nome foglio: "Il Castello di Zara - Risposte Partecipanti"
+5. Nome foglio: "A Tutto Reality: La Rivoluzione - Risposte Partecipanti"
 
 Le risposte si aggiorneranno in tempo reale nel foglio Google Sheets!
 
@@ -272,12 +272,12 @@ Questi partecipanti NON hanno contatti completi - priorità ALTA:
 
 ### Template Reminder
 ```
-Oggetto: ⏰ Reminder: Conferma partecipazione a Il Castello di Zara
+Oggetto: ⏰ Reminder: Conferma partecipazione a A Tutto Reality: La Rivoluzione
 
 Ciao [NOME],
 
 Ti ricordo che mancano solo [X] giorni alla scadenza per confermare
-la tua partecipazione a Il Castello di Zara!
+la tua partecipazione a A Tutto Reality: La Rivoluzione!
 
 Se hai già compilato il form, ignora questo messaggio.
 
@@ -339,7 +339,7 @@ WHERE email IS NULL OR phone_number IS NULL;
 ### Setup Form (oggi - 30 min)
 - [ ] Creare Google Form con 8 domande
 - [ ] Configurare impostazioni e validazioni
-- [ ] Personalizzare tema (verde Il Castello di Zara)
+- [ ] Personalizzare tema (verde A Tutto Reality: La Rivoluzione)
 - [ ] Testare form con dati fake
 - [ ] Ottenere link abbreviato
 - [ ] Salvare link in sicurezza

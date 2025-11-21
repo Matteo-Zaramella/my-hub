@@ -34,12 +34,12 @@ Usa la lista sotto - già pronta per copia-incolla
 
 ### Titolo Form
 ```
-Il Castello di Zara - Conferma Partecipazione
+A Tutto Reality: La Rivoluzione - Conferma Partecipazione
 ```
 
 ### Descrizione Form
 ```
-Benvenuto a Il Castello di Zara! 🎮
+Benvenuto a A Tutto Reality: La Rivoluzione! 🎮
 
 Sei stato invitato a partecipare al gioco interattivo della durata di un anno (24/01/2026 - 24/01/2027).
 
@@ -93,7 +93,7 @@ Per confermare la tua partecipazione e ricevere il codice di accesso personale, 
 - Tipo: **Scelta multipla**
 - Obbligatorio: **SÌ**
 - Testo: `Conferma Partecipazione`
-- Opzione 1: `✅ Confermo la mia partecipazione a Il Castello di Zara`
+- Opzione 1: `✅ Confermo la mia partecipazione a A Tutto Reality: La Rivoluzione`
 - Opzione 2: `❌ Non posso partecipare`
 - Descrizione: `Confermando accetti di partecipare al gioco della durata di un anno`
 
@@ -175,7 +175,7 @@ Potrai richiedere la cancellazione in qualsiasi momento.
 
 ### Oggetto
 ```
-🎮 Il Castello di Zara - Conferma la tua partecipazione entro il 15/01
+🎮 A Tutto Reality: La Rivoluzione - Conferma la tua partecipazione entro il 15/01
 ```
 
 ### A: (metti te stesso)
@@ -192,7 +192,7 @@ matteo.zaramella2002@gmail.com
 ```
 Ciao!
 
-Sei tra i 52 partecipanti selezionati per "Il Castello di Zara", il gioco interattivo della durata di un anno!
+Sei tra i 52 partecipanti selezionati per "A Tutto Reality: La Rivoluzione", il gioco interattivo della durata di un anno!
 
 🎯 COSA TI ASPETTA:
 • 12 sfide mensili dal Febbraio 2026 a Gennaio 2027
@@ -217,7 +217,7 @@ Per domande, rispondi a questa email.
 Ci vediamo il 24 Gennaio! 🎉
 
 Matteo Zaramella
-Organizzatore Il Castello di Zara
+Organizzatore A Tutto Reality: La Rivoluzione
 ```
 
 ### Sostituisci [INCOLLA QUI IL LINK] con il link del form!
@@ -240,7 +240,7 @@ Organizzatore Il Castello di Zara
 1. Tab "Risposte"
 2. Clicca icona **Excel verde** (in alto a destra)
 3. Seleziona "Crea nuovo foglio di calcolo"
-4. Nome: `Il Castello di Zara - Risposte Partecipanti`
+4. Nome: `A Tutto Reality: La Rivoluzione - Risposte Partecipanti`
 5. Le risposte si aggiorneranno automaticamente! ✨
 
 ---

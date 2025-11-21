@@ -353,7 +353,7 @@ Milestone prossima: Form Raccolta Dati (22/11)
 - [ ] Preparazione location fisica
 
 ### 24 Gennaio 2026 🎉
-- [ ] **CERIMONIA APERTURA IL CASTELLO DI ZARA**
+- [ ] **CERIMONIA APERTURA A TUTTO REALITY: LA RIVOLUZIONE**
 
 ---
 
@@ -385,4 +385,4 @@ Milestone prossima: Form Raccolta Dati (22/11)
 
 ---
 
-🎮 **IL CASTELLO DI ZARA IS REAL. IL CASTELLO DI ZARA IS READY.** 🎮
+🎮 **A TUTTO REALITY: LA RIVOLUZIONE IS REAL. A TUTTO REALITY: LA RIVOLUZIONE IS READY.** 🎮

@@ -10,7 +10,7 @@
 1. ✅ **Database Schema creato** - File: `database/chat_tables.sql`
 2. ✅ **Componente Chat implementato** - File: `app/game/GroupChat.tsx`
 3. ✅ **Integrazione nella pagina Game** - File: `app/game/PasswordSuccess.tsx`
-4. ✅ **Titolo pagina aggiornato** - "Il Castello di Zara - Matteo Zaramella"
+4. ✅ **Titolo pagina aggiornato** - "A Tutto Reality: La Rivoluzione - Matteo Zaramella"
 5. ✅ **Data modificata temporaneamente** - Per test immediato (2025-11-11)
 
 ---
@@ -193,7 +193,7 @@ sed -i "11s/2025-11-11/2026-01-26/" app/game/PasswordSuccess.tsx
 - [ ] Chat testata e funzionante
 - [ ] Real-time testato con 2 utenti
 - [ ] Data ripristinata a 2026-01-26
-- [ ] Titolo pagina verificato ("Il Castello di Zara - Matteo Zaramella")
+- [ ] Titolo pagina verificato ("A Tutto Reality: La Rivoluzione - Matteo Zaramella")
 - [ ] Server in esecuzione correttamente
 
 ### Da committare:

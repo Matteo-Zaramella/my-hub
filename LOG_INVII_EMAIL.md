@@ -1,6 +1,6 @@
 # 📧 Log Invii Email - Locali Padova
 
-**Evento:** Il Castello di Zara - Cerimonia Apertura
+**Evento:** A Tutto Reality: La Rivoluzione - Cerimonia Apertura
 **Data evento:** 24 Gennaio 2026
 **Scadenza conferma location:** 25 Novembre 2025
 

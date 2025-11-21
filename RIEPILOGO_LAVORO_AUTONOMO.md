@@ -256,7 +256,7 @@ Prima di procedere, assicurati di:
 
 ## 📈 PROGRESSO COMPLESSIVO
 
-**Progetto:** Il Castello di Zara - My Hub
+**Progetto:** A Tutto Reality: La Rivoluzione - My Hub
 **Versione:** 2.0.0
 **Completamento:** ~85%
 

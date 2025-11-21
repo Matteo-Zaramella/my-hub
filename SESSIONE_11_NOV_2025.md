@@ -362,7 +362,7 @@ git push
 ---
 
 **Creato da:** Claude Code
-**Progetto:** Il Castello di Zara - My Hub
+**Progetto:** A Tutto Reality: La Rivoluzione - My Hub
 **Session Duration:** ~2 ore
 **Status:** ✅ Ottime basi gettate, pronto per esecuzione domani!
 

@@ -15,7 +15,7 @@
    - Se non sei già loggato, fai login con il tuo account
 
 3. **Vai alla gestione partecipanti**
-   - Dashboard → "🎮 Gestione Il Castello di Zara"
+   - Dashboard → "🎮 Gestione A Tutto Reality: La Rivoluzione"
    - Oppure direttamente: http://localhost:3000/dashboard/game-management
    - Clicca sul tab "**👥 Partecipanti**"
 

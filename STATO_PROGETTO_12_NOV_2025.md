@@ -216,7 +216,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 D:/my-hub/
 ├── app/                          # Next.js App Router
 │   ├── dashboard/                # Dashboard privata
-│   │   ├── game-management/      # Gestione Il Castello di Zara
+│   │   ├── game-management/      # Gestione A Tutto Reality: La Rivoluzione
 │   │   │   ├── ParticipantsTab.tsx  # ✨ NUOVO: Gestione partecipanti
 │   │   │   └── ...
 │   │   ├── fitness/              # Modulo fitness

@@ -1,8 +1,8 @@
-# Sistema Chat di Gruppo - Il Castello di Zara
+# Sistema Chat di Gruppo - A Tutto Reality: La Rivoluzione
 
 ## 📋 Panoramica
 
-Sistema di chat di gruppo in tempo reale per "Il Castello di Zara", accessibile tramite codici partecipante univoci stampati su cartoncini fisici.
+Sistema di chat di gruppo in tempo reale per "A Tutto Reality: La Rivoluzione", accessibile tramite codici partecipante univoci stampati su cartoncini fisici.
 
 ## 🏗️ Architettura
 

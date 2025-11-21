@@ -1,4 +1,4 @@
-# 📋 Checklist Organizzazione Il Castello di Zara
+# 📋 Checklist Organizzazione A Tutto Reality: La Rivoluzione
 
 ## 🎯 Overview
 Checklist completa per l'organizzazione della Cerimonia di Apertura (24/01/2026) e lo sviluppo dell'app pubblica.

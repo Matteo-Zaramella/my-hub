@@ -1,4 +1,4 @@
-# 💬 Setup Chat System - Il Castello di Zara
+# 💬 Setup Chat System - A Tutto Reality: La Rivoluzione
 
 ## 📋 Prerequisiti
 - Accesso a Supabase Dashboard
@@ -183,5 +183,5 @@ Assicurati di essere autenticato come owner del progetto Supabase.
 ---
 
 **Creato il:** 11 Novembre 2025
-**Progetto:** Il Castello di Zara - My Hub
+**Progetto:** A Tutto Reality: La Rivoluzione - My Hub
 **Database:** Supabase (wuvuapmjclahbmngntku)

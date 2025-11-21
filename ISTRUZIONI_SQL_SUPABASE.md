@@ -7,7 +7,7 @@
 
 ## 📝 Cosa fa questo script?
 
-Questo script completo configura tutto il database necessario per Il Castello di Zara:
+Questo script completo configura tutto il database necessario per A Tutto Reality: La Rivoluzione:
 
 ### Fix Critici
 - ✅ Aggiunge colonna `note` in `workout_sessions` (BLOCCANTE - il codice la richiede)
@@ -324,5 +324,5 @@ Fornisci queste informazioni per assistenza rapida.
 ---
 
 **Creato da:** Claude Code
-**Progetto:** Il Castello di Zara - My Hub
+**Progetto:** A Tutto Reality: La Rivoluzione - My Hub
 **Database:** Supabase (wuvuapmjclahbmngntku)

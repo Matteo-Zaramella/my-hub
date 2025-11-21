@@ -1,4 +1,4 @@
-# 📧 Sistema Email Automatiche - Il Castello di Zara
+# 📧 Sistema Email Automatiche - A Tutto Reality: La Rivoluzione
 
 **Priorità:** 🔴 ALTA
 **Beneficio:** Eliminazione cartoncini fisici + Onboarding automatico
@@ -127,11 +127,11 @@ export const WelcomeEmail: React.FC<WelcomeEmailProps> = ({
   ceremonyDate
 }) => (
   <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px', maxWidth: '600px' }}>
-    <h1 style={{ color: '#2563eb' }}>🎮 Benvenuto in Il Castello di Zara!</h1>
+    <h1 style={{ color: '#2563eb' }}>🎮 Benvenuto in A Tutto Reality: La Rivoluzione!</h1>
 
     <p>Ciao <strong>{participantName}</strong>,</p>
 
-    <p>Sei stato registrato con successo a <strong>Il Castello di Zara</strong>!</p>
+    <p>Sei stato registrato con successo a <strong>A Tutto Reality: La Rivoluzione</strong>!</p>
 
     <div style={{
       backgroundColor: '#f3f4f6',
@@ -223,9 +223,9 @@ export async function POST(request: Request) {
     const { email, participantName, participantCode, category } = await request.json()
 
     const { data, error } = await resend.emails.send({
-      from: 'Il Castello di Zara <noreply@matteozaramella.com>',
+      from: 'A Tutto Reality: La Rivoluzione <noreply@matteozaramella.com>',
       to: [email],
-      subject: `🎮 Il tuo codice per Il Castello di Zara: ${participantCode}`,
+      subject: `🎮 Il tuo codice per A Tutto Reality: La Rivoluzione: ${participantCode}`,
       react: WelcomeEmail({
         participantName,
         participantCode,
@@ -490,9 +490,9 @@ export async function GET(request: Request) {
   // 3. Invia email a tutti
   const emailPromises = participants.map(p =>
     resend.emails.send({
-      from: 'Il Castello di Zara <noreply@matteozaramella.com>',
+      from: 'A Tutto Reality: La Rivoluzione <noreply@matteozaramella.com>',
       to: p.email,
-      subject: `🔍 Nuovo Indizio Rivelato - Il Castello di Zara`,
+      subject: `🔍 Nuovo Indizio Rivelato - A Tutto Reality: La Rivoluzione`,
       react: NewClueEmail({
         participantName: p.participant_name,
         clueNumber: clue.clue_order,

@@ -92,7 +92,7 @@
 
 ---
 
-## ✅ PRO per "Il Castello di Zara"
+## ✅ PRO per "A Tutto Reality: La Rivoluzione"
 
 1. **Budget PERFETTO** - €516 totali, molto sotto budget (€800-1500)
 2. **WiFi incluso** - Fondamentale per app real-time
@@ -118,7 +118,7 @@
 
 ---
 
-## 🎯 ADATTABILITÀ per "IL CASTELLO DI ZARA"
+## 🎯 ADATTABILITÀ per "A TUTTO REALITY: LA RIVOLUZIONE"
 
 ### Caccia al Tesoro (10 indizi)
 **PERFETTO** - Il parco di 5 ettari offre:

@@ -223,7 +223,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
               La registrazione non è ancora aperta.
             </p>
             <p className="text-white/50 text-sm">
-              Riceverai un link quando sarà possibile registrarsi per Il Castello di Zara.
+              Riceverai un link quando sarà possibile registrarsi per A Tutto Reality: La Rivoluzione.
             </p>
             <p className="text-green-400/70 text-sm font-medium mt-6">
               Resta sintonizzato! 🎮

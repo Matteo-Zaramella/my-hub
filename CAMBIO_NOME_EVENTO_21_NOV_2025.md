@@ -1,16 +1,16 @@
-# 🏰 Cambio Nome Evento - Da "The Game" a "Il Castello di Zara"
+# 🏰 Cambio Nome Evento - Da "The Game" a "A Tutto Reality: La Rivoluzione"
 
 **Data:** 21 Novembre 2025
 **Task:** Rinominazione completa evento
-**Ispirazione:** Takeshi's Castle
+**Ispirazione:** A Tutto Reality (Total Drama) + Cicada 3301
 
 ---
 
 ## ✅ Lavoro Completato
 
 ### Sostituzione Globale
-- **Da:** "The Game"
-- **A:** "Il Castello di Zara"
+- **Prima versione:** "The Game" → "Il Castello di Zara" (Takeshi's Castle - scartata)
+- **Versione finale:** "The Game" → "A Tutto Reality: La Rivoluzione"
 
 ### File Modificati: 82 totali
 
@@ -44,7 +44,7 @@ grep -ri "The Game" --include="*.tsx" --include="*.ts" --include="*.md" --exclud
 
 ### Conferma Nuovo Nome
 ```bash
-grep -c "Il Castello di Zara" README.md
+grep -c "A Tutto Reality: La Rivoluzione" README.md
 ```
 **Risultato:** 3 occorrenze ✅
 
@@ -63,20 +63,20 @@ I seguenti termini sono stati mantenuti intatti perché sono nomi tecnici di mod
 - `game_chat_messages_v2` (database table)
 - `game-management` (route path)
 - `/game` (URL path)
-- `Game Prize` (modulo separato - non fa parte de Il Castello di Zara)
+- `Game Prize` (modulo separato - non fa parte de A Tutto Reality: La Rivoluzione)
 
 Questi NON sono stati cambiati perché:
 1. Sono nomi tecnici di file/componenti
 2. Cambiare i nomi di rotte/componenti richiederebbe refactoring completo
-3. Il nome "Il Castello di Zara" è per il branding/UI, non per il codice interno
+3. Il nome "A Tutto Reality: La Rivoluzione" è per il branding/UI, non per il codice interno
 
 ---
 
 ## 🎯 Impatto Cambio Nome
 
 ### Frontend Utente
-- ✅ Titolo pagina browser: "Il Castello di Zara - Matteo Zaramella"
-- ✅ Email di conferma: "Iscrizione Confermata - Il Castello di Zara"
+- ✅ Titolo pagina browser: "A Tutto Reality: La Rivoluzione - Matteo Zaramella"
+- ✅ Email di conferma: "Iscrizione Confermata - A Tutto Reality: La Rivoluzione"
 - ✅ Tutti i testi visibili all'utente aggiornati
 
 ### Documentazione
@@ -127,18 +127,20 @@ Questi NON sono stati cambiati perché:
 
 ---
 
-## 🎮 Il Castello di Zara - Nuovo Branding
+## 🎮 A Tutto Reality: La Rivoluzione - Nuovo Branding
 
 ### Ispirazione
-- **Show originale:** Takeshi's Castle (Giappone)
-- **Concept:** Castello con sfide, ostacoli e prove di abilità
-- **Tema:** Medievale/Castello con tocco moderno
+- **Format principale:** A Tutto Reality (Total Drama) - reality show competitivo
+- **Meccaniche enigmi:** Cicada 3301 - caccia al tesoro intellettuale
+- **Concept:** Reality game con sfide, indizi progressivi e competizione annuale
+- **Tema:** Rivoluzione terrestre = 365 giorni = durata del gioco
 
 ### Elementi Chiave
-- 🏰 Castello come location simbolica
-- 🎯 Sfide mensili come "prove del castello"
-- 👑 Classifica finale come "conquistatori del castello"
-- 🗡️ Indizi come "chiavi del castello"
+- 🎬 Reality show format con sfide mensili
+- 🔍 Indizi progressivi stile Cicada 3301
+- 🌍 "Rivoluzione" = giro completo della Terra (1 anno)
+- 🏆 Competizione con classifica finale
+- 🧩 Password "EVOLUZIONE" che richiama "RIVOLUZIONE"
 
 ---
 
@@ -153,7 +155,7 @@ Questi NON sono stati cambiati perché:
 
 ### Commit
 - [ ] `git add .`
-- [ ] `git commit -m "Rename event from 'The Game' to 'Il Castello di Zara'"`
+- [ ] `git commit -m "Rename event from 'The Game' to 'A Tutto Reality: La Rivoluzione'"`
 - [ ] `git push origin main`
 
 ### Post-Deploy
@@ -175,7 +177,7 @@ git reset --soft HEAD~1
 git revert <commit_hash>
 
 # Re-sostituisci
-sed -i 's/Il Castello di Zara/The Game/g' <files>
+sed -i 's/A Tutto Reality: La Rivoluzione/The Game/g' <files>
 ```
 
 ---
@@ -187,4 +189,4 @@ sed -i 's/Il Castello di Zara/The Game/g' <files>
 
 ---
 
-**Nuovo nome evento ufficiale:** 🏰 **Il Castello di Zara** 🏰
+**Nuovo nome evento ufficiale:** 🎬 **A Tutto Reality: La Rivoluzione** 🌍

@@ -2,7 +2,7 @@
 
 ## TL;DR - Scelta Consigliata
 
-**Per Il Castello di Zara: USA VERCEL CRON JOBS** ✅
+**Per A Tutto Reality: La Rivoluzione: USA VERCEL CRON JOBS** ✅
 
 - Gratis
 - Già integrato
@@ -23,11 +23,11 @@
 | **Manutenzione** | Nessuna | Nessuna |
 | **Affidabilità** | 99.9% | 99.9% |
 | **Controllo** | Totale | Limitato UI |
-| **Il Castello di Zara needs** | ✅ Perfetto | ❌ Troppo costoso |
+| **A Tutto Reality: La Rivoluzione needs** | ✅ Perfetto | ❌ Troppo costoso |
 
 ---
 
-## 🎯 Esigenze Il Castello di Zara
+## 🎯 Esigenze A Tutto Reality: La Rivoluzione
 
 ### Automazioni Necessarie
 
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
   // 4. Invia email a tutti (52 partecipanti)
   for (const p of participants) {
     await resend.emails.send({
-      from: 'Il Castello di Zara <game@matteozaramella.com>',
+      from: 'A Tutto Reality: La Rivoluzione <game@matteozaramella.com>',
       to: p.email,
       subject: '🔍 Nuovo Indizio Rivelato!',
       html: `
@@ -189,7 +189,7 @@ export async function GET(request: Request) {
   for (const challenge of challenges) {
     for (const p of participants) {
       await resend.emails.send({
-        from: 'Il Castello di Zara <game@matteozaramella.com>',
+        from: 'A Tutto Reality: La Rivoluzione <game@matteozaramella.com>',
         to: p.email,
         subject: `🎯 Sfida ${challenge.challenge_month} tra 2 giorni!`,
         html: `
@@ -219,7 +219,7 @@ Zapier è ottimo quando:
 - ✅ Serve integrare con servizi esterni (es. Google Sheets, Slack)
 - ✅ Task semplici e sporadici (<100/mese)
 
-**Per Il Castello di Zara:** Non conviene. Troppo costoso per le nostre esigenze.
+**Per A Tutto Reality: La Rivoluzione:** Non conviene. Troppo costoso per le nostre esigenze.
 
 ---
 
@@ -274,7 +274,7 @@ http://localhost:3000/api/cron/send-weekly-clue
 
 ## ✅ Conclusione
 
-**Per Il Castello di Zara:**
+**Per A Tutto Reality: La Rivoluzione:**
 - ✅ Usa Vercel Cron Jobs
 - ✅ Gratis, affidabile, scalabile
 - ✅ Controllo totale

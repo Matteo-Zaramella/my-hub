@@ -108,7 +108,7 @@ CREATE POLICY "Anyone can send messages v2"
 ALTER PUBLICATION supabase_realtime ADD TABLE game_chat_messages_v2;
 
 INSERT INTO game_chat_messages_v2 (participant_id, participant_name, participant_code, message, is_system_message)
-SELECT 1, 'Sistema', 'SYSTEM', '🎉 Benvenuti nella chat di gruppo di Il Castello di Zara! Qui potrete comunicare con tutti i partecipanti in tempo reale.', true
+SELECT 1, 'Sistema', 'SYSTEM', '🎉 Benvenuti nella chat di gruppo di A Tutto Reality: La Rivoluzione! Qui potrete comunicare con tutti i partecipanti in tempo reale.', true
 WHERE NOT EXISTS (SELECT 1 FROM game_chat_messages_v2 WHERE is_system_message = true LIMIT 1);
 ```
 

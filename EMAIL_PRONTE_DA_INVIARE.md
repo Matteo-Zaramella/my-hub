@@ -30,7 +30,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso il Conamara Irish Pub.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
@@ -88,7 +88,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso Casa Tormene.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
@@ -144,7 +144,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso il White Pony Pub.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
@@ -200,7 +200,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso La Busa dei Briganti.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
@@ -256,7 +256,7 @@ Buongiorno Alessandra,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso Le Village by CA Triveneto.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
@@ -316,7 +316,7 @@ Buongiorno,
 
 mi chiamo Matteo Zaramella e sono interessato ad organizzare un evento privato presso l'Antica Cascina Dal Pozzo.
 
-Si tratta della cerimonia di apertura di "Il Castello di Zara", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
+Si tratta della cerimonia di apertura di "A Tutto Reality: La Rivoluzione", un gioco interattivo della durata di un anno che coinvolgerà 52 partecipanti tra i 25 e i 35 anni.
 
 📅 DETTAGLI EVENTO:
 • Data: Venerdì 24 Gennaio 2026
