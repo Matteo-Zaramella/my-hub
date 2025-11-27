@@ -1,0 +1,17 @@
+# robots.txt
+
+User-agent: *
+
+# Block game and dashboard areas from indexing
+Disallow: /game
+Disallow: /game/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/
+
+# Allow homepage and public pages
+Allow: /
+Allow: /wishlist-public
+
+# Sitemap location
+Sitemap: https://matteozaramella.it/sitemap.xml

@@ -13,8 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "A Tutto Reality: La Rivoluzione - Matteo Zaramella",
-  description: "A Tutto Reality: La Rivoluzione 2026-2027 - Un anno di sfide, indizi e divertimento",
+  title: "Matteo Zaramella",
+  description: "Sito personale di Matteo Zaramella - Portfolio, progetti e contenuti",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "Matteo Zaramella",
+    description: "Sito personale di Matteo Zaramella - Portfolio, progetti e contenuti",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

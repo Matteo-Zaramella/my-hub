@@ -5,53 +5,78 @@ import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
 import { createClient } from '@/lib/supabase/client'
 
-// Componente per mostrare indizi cerimonia apertura
-function CeremonyCluesSection({ participantCode }: { participantCode: string }) {
+// Componente per mostrare indizi sfide mensili con accordion
+function MonthlyChallengesCluesSection() {
   const supabase = createClient()
-  const [foundClues, setFoundClues] = useState<string[]>([])
+  const [challenges, setChallenges] = useState<any[]>([])
+  const [clues, setClues] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-
-  const allClues = [
-    'ENIGMA',
-    'VULCANO',
-    'OBELISCO',
-    'LABIRINTO',
-    'UNIVERSO',
-    'ZAFFIRO',
-    'IPNOSI',
-    'ORCHESTRA',
-    'NEBULOSA',
-    'ECLISSI',
-  ]
+  const [openChallengeId, setOpenChallengeId] = useState<number | null>(null)
 
   useEffect(() => {
-    loadFoundClues()
-  }, [participantCode])
+    loadChallengesAndClues()
+  }, [])
 
-  async function loadFoundClues() {
+  async function loadChallengesAndClues() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('ceremony_clues_found')
-      .select('clue_word')
-      .eq('participant_code', participantCode)
 
-    if (error) {
-      console.error('Error loading clues:', error)
+    // Carica le 11 sfide mensili (Febbraio 2026 - Dicembre 2026)
+    const { data: challengesData, error: challengesError } = await supabase
+      .from('game_challenges')
+      .select('*')
+      .gte('start_date', '2026-02-01')
+      .lte('start_date', '2026-12-31')
+      .order('start_date', { ascending: true })
+
+    if (challengesError) {
+      console.error('Error loading challenges:', challengesError)
       setLoading(false)
       return
     }
 
-    if (data) {
-      setFoundClues(data.map((row) => row.clue_word))
+    // Carica tutti gli indizi
+    const { data: cluesData, error: cluesError } = await supabase
+      .from('game_clues')
+      .select('*')
+      .order('revealed_date', { ascending: true })
+
+    if (cluesError) {
+      console.error('Error loading clues:', cluesError)
+      setLoading(false)
+      return
     }
+
+    setChallenges(challengesData || [])
+    setClues(cluesData || [])
     setLoading(false)
+  }
+
+  function getChallengeClues(challengeId: number) {
+    return clues.filter((clue) => clue.challenge_id === challengeId)
+  }
+
+  function toggleChallenge(challengeId: number) {
+    setOpenChallengeId(openChallengeId === challengeId ? null : challengeId)
+  }
+
+  function formatDate(dateString: string) {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+  }
+
+  function isClueRevealed(revealDate: string) {
+    return new Date(revealDate) <= new Date()
   }
 
   return (
     <div className="space-y-6">
       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-          🔍 Indizi Cerimonia di Apertura
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+          🔍 Indizi Sfide Mensili
         </h2>
 
         {loading ? (
@@ -60,97 +85,106 @@ function CeremonyCluesSection({ participantCode }: { participantCode: string }) 
             <p className="text-white/60">Caricamento...</p>
           </div>
         ) : (
-          <>
-            {/* Progresso */}
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-white/80 font-semibold">Progresso Indizi</span>
-                <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-                  {foundClues.length}/10
-                </span>
-              </div>
+          <div className="space-y-3">
+            {challenges.map((challenge, index) => {
+              const challengeClues = getChallengeClues(challenge.id)
+              const isOpen = openChallengeId === challenge.id
+              const revealedClues = challengeClues.filter(c => isClueRevealed(c.revealed_date))
 
-              {/* Barra progresso */}
-              <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+              return (
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
-                  style={{ width: `${(foundClues.length / 10) * 100}%` }}
-                ></div>
-              </div>
-
-              {foundClues.length === 10 && (
-                <div className="mt-4 space-y-2">
-                  <p className="text-center text-green-400 font-bold text-lg">
-                    🎉 Hai trovato tutti gli indizi!
-                  </p>
-                  <p className="text-center text-purple-300 text-sm">
-                    💡 Le prime lettere formano: <span className="font-bold">EVOLUZIONE</span>
-                  </p>
-                  <p className="text-center text-white/70 text-xs">
-                    Inserisci EVOLUZIONE nella homepage per ricevere +100 punti!
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Lista indizi */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {allClues.map((clue, index) => {
-                const isFound = foundClues.includes(clue)
-                return (
-                  <div
-                    key={clue}
-                    className={`
-                      p-4 rounded-lg border-2 transition-all
-                      ${
-                        isFound
-                          ? 'bg-green-500/20 border-green-500/50'
-                          : 'bg-white/5 border-white/10'
-                      }
-                    `}
+                  key={challenge.id}
+                  className="bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all hover:border-purple-500/30"
+                >
+                  {/* Header - Clickable */}
+                  <button
+                    onClick={() => toggleChallenge(challenge.id)}
+                    className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-white/60 font-mono text-sm">#{index + 1}</span>
-                        {isFound ? (
-                          <>
-                            <span className="text-2xl">✅</span>
-                            <span className="font-bold text-white">{clue}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-2xl">⬜</span>
-                            <span className="text-white/40">???</span>
-                          </>
-                        )}
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-lg">
+                        {index + 1}
                       </div>
-                      {isFound && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-purple-400 text-lg font-bold">{clue[0]}</span>
-                          <span className="text-green-400 text-xs">✓</span>
+                      <div className="text-left">
+                        <div className="font-bold text-white text-lg">
+                          Sfida {formatDate(challenge.start_date)}
                         </div>
+                        <div className="text-sm text-white/60">
+                          {revealedClues.length}/{challengeClues.length} indizi rivelati
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-2xl transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                      ▼
+                    </div>
+                  </button>
+
+                  {/* Content - Accordion */}
+                  {isOpen && (
+                    <div className="border-t border-white/10 p-5 bg-white/5 space-y-3">
+                      {challengeClues.length === 0 ? (
+                        <p className="text-white/60 text-center py-4">
+                          Nessun indizio disponibile per questa sfida
+                        </p>
+                      ) : (
+                        challengeClues.map((clue, clueIndex) => {
+                          const revealed = isClueRevealed(clue.revealed_date)
+                          return (
+                            <div
+                              key={clue.id}
+                              className={`p-4 rounded-lg border-2 transition-all ${
+                                revealed
+                                  ? 'bg-green-500/10 border-green-500/30'
+                                  : 'bg-white/5 border-white/10'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-lg">{revealed ? '✅' : '🔒'}</span>
+                                    <span className="font-semibold text-white/80">
+                                      Indizio #{clueIndex + 1}
+                                    </span>
+                                    <span className="text-xs text-white/50">
+                                      Rivelato: {formatDate(clue.revealed_date)}
+                                    </span>
+                                  </div>
+                                  {revealed ? (
+                                    <p className="text-white leading-relaxed">
+                                      {clue.clue_text}
+                                    </p>
+                                  ) : (
+                                    <p className="text-white/40 italic">
+                                      Indizio disponibile da {formatDate(clue.revealed_date)}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
                       )}
                     </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Info */}
-            <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
-              <p className="text-sm text-white/70">
-                💡 <span className="font-bold">Come funziona:</span> Trova gli sticker nascosti all'<span className="text-purple-300">Oste Divino</span> durante la festa.
-                Ogni sticker contiene una parola. Inserisci la parola in MAIUSCOLO nella homepage - i cerchi si illumineranno per confermare!
-              </p>
-              <p className="text-sm text-purple-300">
-                🎯 <span className="font-bold">Obiettivo:</span> Le prime lettere dei 10 indizi formano <span className="font-bold">EVOLUZIONE</span>
-              </p>
-              <p className="text-sm text-green-300">
-                🏆 <span className="font-bold">Premio:</span> Indovina EVOLUZIONE → <span className="font-bold">+100 punti</span> + accesso area di gioco!
-              </p>
-            </div>
-          </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         )}
+
+        {/* Info */}
+        <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
+          <p className="text-sm text-white/70">
+            💡 <span className="font-bold">Come funziona:</span> Ogni sabato alle 00:00 viene rivelato un nuovo indizio.
+            Gli indizi ti aiuteranno a scoprire location e dettagli della sfida del weekend!
+          </p>
+          <p className="text-sm text-purple-300">
+            🎯 <span className="font-bold">11 Sfide:</span> Da Febbraio 2026 a Dicembre 2026, una sfida al mese
+          </p>
+          <p className="text-sm text-green-300">
+            🏆 <span className="font-bold">Punti:</span> Ogni sfida vale 100 punti - partecipa e divertiti!
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -282,16 +316,24 @@ export default function GameAreaWithChat() {
       {/* Header */}
       <header className="bg-black/30 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">🎮 A Tutto Reality: La Rivoluzione</h1>
-              <p className="text-purple-200 text-sm md:text-base">
-                Ciao, {participant.participant_name}!
-              </p>
+          <div className="flex justify-between items-center gap-4">
+            {/* Logo e Titolo */}
+            <div className="flex items-center gap-4">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="w-12 h-12 md:w-16 md:h-16 rounded-lg"
+              />
+              <div>
+                <h1 className="text-xl md:text-3xl font-bold">A Tutto Reality: La Rivoluzione</h1>
+                <p className="text-purple-200 text-sm md:text-base">
+                  Ciao, {participant.participant_name}!
+                </p>
+              </div>
             </div>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm md:text-base"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm md:text-base flex-shrink-0"
             >
               Esci
             </button>
@@ -350,7 +392,7 @@ export default function GameAreaWithChat() {
 
         {/* Clues Tab */}
         {activeTab === 'clues' && (
-          <CeremonyCluesSection participantCode={participant.participant_code} />
+          <MonthlyChallengesCluesSection />
         )}
 
         {/* Private Tab */}

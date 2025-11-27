@@ -2,6 +2,15 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import GameArea from './GameArea'
 import PasswordSuccess from './PasswordSuccess'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Area Riservata",
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 export default async function GamePage({
   searchParams,
