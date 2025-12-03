@@ -30,9 +30,6 @@ const CHECKLIST_DATA: ChecklistItem[] = [
   // 🟡 ALTA PRIORITÀ - Scadenza: 30/11/2025
   { id: '11', text: 'Sfida Febbraio: definire tipo, location, 3 indizi (21-22/02)', completed: false, category: 'Sfide', priority: 'high', deadline: '30/11' },
   { id: '12', text: 'Sfida Marzo: definire tipo, location, 3 indizi (21-22/03)', completed: false, category: 'Sfide', priority: 'high', deadline: '05/12' },
-  { id: '45', text: '🔐 Sistema validazione risposte automatico (indizi + sfide con codici)', completed: false, category: 'Tecnico', priority: 'high', deadline: '15/12' },
-  { id: '46', text: '🔑 Generare 44 password NordPass (33 indizi + 11 sfide) e inserirle DB', completed: false, category: 'Tecnico', priority: 'high', deadline: '20/12' },
-  { id: '47', text: '🏆 Testare sistema punteggi con classifica ordine inserimento risposte', completed: false, category: 'Testing', priority: 'high', deadline: '10/01' },
 
   // 🟢 MEDIA PRIORITÀ - Dicembre 2025
   { id: '3', text: 'Stampare e preparare 10 indizi fisici (formato A5)', completed: false, category: 'Location', priority: 'medium', deadline: '20/12' },
@@ -53,12 +50,6 @@ const CHECKLIST_DATA: ChecklistItem[] = [
   { id: '32', text: 'Test carico chat con 50+ utenti simultanei', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
   { id: '33', text: 'Test rivelazione automatica indizi', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
   { id: '34', text: 'Test deployment e stabilità su Vercel', completed: false, category: 'Testing', priority: 'medium', deadline: '10/01' },
-
-  // 🎨🔐 ESTETICA & SECURITY PRE-LANCIO - Gennaio 2026 (CRITICI)
-  { id: '41', text: '🎨 Controllo estetica finale sito pubblico (homepage, form, wishlist)', completed: false, category: 'Testing', priority: 'high', deadline: '18/01' },
-  { id: '42', text: '🔐 CRITICO: Indizi/risposte NON visibili con F12/Ispeziona/Network', completed: false, category: 'Testing', priority: 'urgent', deadline: '20/01' },
-  { id: '43', text: '🔐 CRITICO: Verificare RLS Supabase su TUTTE le tabelle', completed: false, category: 'Testing', priority: 'urgent', deadline: '20/01' },
-  { id: '44', text: '🔐 Security: test penetrazione (accessi non autorizzati, SQL injection, XSS)', completed: false, category: 'Testing', priority: 'urgent', deadline: '20/01' },
 
   // ⚪ BASSA PRIORITÀ - Gennaio 2026
   { id: '2', text: 'Setup location: verifica WiFi, sistema audio, spazi indizi', completed: false, category: 'Location', priority: 'low', deadline: '20/01' },

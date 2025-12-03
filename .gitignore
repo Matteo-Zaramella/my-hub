@@ -55,3 +55,7 @@ backups/
 .claude.json
 \!.env.example
 .tsx
+
+# Password mapping (CONFIDENTIAL)
+PASSWORD_MAPPING_CONFIDENTIAL.md
+.supabase-config

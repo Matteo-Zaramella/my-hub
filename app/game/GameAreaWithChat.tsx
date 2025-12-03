@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
+import ValidateAnswerTab from './ValidateAnswerTab'
 import { createClient } from '@/lib/supabase/client'
 
 // Componente per mostrare indizi sfide mensili con accordion
@@ -286,7 +287,7 @@ interface Participant {
 
 export default function GameAreaWithChat() {
   const [participant, setParticipant] = useState<Participant | null>(null)
-  const [activeTab, setActiveTab] = useState<'chat' | 'clues' | 'private'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | 'clues' | 'validate' | 'private'>('chat')
 
   // Carica partecipante da localStorage se esiste
   useEffect(() => {
@@ -366,6 +367,16 @@ export default function GameAreaWithChat() {
               🔍 Indizi
             </button>
             <button
+              onClick={() => setActiveTab('validate')}
+              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+                activeTab === 'validate'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              🔐 Valida Risposta
+            </button>
+            <button
               onClick={() => setActiveTab('private')}
               className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
                 activeTab === 'private'
@@ -393,6 +404,11 @@ export default function GameAreaWithChat() {
         {/* Clues Tab */}
         {activeTab === 'clues' && (
           <MonthlyChallengesCluesSection />
+        )}
+
+        {/* Validate Answer Tab */}
+        {activeTab === 'validate' && (
+          <ValidateAnswerTab participantId={participant.id} />
         )}
 
         {/* Private Tab */}

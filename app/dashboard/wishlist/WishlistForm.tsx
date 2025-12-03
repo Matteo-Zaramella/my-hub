@@ -9,6 +9,7 @@ export default function WishlistForm() {
   const [descrizione, setDescrizione] = useState('')
   const [link, setLink] = useState('')
   const [priorita, setPriorita] = useState('media')
+  const [categoria, setCategoria] = useState('altro')
   const [pubblico, setPubblico] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -39,6 +40,7 @@ export default function WishlistForm() {
             descrizione,
             link: link || null,
             priorita,
+            categoria,
             pubblico,
           },
         ])
@@ -52,6 +54,7 @@ export default function WishlistForm() {
         setDescrizione('')
         setLink('')
         setPriorita('media')
+        setCategoria('altro')
         setPubblico(true)
         setLoading(false)
 
@@ -104,6 +107,23 @@ export default function WishlistForm() {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
           placeholder="https://..."
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Categoria
+        </label>
+        <select
+          value={categoria}
+          onChange={(e) => setCategoria(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+        >
+          <option value="elettrodomestici">🏠 Elettrodomestici</option>
+          <option value="bici">🚴 Bici</option>
+          <option value="integratori">💊 Integratori</option>
+          <option value="vestiti">👕 Vestiti</option>
+          <option value="altro">📦 Altro</option>
+        </select>
       </div>
 
       <div>

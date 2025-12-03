@@ -18,6 +18,13 @@ interface Participant {
   present_at_opening: boolean
   opening_bonus_awarded: boolean
   registration_completed: boolean
+  participant_type: 'principale' | 'partner'
+}
+
+interface CategoryColor {
+  category: string
+  color_hex: string
+  color_name: string
 }
 
 interface EditingData {
@@ -33,9 +40,11 @@ type SortDirection = 'asc' | 'desc'
 
 export default function ParticipantsTab() {
   const [participants, setParticipants] = useState<Participant[]>([])
+  const [categoryColors, setCategoryColors] = useState<Record<string, CategoryColor>>({})
   const [loading, setLoading] = useState(true)
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [coupleFilter, setCoupleFilter] = useState<string>('all')
+  const [typeFilter, setTypeFilter] = useState<string>('all') // Nuovo filtro
   const [searchQuery, setSearchQuery] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingData, setEditingData] = useState<EditingData>({
@@ -75,6 +84,7 @@ export default function ParticipantsTab() {
 
   useEffect(() => {
     fetchParticipants()
+    fetchCategoryColors()
   }, [])
 
   const fetchParticipants = async () => {
@@ -85,6 +95,20 @@ export default function ParticipantsTab() {
 
     setParticipants(data || [])
     setLoading(false)
+  }
+
+  const fetchCategoryColors = async () => {
+    const { data } = await supabase
+      .from('category_colors')
+      .select('*')
+
+    if (data) {
+      const colorsMap: Record<string, CategoryColor> = {}
+      data.forEach((item) => {
+        colorsMap[item.category] = item
+      })
+      setCategoryColors(colorsMap)
+    }
   }
 
   const handleEdit = (participant: Participant) => {
@@ -394,11 +418,12 @@ export default function ParticipantsTab() {
     const matchesCouple = coupleFilter === 'all' ||
       (coupleFilter === 'couple' && p.is_couple) ||
       (coupleFilter === 'single' && !p.is_couple)
+    const matchesType = typeFilter === 'all' || p.participant_type === typeFilter
     const matchesSearch = searchQuery === '' ||
       p.participant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.partner_name?.toLowerCase().includes(searchQuery.toLowerCase()) || false)
 
-    return matchesCategory && matchesCouple && matchesSearch
+    return matchesCategory && matchesCouple && matchesType && matchesSearch
   })
 
   // Sort participants
@@ -607,7 +632,7 @@ export default function ParticipantsTab() {
 
       {/* Filters */}
       <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search */}
           <div>
             <label className="block text-sm font-medium text-white/80 mb-2">🔍 Cerca</label>
@@ -618,6 +643,20 @@ export default function ParticipantsTab() {
               placeholder="Nome..."
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
+          </div>
+
+          {/* Type Filter */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">👤 Tipo</label>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 [&>option]:bg-gray-900 [&>option]:text-white"
+            >
+              <option value="all">Tutti</option>
+              <option value="principale">Principale</option>
+              <option value="partner">Partner</option>
+            </select>
           </div>
 
           {/* Category Filter */}
@@ -674,6 +713,7 @@ export default function ParticipantsTab() {
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Telefono</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Instagram</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Email</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Tipo</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">
                   <button
                     onClick={() => handleSort('category')}
@@ -766,6 +806,17 @@ export default function ParticipantsTab() {
                     )}
                   </td>
 
+                  {/* Tipo */}
+                  <td className="px-4 py-3 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      participant.participant_type === 'principale'
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                    }`}>
+                      {participant.participant_type === 'principale' ? '👤 Principale' : '👥 Partner'}
+                    </span>
+                  </td>
+
                   {/* Categoria */}
                   <td className="px-4 py-3 text-sm text-white/80">
                     {isEditing ? (
@@ -783,6 +834,17 @@ export default function ParticipantsTab() {
                         <option value="Amici">Amici</option>
                         <option value="Vigodarzere">Vigodarzere</option>
                       </select>
+                    ) : participant.category && categoryColors[participant.category] ? (
+                      <span
+                        className="px-2 py-1 rounded-full text-xs font-semibold border"
+                        style={{
+                          backgroundColor: `${categoryColors[participant.category].color_hex}20`,
+                          color: categoryColors[participant.category].color_hex,
+                          borderColor: `${categoryColors[participant.category].color_hex}50`
+                        }}
+                      >
+                        {participant.category}
+                      </span>
                     ) : (
                       participant.category || '-'
                     )}

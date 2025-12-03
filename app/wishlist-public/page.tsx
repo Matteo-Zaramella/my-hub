@@ -1,9 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import NextImage from 'next/image'
+
+interface ColorVariant {
+  colore: string
+  hex: string
+  immagine_url: string
+}
 
 interface WishlistItem {
   id: number
@@ -13,12 +19,31 @@ interface WishlistItem {
   prezzo: number | null
   immagine_url: string | null
   pubblico: boolean
+  categoria: string
+  taglie: {
+    pantaloni?: string
+    maglie?: string
+    tshirt?: string
+    note?: string
+    colori_preferiti?: string[]
+  } | null
+  colori_disponibili: ColorVariant[] | null
+  colore_selezionato: string | null
+}
+
+const CATEGORIE_LABELS: Record<string, string> = {
+  elettrodomestici: 'Elettrodomestici',
+  bici: 'Bici',
+  integratori: 'Integratori',
+  vestiti: 'Vestiti',
+  altro: 'Altro'
 }
 
 export default function PublicWishlistPage() {
   const [items, setItems] = useState<WishlistItem[]>([])
   const [loading, setLoading] = useState(true)
   const [dominantColors, setDominantColors] = useState<Record<number, string>>({})
+  const [selectedColors, setSelectedColors] = useState<Record<number, number>>({}) // item_id -> color_index
   const supabase = createClient()
 
   useEffect(() => {
@@ -28,8 +53,9 @@ export default function PublicWishlistPage() {
   async function loadPublicItems() {
     const { data, error } = await supabase
       .from('wishlist_items')
-      .select('id, nome, descrizione, link, prezzo, immagine_url, pubblico')
+      .select('id, nome, descrizione, link, prezzo, immagine_url, pubblico, categoria, taglie, colori_disponibili, colore_selezionato')
       .eq('pubblico', true)
+      .order('categoria', { ascending: true })
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -69,7 +95,6 @@ export default function PublicWishlistPage() {
         const pixels = imageData.data
         let r = 0, g = 0, b = 0, count = 0
 
-        // Sample pixels (ogni 10 pixel per performance)
         for (let i = 0; i < pixels.length; i += 40) {
           r += pixels[i]
           g += pixels[i + 1]
@@ -81,7 +106,6 @@ export default function PublicWishlistPage() {
         g = Math.floor(g / count)
         b = Math.floor(b / count)
 
-        // Scurisci il colore per lo sfondo (più scuro del 60%)
         const darkenFactor = 0.4
         r = Math.floor(r * darkenFactor)
         g = Math.floor(g * darkenFactor)
@@ -91,20 +115,38 @@ export default function PublicWishlistPage() {
         setDominantColors(prev => ({ ...prev, [itemId]: color }))
       } catch (error) {
         console.error('Error extracting color:', error)
-        // Fallback al colore di default
         setDominantColors(prev => ({ ...prev, [itemId]: 'rgb(13, 13, 13)' }))
       }
     }
 
     img.onerror = () => {
-      // Fallback al colore di default
       setDominantColors(prev => ({ ...prev, [itemId]: 'rgb(13, 13, 13)' }))
     }
   }
 
+  // Group items by category
+  const itemsByCategory = items.reduce((acc, item) => {
+    const cat = item.categoria || 'altro'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(item)
+    return acc
+  }, {} as Record<string, WishlistItem[]>)
+
+  const handleColorChange = (itemId: number, colorIndex: number) => {
+    setSelectedColors(prev => ({ ...prev, [itemId]: colorIndex }))
+  }
+
+  const getCurrentImageUrl = (item: WishlistItem) => {
+    if (item.colori_disponibili && item.colori_disponibili.length > 0) {
+      const selectedIndex = selectedColors[item.id] ?? 0
+      return item.colori_disponibili[selectedIndex]?.immagine_url || item.immagine_url
+    }
+    return item.immagine_url
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header minimalista */}
+      {/* Header */}
       <header className="border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -132,75 +174,126 @@ export default function PublicWishlistPage() {
             <p className="text-white/50 text-lg">Nessun prodotto nella wishlist</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="group border border-white/10 rounded-lg overflow-hidden hover:border-white/30 transition-colors"
-              >
-                {/* Immagine */}
-                {item.immagine_url ? (
-                  <div
-                    className="aspect-square overflow-hidden flex items-center justify-center transition-colors duration-500 relative"
-                    style={{
-                      backgroundColor: dominantColors[item.id] || 'rgb(13, 13, 13)'
-                    }}
-                  >
-                    <NextImage
-                      src={item.immagine_url}
-                      alt={item.nome}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-contain group-hover:scale-105 transition-transform duration-300"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-square bg-white/5 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                )}
+          <div className="space-y-12">
+            {Object.entries(itemsByCategory).map(([categoria, categoryItems]) => (
+              <section key={categoria}>
+                {/* Category Header */}
+                <h2 className="text-xl sm:text-2xl font-light mb-6 border-b border-white/10 pb-3">
+                  {CATEGORIE_LABELS[categoria] || categoria}
+                </h2>
 
-                {/* Info */}
-                <div className="p-4 sm:p-6">
-                  <h3 className="text-lg sm:text-xl font-light mb-2 line-clamp-2">
-                    {item.nome}
-                  </h3>
+                {/* Items Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                  {categoryItems.map((item) => {
+                    const currentImageUrl = getCurrentImageUrl(item)
+                    const selectedColorIndex = selectedColors[item.id] ?? 0
 
-                  {item.descrizione && (
-                    <p className="text-white/60 text-sm mb-4 line-clamp-3">
-                      {item.descrizione}
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    {item.prezzo && (
-                      <span className="text-white/80 font-light">
-                        €{item.prezzo.toFixed(2)}
-                      </span>
-                    )}
-
-                    {item.link && (
-                      <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-auto px-4 py-2 border border-white/20 rounded hover:bg-white hover:text-black transition-colors text-sm"
+                    return (
+                      <div
+                        key={item.id}
+                        className="group border border-white/10 rounded-lg overflow-hidden hover:border-white/30 transition-colors"
                       >
-                        Vedi
-                      </a>
-                    )}
-                  </div>
+                        {/* Image */}
+                        {currentImageUrl ? (
+                          <div
+                            className="aspect-square overflow-hidden flex items-center justify-center transition-colors duration-500 relative"
+                            style={{
+                              backgroundColor: dominantColors[item.id] || 'rgb(13, 13, 13)'
+                            }}
+                          >
+                            <NextImage
+                              src={currentImageUrl}
+                              alt={item.nome}
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              className="object-contain group-hover:scale-105 transition-transform duration-300"
+                              unoptimized
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-square bg-white/5 flex items-center justify-center">
+                            <svg className="w-16 h-16 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+
+                        {/* Info */}
+                        <div className="p-4 sm:p-6">
+                          <h3 className="text-lg sm:text-xl font-light mb-2 line-clamp-2">
+                            {item.nome}
+                          </h3>
+
+                          {item.descrizione && (
+                            <p className="text-white/60 text-sm mb-4 line-clamp-3">
+                              {item.descrizione}
+                            </p>
+                          )}
+
+                          {/* Taglie (solo vestiti) */}
+                          {item.categoria === 'vestiti' && item.taglie && (
+                            <div className="mb-4 text-xs text-white/50 space-y-1">
+                              {item.taglie.pantaloni && <p>Pantaloni: {item.taglie.pantaloni}</p>}
+                              {item.taglie.maglie && <p>Maglie: {item.taglie.maglie}</p>}
+                              {item.taglie.tshirt && <p>T-shirt: {item.taglie.tshirt}</p>}
+                              {item.taglie.colori_preferiti && item.taglie.colori_preferiti.length > 0 && (
+                                <p>Colori preferiti: {item.taglie.colori_preferiti.join(', ')}</p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Color Selector */}
+                          {item.colori_disponibili && item.colori_disponibili.length > 1 && (
+                            <div className="mb-4">
+                              <p className="text-xs text-white/50 mb-2">Colori disponibili:</p>
+                              <div className="flex gap-2 flex-wrap">
+                                {item.colori_disponibili.map((colorVariant, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => handleColorChange(item.id, index)}
+                                    className={`w-8 h-8 rounded-full border-2 transition-all ${
+                                      selectedColorIndex === index
+                                        ? 'border-white scale-110'
+                                        : 'border-white/30 hover:border-white/50'
+                                    }`}
+                                    style={{ backgroundColor: colorVariant.hex }}
+                                    title={colorVariant.colore}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between">
+                            {item.prezzo && (
+                              <span className="text-white/80 font-light">
+                                €{item.prezzo.toFixed(2)}
+                              </span>
+                            )}
+
+                            {item.link && (
+                              <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-auto px-4 py-2 border border-white/20 rounded hover:bg-white hover:text-black transition-colors text-sm"
+                              >
+                                Vedi
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              </div>
+              </section>
             ))}
           </div>
         )}
       </main>
 
-      {/* Footer minimalista */}
+      {/* Footer */}
       <footer className="border-t border-white/10 mt-16">
         <div className="max-w-6xl mx-auto px-4 py-6 text-center text-white/40 text-sm">
           <p>My Hub · Wishlist Pubblica</p>

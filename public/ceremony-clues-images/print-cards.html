@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Cerimonia - A Tutto Reality: La Rivoluzione</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            .page-break {
+                page-break-after: always;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .instructions {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .instructions h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .instructions p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .print-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .print-button:hover {
+            background: #2980b9;
+        }
+
+        /* Foglio A4: 210mm x 297mm - Layout 2x2 card da 90mm */
+        .sheet {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            margin: 20px auto;
+            padding: 10mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: repeat(2, 90mm);
+            grid-template-rows: repeat(2, 90mm);
+            gap: 10mm;
+            justify-content: center;
+            align-content: center;
+            position: relative;
+        }
+
+        .card {
+            width: 90mm;
+            height: 90mm;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .sheet-title {
+            position: absolute;
+            top: 2mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* Foglio loghi - 2x2 da 90mm come le card */
+        .sheet.logos {
+            display: grid;
+            grid-template-columns: repeat(2, 90mm);
+            grid-template-rows: repeat(2, 90mm);
+            gap: 10mm;
+            justify-content: center;
+            align-content: center;
+        }
+
+        .logo-card {
+            width: 90mm;
+            height: 90mm;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10mm;
+            background: white;
+        }
+
+        .logo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .cut-guide {
+            position: absolute;
+            font-size: 8pt;
+            color: #999;
+            bottom: 2mm;
+            left: 10mm;
+            right: 10mm;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions no-print">
+        <h1>📋 Istruzioni Stampa Card Cerimonia</h1>
+        <p><strong>A Tutto Reality: La Rivoluzione</strong> - 24 Gennaio 2026</p>
+
+        <h2 style="margin-top: 20px; color: #2c3e50;">🎯 Cosa Otterrai:</h2>
+        <ul>
+            <li><strong>5 Fogli A4 totali</strong> con layout 2x2 (4 elementi per foglio)</li>
+            <li><strong>Foglio 1:</strong> Card fronte #1-4 (90x90mm)</li>
+            <li><strong>Foglio 2:</strong> Loghi retro #1-4 (90x90mm)</li>
+            <li><strong>Foglio 3:</strong> Card fronte #5-8 (90x90mm)</li>
+            <li><strong>Foglio 4:</strong> Loghi retro #5-8 (90x90mm)</li>
+            <li><strong>Foglio 5:</strong> Card fronte #9-10 (sopra) + Loghi retro #9-10 (sotto) - 90x90mm</li>
+        </ul>
+        <p style="margin-top: 10px; color: #27ae60; font-weight: bold;">
+            ✅ Tutte le card sono 90mm x 90mm (9cm x 9cm) QUADRATE!<br>
+            ✅ Solo 5 fogli necessari (risparmio carta!)
+        </p>
+
+        <h2 style="margin-top: 20px; color: #2c3e50;">🖨️ Impostazioni Stampa:</h2>
+        <ul>
+            <li><strong>Formato:</strong> A4 (210 x 297 mm)</li>
+            <li><strong>Orientamento:</strong> Verticale</li>
+            <li><strong>Margini:</strong> 0 mm (senza margini)</li>
+            <li><strong>Carta:</strong> Fotografica lucida/opaca 200-300 g/m²</li>
+            <li><strong>Qualità:</strong> Massima (1000 DPI se possibile)</li>
+            <li><strong>Colore:</strong> A colori</li>
+        </ul>
+
+        <h2 style="margin-top: 20px; color: #2c3e50;">✂️ Dopo la Stampa:</h2>
+        <ul>
+            <li>Taglia lungo le linee tratteggiate</li>
+            <li>Incolla i loghi sul retro delle card indizi</li>
+            <li>Plastifica le card per maggiore resistenza (opzionale)</li>
+            <li>Nascondi le 10 card durante la festa seguendo gli indovinelli</li>
+        </ul>
+
+        <h2 style="margin-top: 20px; color: #2c3e50;">📝 Lista Indizi (ordine):</h2>
+        <ul>
+            <li>1. ENIGMA (E)</li>
+            <li>2. VULCANO (V)</li>
+            <li>3. OBELISCO (O)</li>
+            <li>4. LABIRINTO (L)</li>
+            <li>5. UMIDIFICATORE (U)</li>
+            <li>6. ZAFFIRO (Z)</li>
+            <li>7. IPNOSI (I)</li>
+            <li>8. ORCHESTRA (O)</li>
+            <li>9. NEBULOSA (N)</li>
+            <li>10. ERMETICO (E) - <strong>STAMPA SEPARATAMENTE</strong></li>
+        </ul>
+
+        <p style="margin-top: 20px; color: #e74c3c; font-weight: bold;">
+            ⚠️ NOTA: Il foglio 1 contiene 9 card. L'indizio #10 (ERMETICO) va stampato a parte o aggiunto a un secondo foglio.
+        </p>
+
+        <button class="print-button" onclick="window.print()">🖨️ Stampa le Card</button>
+    </div>
+
+    <!-- FOGLIO 1: Card Fronte #1-4 -->
+    <div class="sheet page-break">
+        <div class="sheet-title">FOGLIO 1 - FRONTE Card #1-4 (90x90mm)</div>
+        <div class="card">
+            <img src="01-enigma.jpg" alt="Enigma">
+            <div class="card-number">#1</div>
+        </div>
+        <div class="card">
+            <img src="02-vulcano.jpg" alt="Vulcano">
+            <div class="card-number">#2</div>
+        </div>
+        <div class="card">
+            <img src="03-obelisco.jpg" alt="Obelisco">
+            <div class="card-number">#3</div>
+        </div>
+        <div class="card">
+            <img src="04-labirinto.jpg" alt="Labirinto">
+            <div class="card-number">#4</div>
+        </div>
+        <div class="cut-guide">✂️ Card QUADRATE 90x90mm - Taglia lungo le linee</div>
+    </div>
+
+    <!-- FOGLIO 2: Loghi Retro #1-4 -->
+    <div class="sheet logos page-break">
+        <div class="sheet-title">FOGLIO 2 - RETRO Loghi #1-4 (90x90mm)</div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #1">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #2">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #3">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #4">
+        </div>
+        <div class="cut-guide">✂️ Loghi QUADRATI 90x90mm - Incolla sul retro card 1-4</div>
+    </div>
+
+    <!-- FOGLIO 3: Card Fronte #5-8 -->
+    <div class="sheet page-break">
+        <div class="sheet-title">FOGLIO 3 - FRONTE Card #5-8 (90x90mm)</div>
+        <div class="card">
+            <img src="05-umidificatore.jpg" alt="Umidificatore">
+            <div class="card-number">#5</div>
+        </div>
+        <div class="card">
+            <img src="06-zaffiro.jpg" alt="Zaffiro">
+            <div class="card-number">#6</div>
+        </div>
+        <div class="card">
+            <img src="07-ipnosi.jpg" alt="Ipnosi">
+            <div class="card-number">#7</div>
+        </div>
+        <div class="card">
+            <img src="08-orchestra.jpg" alt="Orchestra">
+            <div class="card-number">#8</div>
+        </div>
+        <div class="cut-guide">✂️ Card QUADRATE 90x90mm - Taglia lungo le linee</div>
+    </div>
+
+    <!-- FOGLIO 4: Loghi Retro #5-8 -->
+    <div class="sheet logos page-break">
+        <div class="sheet-title">FOGLIO 4 - RETRO Loghi #5-8 (90x90mm)</div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #5">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #6">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #7">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #8">
+        </div>
+        <div class="cut-guide">✂️ Loghi QUADRATI 90x90mm - Incolla sul retro card 5-8</div>
+    </div>
+
+    <!-- FOGLIO 5: Card #9-10 Fronte + Loghi Retro (tutto su 1 foglio) -->
+    <div class="sheet page-break">
+        <div class="sheet-title">FOGLIO 5 - Card #9-10 FRONTE + LOGHI RETRO (90x90mm)</div>
+        <div class="card">
+            <img src="09-nebulosa.jpg" alt="Nebulosa">
+            <div class="card-number">#9</div>
+        </div>
+        <div class="card">
+            <img src="10-ermetico.jpg" alt="Ermetico">
+            <div class="card-number">#10</div>
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #9">
+        </div>
+        <div class="logo-card">
+            <img src="../logo.png" alt="Logo #10">
+        </div>
+        <div class="cut-guide">✂️ Sopra: Card 9-10 | Sotto: Loghi 9-10 - TOTALE 5 FOGLI!</div>
+    </div>
+
+    <div class="instructions no-print" style="margin-top: 40px;">
+        <h2 style="color: #27ae60;">✅ Checklist Pre-Stampa:</h2>
+        <ul>
+            <li>☐ Carta fotografica caricata nella stampante</li>
+            <li>☐ Impostazioni: A4, verticale, margini 0mm</li>
+            <li>☐ Qualità massima selezionata</li>
+            <li>☐ Anteprima di stampa verificata</li>
+            <li>☐ Cutter e righello pronti per il taglio</li>
+            <li>☐ Colla stick per incollare i loghi</li>
+            <li>☐ (Opzionale) Plastificatrice A4</li>
+        </ul>
+
+        <p style="margin-top: 20px; color: #16a085; font-weight: bold;">
+            🎉 Buona fortuna con la cerimonia del 24 Gennaio 2026!
+        </p>
+    </div>
+</body>
+</html>

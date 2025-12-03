@@ -10,6 +10,7 @@ interface WishlistItemProps {
     nome: string
     descrizione: string | null
     link: string | null
+    immagine_url: string | null
     priorita: string
     pubblico: boolean
     created_at: string
@@ -21,6 +22,7 @@ export default function WishlistItem({ item }: WishlistItemProps) {
   const [nome, setNome] = useState(item.nome)
   const [descrizione, setDescrizione] = useState(item.descrizione || '')
   const [link, setLink] = useState(item.link || '')
+  const [immagineUrl, setImmagineUrl] = useState(item.immagine_url || '')
   const [priorita, setPriorita] = useState(item.priorita)
   const [pubblico, setPubblico] = useState(item.pubblico)
   const [loading, setLoading] = useState(false)
@@ -37,6 +39,7 @@ export default function WishlistItem({ item }: WishlistItemProps) {
         nome,
         descrizione: descrizione || null,
         link: link || null,
+        immagine_url: immagineUrl || null,
         priorita,
         pubblico,
       })
@@ -142,6 +145,19 @@ export default function WishlistItem({ item }: WishlistItemProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              URL Immagine
+            </label>
+            <input
+              type="url"
+              value={immagineUrl}
+              onChange={(e) => setImmagineUrl(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Priorità
             </label>
             <select
@@ -209,19 +225,35 @@ export default function WishlistItem({ item }: WishlistItemProps) {
             <p className="text-gray-600 mb-3">{item.descrizione}</p>
           )}
 
-          {item.link && (
-            <a
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-pink-600 hover:text-pink-700 text-sm font-medium inline-flex items-center gap-1"
-            >
-              🔗 Vedi link
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          )}
+          <div className="space-y-2">
+            {item.link && (
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-pink-600 hover:text-pink-700 text-sm font-medium inline-flex items-center gap-1"
+              >
+                🔗 Vedi link
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            )}
+
+            {item.immagine_url && (
+              <div className="flex items-start gap-2">
+                <span className="text-xs text-gray-500 font-medium">🖼️ Immagine:</span>
+                <a
+                  href={item.immagine_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:text-blue-700 break-all"
+                >
+                  {item.immagine_url}
+                </a>
+              </div>
+            )}
+          </div>
 
           <p className="text-xs text-gray-400 mt-3">
             Aggiunto il {new Date(item.created_at).toLocaleDateString('it-IT')}

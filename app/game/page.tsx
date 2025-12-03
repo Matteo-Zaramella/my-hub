@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import GameArea from './GameArea'
 import PasswordSuccess from './PasswordSuccess'
 import { Metadata } from 'next'
 
@@ -31,21 +30,16 @@ export default async function GamePage({
   const params = await searchParams
   const password = params.password
 
-  console.log('Game page - password received:', password)
-
   if (!password) {
     // Redirect back to home if no password provided
-    console.log('No password, redirecting to home')
     redirect('/')
   }
 
   // If password is correct, show success page
   if (password === GAME_PASSWORD) {
-    console.log('Password correct, showing success page')
     return <PasswordSuccess />
   }
 
   // If password is wrong, redirect back to home
-  console.log('Password incorrect, redirecting to home')
   redirect('/')
 }
