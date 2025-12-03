@@ -501,7 +501,7 @@ function ClickerChallenge({ onComplete, onBack }: MemoryGameProps) {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const newTargets = []
+    const newTargets: { x: number; y: number; radius: number }[] = []
     for (let i = 0; i < count; i++) {
       newTargets.push({
         x: Math.random() * (canvas.width - 60) + 30,
