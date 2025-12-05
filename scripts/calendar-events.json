@@ -1,0 +1,275 @@
+[
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 1",
+    "start": "2026-02-07",
+    "description": "Indizio 2 per Sfida 1\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 3 - Sfida 1",
+    "start": "2026-02-14",
+    "description": "Indizio 3 per Sfida 1\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 1 - Febbraio",
+    "start": "2026-02-21",
+    "description": "Descrizione della Sfida 1\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 2",
+    "start": "2026-02-28",
+    "description": "Indizio 1 per Sfida 2\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 2",
+    "start": "2026-03-07",
+    "description": "Indizio 2 per Sfida 2\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 3 - Sfida 2",
+    "start": "2026-03-14",
+    "description": "Indizio 3 per Sfida 2\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 2 - Marzo",
+    "start": "2026-03-21",
+    "description": "Descrizione della Sfida 2\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 3",
+    "start": "2026-03-28",
+    "description": "Indizio 5 per Sfida 2\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 3",
+    "start": "2026-04-04",
+    "description": "Indizio 1 per Sfida 3\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 3",
+    "start": "2026-04-11",
+    "description": "Indizio 2 per Sfida 3\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 3 - Aprile",
+    "start": "2026-04-18",
+    "description": "Descrizione della Sfida 3\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 4",
+    "start": "2026-04-25",
+    "description": "Indizio 4 per Sfida 3\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 4",
+    "start": "2026-05-02",
+    "description": "Indizio 1 per Sfida 4\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 4",
+    "start": "2026-05-09",
+    "description": "Indizio 2 per Sfida 4\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 4 - Maggio",
+    "start": "2026-05-16",
+    "description": "Descrizione della Sfida 4\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 5",
+    "start": "2026-06-06",
+    "description": "Indizio 1 per Sfida 5\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 5",
+    "start": "2026-06-13",
+    "description": "Indizio 2 per Sfida 5\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 5 - Giugno",
+    "start": "2026-06-20",
+    "description": "Descrizione della Sfida 5\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 6",
+    "start": "2026-07-04",
+    "description": "Indizio 1 per Sfida 6\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 6",
+    "start": "2026-07-11",
+    "description": "Indizio 2 per Sfida 6\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 6 - Luglio",
+    "start": "2026-07-18",
+    "description": "Descrizione della Sfida 6\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 7",
+    "start": "2026-08-08",
+    "description": "Indizio 1 per Sfida 7\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 7",
+    "start": "2026-08-15",
+    "description": "Indizio 2 per Sfida 7\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 7 - Agosto",
+    "start": "2026-08-22",
+    "description": "Descrizione della Sfida 7\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 8",
+    "start": "2026-09-05",
+    "description": "Indizio 1 per Sfida 8\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 8",
+    "start": "2026-09-12",
+    "description": "Indizio 2 per Sfida 8\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 8 - Settembre",
+    "start": "2026-09-19",
+    "description": "Descrizione della Sfida 8\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 9",
+    "start": "2026-10-03",
+    "description": "Indizio 1 per Sfida 9\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 9",
+    "start": "2026-10-10",
+    "description": "Indizio 2 per Sfida 9\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 9 - Ottobre",
+    "start": "2026-10-17",
+    "description": "Descrizione della Sfida 9\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 10",
+    "start": "2026-10-31",
+    "description": "Indizio 1 per Sfida 10\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 10",
+    "start": "2026-11-07",
+    "description": "Indizio 2 per Sfida 10\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 3 - Sfida 10",
+    "start": "2026-11-14",
+    "description": "Indizio 3 per Sfida 10\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 10 - Novembre",
+    "start": "2026-11-21",
+    "description": "Descrizione della Sfida 10\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 1 - Sfida 11",
+    "start": "2026-11-28",
+    "description": "Indizio 1 per Sfida 11\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 2 - Sfida 11",
+    "start": "2026-12-05",
+    "description": "Indizio 2 per Sfida 11\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 3 - Sfida 11",
+    "start": "2026-12-12",
+    "description": "Indizio 3 per Sfida 11\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  },
+  {
+    "type": "challenge",
+    "summary": "🎯 Sfida 11 - Dicembre",
+    "start": "2026-12-19",
+    "description": "Descrizione della Sfida 11\n\n💰 Punti: 1200 (1°) - 540 (ultimo)\n📍 Location: Da definire\n\n🔐 I partecipanti devono trovare il codice segreto per validare la sfida completata.",
+    "colorId": "11"
+  },
+  {
+    "type": "clue",
+    "summary": "🔍 Indizio 5 - Sfida 11",
+    "start": "2026-12-26",
+    "description": "Indizio 5 per Sfida 11\n\n💡 Pubblicazione automatica alle 12:00\n🔐 Codice validazione richiesto\n💰 Punti: 1000 (1°) - 450 (ultimo)",
+    "colorId": "9"
+  }
+]

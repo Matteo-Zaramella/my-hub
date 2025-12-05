@@ -1,0 +1,1 @@
+Placeholder per immagini indizi

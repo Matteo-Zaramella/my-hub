@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import RegistrationForm from './RegistrationForm'
+import TerminalWelcome from './components/TerminalWelcome'
 
 export default function LandingPage() {
   const router = useRouter()
@@ -27,6 +28,10 @@ export default function LandingPage() {
   const [passwordInputEnabled, setPasswordInputEnabled] = useState(false) // Barra inserimento password
   const [minigameButtonEnabled, setMinigameButtonEnabled] = useState(false) // Cerchio 95 Saetta McQueen
 
+  // Terminal welcome animation
+  const [showTerminalWelcome, setShowTerminalWelcome] = useState(false)
+  const [welcomeCompleted, setWelcomeCompleted] = useState(false)
+
   // Load ceremony clues from admin panel
   const [ceremonyClues, setCeremonyClues] = useState<{ word: string; order: number }[]>([])
 
@@ -34,6 +39,23 @@ export default function LandingPage() {
   const GAME_PASSWORD = 'EVOLUZIONE'
 
   const supabase = createClient()
+
+  // Check if first visit for terminal welcome animation
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
+    if (!hasSeenWelcome) {
+      setShowTerminalWelcome(true)
+    } else {
+      setWelcomeCompleted(true)
+    }
+  }, [])
+
+  // Handle welcome animation completion
+  const handleWelcomeComplete = () => {
+    localStorage.setItem('hasSeenWelcome', 'true')
+    setShowTerminalWelcome(false)
+    setWelcomeCompleted(true)
+  }
 
   // Load participant code and clues from database
   useEffect(() => {
@@ -338,6 +360,8 @@ export default function LandingPage() {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
+      {/* Terminal Welcome Animation - First visit only */}
+      {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} />}
       {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati */}
       {cluesFound < 10 && (
         <div className="absolute inset-0 flex items-center justify-center">

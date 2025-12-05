@@ -33,7 +33,7 @@ export default async function GameManagementPage() {
     <div className="min-h-screen bg-black">
       {/* Header */}
       <header className="bg-black border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-white/60 hover:text-white">
               ← Dashboard
@@ -44,7 +44,7 @@ export default async function GameManagementPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <GameManagement
           gameConfig={gameConfig}
           challenges={challenges || []}

@@ -12,8 +12,8 @@ interface RegistrationFormProps {
 export default function RegistrationForm({ onClose, onSuccess, participantCode }: RegistrationFormProps) {
   const supabase = createClient()
 
-  // Form step: 'identity' per verifica, 'data' per inserimento dati
-  const [step, setStep] = useState<'identity' | 'data'>('identity')
+  // Form step: 'identity' per verifica, 'warning' per countdown, 'data' per inserimento dati, 'already_registered' per utenti già registrati
+  const [step, setStep] = useState<'identity' | 'warning' | 'data' | 'already_registered'>('identity')
 
   // Dati form
   const [firstName, setFirstName] = useState('')
@@ -27,8 +27,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
   const [loading, setLoading] = useState(true) // Inizia come loading per check settings
   const [error, setError] = useState('')
   const [foundParticipant, setFoundParticipant] = useState<any>(null)
-  const [countdown, setCountdown] = useState(10) // Timer 10 secondi
-  const [canSubmit, setCanSubmit] = useState(false) // Può inviare solo dopo 10 secondi
+  const [warningCountdown, setWarningCountdown] = useState(10) // Timer 10 secondi schermata gialla
   const [registrationEnabled, setRegistrationEnabled] = useState(false)
 
   // Check se la registrazione è abilitata
@@ -58,14 +57,14 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
     }
   }
 
-  // Timer countdown quando si arriva allo step 2
+  // Timer countdown schermata gialla (warning)
   useEffect(() => {
-    if (step === 'data' && !canSubmit) {
+    if (step === 'warning') {
       const timer = setInterval(() => {
-        setCountdown((prev) => {
+        setWarningCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer)
-            setCanSubmit(true)
+            setStep('data')
             return 0
           }
           return prev - 1
@@ -74,7 +73,8 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
 
       return () => clearInterval(timer)
     }
-  }, [step, canSubmit])
+  }, [step])
+
 
   // Step 1: Verifica identità
   const handleIdentitySubmit = async (e: React.FormEvent) => {
@@ -106,14 +106,14 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
 
       // Verifica se ha già completato la registrazione
       if (data.registration_completed) {
-        setError('Hai già completato la registrazione. I dati non possono essere modificati.')
+        setStep('already_registered')
         setLoading(false)
         return
       }
 
       // NON pre-compilare i dati - l'utente deve inserirli da zero
-      // Passa allo step 2
-      setStep('data')
+      // Passa alla schermata warning (countdown 10 secondi)
+      setStep('warning')
     } catch (err) {
       console.error('Error verifying identity:', err)
       setError('Errore nella verifica. Riprova.')
@@ -187,7 +187,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
   // Loading state
   if (loading) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center z-50" style={{ backgroundColor: '#0a2818' }}>
+      <div className="absolute inset-0 flex items-center justify-center z-50" style={{ backgroundColor: '#000000' }}>
         <div className="text-white/60">Caricamento...</div>
       </div>
     )
@@ -196,262 +196,160 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
   // Registrazione disabilitata
   if (!registrationEnabled) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: '#0a2818' }}>
-        {/* Sfondo Fenice Verde */}
-        <div
-          className="absolute inset-y-0 left-0 bg-contain bg-left bg-no-repeat opacity-30"
+      <div className="absolute inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: '#000000' }}>
+        {/* Logo Fenice in alto a destra - Cliccabile per aprire mappa */}
+        <button
+          onClick={() => window.open('/mappa-fenice.jpg', '_blank')}
+          className="absolute top-8 right-8 w-24 h-24 md:w-32 md:h-32 bg-contain bg-center bg-no-repeat opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
           style={{
-            backgroundImage: 'url(/fenice-verde-full.jpg)',
-            width: '50%',
-            maxWidth: '800px'
+            backgroundImage: 'url(/fenice-verde.png)'
           }}
+          aria-label="Apri mappa Fenice Green Energy Park"
         />
 
-        <div className="relative w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-lg p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-white">⏸️ Registrazione Non Disponibile</h2>
-            <button
-              onClick={onClose}
-              className="text-white/40 hover:text-white text-xl transition-colors"
-            >
-              ✕
-            </button>
-          </div>
+        <div className="relative w-full max-w-md">
+          <button
+            onClick={onClose}
+            className="absolute -top-12 right-0 text-white/40 hover:text-white text-xl transition-colors"
+          >
+            ✕
+          </button>
 
-          <div className="space-y-4 text-center">
-            <p className="text-white/70">
-              La registrazione non è ancora aperta.
-            </p>
-            <p className="text-white/50 text-sm">
-              Riceverai un link quando sarà possibile registrarsi.
-            </p>
-            <p className="text-green-400/70 text-sm font-medium mt-6">
-              Resta sintonizzato!
-            </p>
-          </div>
+          <p className="text-white text-xl text-center">
+            REGISTRAZIONE NON DISPONIBILE
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto" style={{ backgroundColor: '#0a2818' }}>
-      {/* Sfondo Fenice Verde - Posizionata a Sinistra */}
-      <div
-        className="absolute inset-y-0 left-0 bg-contain bg-left bg-no-repeat opacity-30"
+    <div className="absolute inset-0 flex items-center justify-center z-50 p-4 overflow-y-auto" style={{ backgroundColor: '#000000' }}>
+      {/* Logo Fenice in alto a destra - Cliccabile per aprire mappa */}
+      <button
+        onClick={() => window.open('/mappa-fenice.jpg', '_blank')}
+        className="absolute top-8 right-8 w-24 h-24 md:w-32 md:h-32 bg-contain bg-center bg-no-repeat opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
         style={{
-          backgroundImage: 'url(/fenice-verde-full.jpg)',
-          width: '50%',
-          maxWidth: '800px'
+          backgroundImage: 'url(/fenice-verde.png)'
         }}
+        aria-label="Apri mappa Fenice Green Energy Park"
       />
 
-      <div className="relative w-full max-w-md bg-black/60 backdrop-blur-md border border-white/20 rounded-lg p-8 my-8">
-        {/* Header Minimale */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-xl font-bold text-white">📝 Iscrizione</h2>
-            <p className="text-white/40 text-sm mt-1">
-              {step === 'identity' ? 'Step 1/2: Verifica identità' : 'Step 2/2: I tuoi dati'}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white/40 hover:text-white text-xl transition-colors"
-          >
-            ✕
-          </button>
-        </div>
+      <div className="relative w-full max-w-md">
+        <button
+          onClick={onClose}
+          className="absolute -top-12 right-0 text-white/40 hover:text-white text-xl transition-colors"
+        >
+          ✕
+        </button>
 
         {/* Step 1: Verifica Identità */}
         {step === 'identity' && (
-          <form onSubmit={handleIdentitySubmit} className="space-y-6">
-            <p className="text-white/60 text-sm">
-              Inserisci il tuo nome come registrato per verificare la tua identità:
-            </p>
+          <form onSubmit={handleIdentitySubmit} className="flex flex-col gap-3">
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="NOME"
+              required
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            {/* Nome */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Nome *
-              </label>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Mario"
-                required
-                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-              />
-            </div>
+            <input
+              type="text"
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+              placeholder="SECONDO NOME"
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            {/* Secondo Nome */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Secondo Nome <span className="text-white/30">(solo se hai un doppio nome)</span>
-              </label>
-              <input
-                type="text"
-                value={middleName}
-                onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="es: Francesco"
-                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-              />
-              <p className="text-xs text-white/30 mt-1">
-                💡 Es: Giovanni Francesco Rossi → secondo nome = "Francesco"
-              </p>
-            </div>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="COGNOME"
+              required
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            {/* Cognome */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Cognome Completo *
-              </label>
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="es: De Sandre"
-                required
-                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-              />
-              <p className="text-xs text-white/30 mt-1">
-                💡 Includi "De", "Della", "Di" ecc. nel cognome
-              </p>
-            </div>
-
-            {/* Error */}
             {error && (
-              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
-                <p className="text-red-300 text-sm">{error}</p>
-              </div>
+              <p className="text-red-400 text-sm text-center">{error}</p>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading || !firstName || !lastName}
-              className="w-full bg-white text-black px-6 py-3 rounded-lg font-medium hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? 'Verifica in corso...' : 'Continua →'}
-            </button>
+              className="w-16 h-16 bg-white rounded-lg hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all mx-auto mt-3"
+            />
           </form>
+        )}
+
+        {/* Schermata Warning - Countdown 10 secondi */}
+        {step === 'warning' && (
+          <div className="w-full max-w-md bg-yellow-400 rounded-lg p-8 text-center">
+            <p className="text-black text-xl font-bold mb-4 uppercase">
+              ⚠️ ATTENZIONE
+            </p>
+            <p className="text-black text-lg mb-6">
+              L'iscrizione è DEFINITIVA
+            </p>
+            <p className="text-black text-base mb-4">
+              Una volta salvata, non potrai più modificare i tuoi dati
+            </p>
+            <p className="text-black text-6xl font-bold">
+              {warningCountdown}
+            </p>
+          </div>
+        )}
+
+        {/* Schermata Già Registrato */}
+        {step === 'already_registered' && (
+          <div className="w-full max-w-md text-center">
+            <p className="text-white text-xl uppercase">
+              PARTECIPANTE REGISTRATO CON SUCCESSO
+            </p>
+          </div>
         )}
 
         {/* Step 2: Inserimento Dati */}
         {step === 'data' && foundParticipant && (
-          <form onSubmit={handleDataSubmit} className="space-y-6">
-            {/* Conferma identità */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
-              <p className="text-white/80 text-sm">
-                ✅ Identità verificata: <span className="font-semibold">{foundParticipant.participant_name}</span>
-              </p>
-            </div>
+          <form onSubmit={handleDataSubmit} className="flex flex-col gap-3">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="TELEFONO"
+              required
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            <p className="text-white/60 text-sm">
-              Inserisci i tuoi dati di contatto:
-            </p>
+            <input
+              type="text"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              placeholder="INSTAGRAM"
+              required
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            {/* Telefono */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Numero di Cellulare *
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+39 123 456 7890"
-                required
-                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-              />
-            </div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="EMAIL"
+              required
+              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+            />
 
-            {/* Instagram */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Username Instagram *
-              </label>
-              <div className="flex">
-                <span className="inline-flex items-center px-3 bg-transparent border border-r-0 border-white/20 rounded-l-lg text-white/40">
-                  @
-                </span>
-                <input
-                  type="text"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                  placeholder="username"
-                  required
-                  className="flex-1 px-4 py-3 bg-transparent border border-white/20 rounded-r-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-xs text-white/40 mb-2">
-                Indirizzo Email *
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nome@email.com"
-                required
-                className="w-full px-4 py-3 bg-transparent border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-white/40 transition-colors"
-              />
-            </div>
-
-            {/* Error */}
             {error && (
-              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
-                <p className="text-red-300 text-sm">{error}</p>
-              </div>
+              <p className="text-red-400 text-sm text-center">{error}</p>
             )}
 
-            {/* Countdown Warning */}
-            {!canSubmit && (
-              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4">
-                <p className="text-yellow-300 font-semibold text-center mb-2">
-                  ⚠️ Attenzione: L'iscrizione è DEFINITIVA
-                </p>
-                <p className="text-yellow-200 text-sm text-center mb-2">
-                  Una volta salvata, non potrai più modificare i tuoi dati.
-                  Controlla attentamente tutte le informazioni inserite.
-                </p>
-                <p className="text-yellow-100 text-lg font-bold text-center">
-                  {countdown} secondi
-                </p>
-              </div>
-            )}
-
-            {/* Info */}
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-              <p className="text-blue-200 text-xs">
-                💡 Tutti i campi sono obbligatori per completare l'iscrizione
-              </p>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('identity')
-                  setError('')
-                }}
-                className="px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/20 transition"
-              >
-                ← Indietro
-              </button>
-              <button
-                type="submit"
-                disabled={loading || !canSubmit}
-                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                {loading ? 'Salvataggio...' : !canSubmit ? `Attendi ${countdown}s...` : '✓ Completa Iscrizione'}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading || !phone || !instagram || !email}
+              className="w-16 h-16 bg-white rounded-lg hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all mx-auto mt-3"
+            />
           </form>
         )}
       </div>

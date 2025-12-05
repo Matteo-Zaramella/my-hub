@@ -73,6 +73,23 @@ function MonthlyChallengesCluesSection() {
     return new Date(revealDate) <= new Date()
   }
 
+  // Calcola il prossimo lunedì dopo una data
+  function getNextMonday(date: Date): Date {
+    const result = new Date(date)
+    const day = result.getDay()
+    const daysUntilMonday = day === 0 ? 1 : (8 - day) % 7
+    result.setDate(result.getDate() + daysUntilMonday)
+    result.setHours(0, 0, 0, 0)
+    return result
+  }
+
+  // Verifica se l'immagine dell'indizio può essere mostrata (lunedì dopo revealed_date)
+  function canShowClueImage(revealDate: string) {
+    const reveal = new Date(revealDate)
+    const nextMonday = getNextMonday(reveal)
+    return new Date() >= nextMonday
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
@@ -122,48 +139,62 @@ function MonthlyChallengesCluesSection() {
 
                   {/* Content - Accordion */}
                   {isOpen && (
-                    <div className="border-t border-white/10 p-5 bg-white/5 space-y-3">
+                    <div className="border-t border-white/10 p-5 bg-white/5">
                       {challengeClues.length === 0 ? (
                         <p className="text-white/60 text-center py-4">
                           Nessun indizio disponibile per questa sfida
                         </p>
                       ) : (
-                        challengeClues.map((clue, clueIndex) => {
-                          const revealed = isClueRevealed(clue.revealed_date)
-                          return (
-                            <div
-                              key={clue.id}
-                              className={`p-4 rounded-lg border-2 transition-all ${
-                                revealed
-                                  ? 'bg-green-500/10 border-green-500/30'
-                                  : 'bg-white/5 border-white/10'
-                              }`}
-                            >
-                              <div className="flex items-start justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-lg">{revealed ? '✅' : '🔒'}</span>
-                                    <span className="font-semibold text-white/80">
-                                      Indizio #{clueIndex + 1}
-                                    </span>
-                                    <span className="text-xs text-white/50">
-                                      Rivelato: {formatDate(clue.revealed_date)}
-                                    </span>
-                                  </div>
-                                  {revealed ? (
-                                    <p className="text-white leading-relaxed">
-                                      {clue.clue_text}
-                                    </p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {challengeClues.map((clue, clueIndex) => {
+                            const imageRevealed = canShowClueImage(clue.revealed_date)
+                            const nextMonday = getNextMonday(new Date(clue.revealed_date))
+
+                            return (
+                              <div
+                                key={clue.id}
+                                className="relative aspect-square rounded-xl overflow-hidden border-2 border-white/20 group hover:border-purple-500/50 transition-all"
+                              >
+                                {imageRevealed ? (
+                                  // Immagine rivelata
+                                  clue.image_url ? (
+                                    <div className="relative w-full h-full">
+                                      <img
+                                        src={clue.image_url}
+                                        alt={`Indizio ${clueIndex + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
+                                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                                        <p className="text-white text-sm font-semibold">
+                                          Indizio #{clueIndex + 1}
+                                        </p>
+                                        <p className="text-white/70 text-xs">
+                                          {formatDate(clue.revealed_date)}
+                                        </p>
+                                      </div>
+                                    </div>
                                   ) : (
-                                    <p className="text-white/40 italic">
-                                      Indizio disponibile da {formatDate(clue.revealed_date)}
+                                    // Placeholder se l'immagine non è stata caricata
+                                    <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex flex-col items-center justify-center p-4 text-center">
+                                      <span className="text-4xl mb-2">📷</span>
+                                      <p className="text-white/80 font-semibold">Indizio #{clueIndex + 1}</p>
+                                      <p className="text-white/50 text-xs mt-2">Immagine non ancora caricata</p>
+                                    </div>
+                                  )
+                                ) : (
+                                  // Card lucchettata
+                                  <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex flex-col items-center justify-center p-4 text-center">
+                                    <span className="text-6xl mb-3 opacity-50">🔒</span>
+                                    <p className="text-white/80 font-semibold mb-1">Indizio #{clueIndex + 1}</p>
+                                    <p className="text-white/50 text-xs">
+                                      Disponibile dal {nextMonday.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
                                     </p>
-                                  )}
-                                </div>
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          )
-                        })
+                            )
+                          })}
+                        </div>
                       )}
                     </div>
                   )}
@@ -176,14 +207,15 @@ function MonthlyChallengesCluesSection() {
         {/* Info */}
         <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
           <p className="text-sm text-white/70">
-            💡 <span className="font-bold">Come funziona:</span> Ogni sabato alle 00:00 viene rivelato un nuovo indizio.
-            Gli indizi ti aiuteranno a scoprire location e dettagli della sfida del weekend!
+            💡 <span className="font-bold">Come funziona:</span> Gli indizi vengono pubblicati ogni settimana, ma le immagini
+            si rivelano solo il <span className="font-bold">lunedì successivo</span> per dare tempo a tutti di partecipare!
           </p>
           <p className="text-sm text-purple-300">
-            🎯 <span className="font-bold">11 Sfide:</span> Da Febbraio 2026 a Dicembre 2026, una sfida al mese
+            🔒 <span className="font-bold">Rivelazione:</span> Durante il giorno dell'indizio/sfida rimane tutto lucchettato.
+            Le immagini si sbloccano il lunedì successivo.
           </p>
           <p className="text-sm text-green-300">
-            🏆 <span className="font-bold">Punti:</span> Ogni sfida vale 100 punti - partecipa e divertiti!
+            🏆 <span className="font-bold">11 Sfide:</span> Da Febbraio 2026 a Dicembre 2026, una sfida al mese con 3-4 indizi ciascuna
           </p>
         </div>
       </div>

@@ -4,8 +4,19 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 /**
- * Cron job che rivela automaticamente gli indizi ogni sabato a mezzanotte
- * Viene eseguito da Vercel Cron Jobs
+ * NOTA: Questo endpoint cron non è più utilizzato.
+ *
+ * La pubblicazione degli indizi funziona tramite controllo client-side:
+ * - Ogni indizio ha una revealed_date nel database
+ * - Il frontend (GameAreaWithChat.tsx) controlla se new Date() >= revealed_date
+ * - Gli indizi vengono mostrati automaticamente quando la data corrente supera revealed_date
+ *
+ * Questo approccio è più efficiente perché:
+ * - Non richiede esecuzione schedulata
+ * - Gli indizi appaiono esattamente alla mezzanotte (00:00) del giorno successivo
+ * - Non c'è rischio di ritardi o fallimenti del cron job
+ *
+ * L'endpoint è mantenuto per eventuali usi futuri o test manuali.
  */
 export async function GET(request: Request) {
   // Verifica che la richiesta provenga da Vercel Cron

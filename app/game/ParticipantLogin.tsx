@@ -86,6 +86,8 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-xl font-mono tracking-wider"
                 maxLength={6}
                 disabled={loading}
+                autoComplete="off"
+                suppressHydrationWarning
               />
             </div>
 
