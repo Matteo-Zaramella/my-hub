@@ -15,8 +15,9 @@ Hub personale per la gestione di attività, fitness, alimentazione e giochi.
 
 ### 🎮 A Tutto Reality: La Rivoluzione (NEW!)
 Sistema di gioco con:
+- **🎬 Terminal Welcome** - Animazione benvenuto stile command prompt (prima visita)
 - **💬 Chat di Gruppo** - Real-time messaging tra partecipanti
-- **🔍 Indizi** - Sistema indizi con rivelazione programmata
+- **🔍 Indizi con Immagini** - Card quadrate con lucchetti, rivelazione graduale
 - **🔒 Privato** - Sezione esclusiva con countdown
 - **Login con codici** - Autenticazione tramite codici partecipante
 - **Date activation** - Attivazione automatica 26/01/2026
@@ -82,7 +83,9 @@ npm start      # Avvio produzione
 npm run lint   # Lint
 
 # Script utili A Tutto Reality: La Rivoluzione
-node scripts/check-chat-table.mjs  # Verifica tabella chat
+node scripts/check-chat-table.mjs             # Verifica tabella chat
+node scripts/check-challenge-clues.mjs 2      # Verifica immagini sfida 2
+node scripts/update-clue-image.mjs 2 1 img.jpg # Aggiorna immagine indizio
 ```
 
 ## 🚀 Deploy su Vercel
@@ -100,6 +103,21 @@ node scripts/check-chat-table.mjs  # Verifica tabella chat
 
 ## 🎮 A Tutto Reality: La Rivoluzione - Quick Start
 
+### Features Recenti (Dicembre 2025)
+
+**🎬 Terminal Welcome Animation**
+- Animazione stile command prompt alla prima visita
+- Testo verde su nero con typing effect
+- 4 messaggi: "Eccoti." → "Sei invitato a una festa." → "Durante la serata, un gioco coinvolgente." → "Dove e quando? Naviga il sito."
+- Cursore lampeggiante, skip button, localStorage per mostrare solo una volta
+
+**🖼️ Sistema Indizi con Immagini**
+- 3 card quadrate per ogni sfida
+- Lucchetto 🔒 su immagini fino al lunedì successivo
+- Testo indizio sempre visibile
+- Cartella: `public/game-clues/`
+- Scripts: `check-challenge-clues.mjs`, `update-clue-image.mjs`
+
 ### Setup Chat Database (Obbligatorio)
 
 Per far funzionare la chat:
@@ -110,13 +128,14 @@ Per far funzionare la chat:
 
 ### Testing
 
-1. Vai su: http://localhost:3000/game?password=EVOLUZIONE
-2. Clicca "Accedi all'Area Game"
-3. Usa codice: **VHLZX5** (Alberto Faraldi)
-4. Testa le 3 sezioni: Chat, Indizi, Privato
+1. Vai su: http://localhost:3000/ (terminal welcome animation)
+2. Poi: http://localhost:3000/game?password=EVOLUZIONE
+3. Clicca "Accedi all'Area Game"
+4. Usa codice: **VHLZX5** (Alberto Faraldi)
+5. Testa le 3 sezioni: Chat, Indizi (con immagini), Privato
 
-📚 **Docs:** `README_QUICK_START.md` | `MODIFICHE_COMPLETATE.md`
+📚 **Docs:** `ONBOARDING_DOMANI_4_DIC_2025.md` | `GUIDA_COMPLETA_JOURNEY_PARTECIPANTI.md`
 
 ---
 
-**Versione**: 2.0.0 | **Data**: 11 Novembre 2025
+**Versione**: 2.1.0 | **Data**: 5 Dicembre 2025

@@ -1,8 +1,8 @@
-# 🚀 Onboarding Sessione 4 Dicembre 2025
+# 🚀 Onboarding Sessione 5 Dicembre 2025
 
-**Ultimo aggiornamento:** 3 Dicembre 2025, ore 17:30
-**Status progetto:** ✅ Toggle landing page funzionanti, documentazione completa
-**Deploy:** ✅ Push GitHub completato, Vercel auto-deploy triggerato
+**Ultimo aggiornamento:** 5 Dicembre 2025, ore 01:00
+**Status progetto:** ✅ Terminal welcome animation implementata, sistema indizi con immagini completo
+**Deploy:** ✅ Push GitHub completato (commit 5ac96a1), Vercel auto-deploy attivo
 
 ---
 
@@ -10,8 +10,14 @@
 
 ### ✅ Funzionalità Operative
 
-**1. Landing Page (`/`)**
+**1. Landing Page (`/`) + Terminal Welcome (NEW!)**
 - ✅ 100 cerchi grid (10×10) con countdown timer
+- ✅ **Animazione Terminal Welcome** (prima visita):
+  - Schermo nero, testo verde stile command prompt
+  - Typing character-by-character: "Eccoti." → "Sei invitato a una festa." → "Durante la serata, un gioco coinvolgente." → "Dove e quando? Naviga il sito."
+  - Cursore lampeggiante `_` (500ms interval)
+  - Bottone skip (⏩) bottom-right con fade-in dopo 2 secondi
+  - Salvataggio localStorage per mostrare solo prima volta
 - ✅ Toggle admin per controllo pulsanti:
   - Numero 1 (index 0): Wishlist pubblica
   - Numero 2 (index 1): Form registrazione
@@ -35,6 +41,12 @@
 - ✅ Chat system
 - ✅ Password protection
 - ✅ GameArea component funzionante
+- ✅ **Sistema Indizi con Immagini** (NEW!):
+  - 3 card quadrate per sfida
+  - Lucchetto 🔒 su immagini fino al lunedì successivo
+  - Testo indizio sempre visibile
+  - Immagini caricate in `public/game-clues/`
+  - Sfida 2 completa: 3/3 immagini (cronometro, cerchi, Saetta McQueen)
 
 ---
 
@@ -105,9 +117,78 @@
 
 ---
 
-## 📝 Lavoro Completato Ieri (3 Dicembre)
+## 📝 Lavoro Completato Recentemente
 
-### Fix Toggle Landing Page Buttons
+### 🎬 Terminal Welcome Animation (4 Dicembre 2025)
+**Feature:** Animazione benvenuto stile command prompt per prima visita
+**Componente:** `app/components/TerminalWelcome.tsx` (nuovo file)
+**Integrazioni:** `app/LandingPage.tsx` modificato
+
+**Specifiche:**
+- Testo verde su nero (#34D399 green-400)
+- Font monospace
+- Typing speed: 50ms per carattere
+- Pausa tra righe: 1000ms
+- 4 linee di testo con avanzamento automatico
+- Cursore lampeggiante ogni 500ms
+- Skip button (doppia freccia ⏩) fade-in dopo 2s
+- localStorage `hasSeenWelcome` per mostrare solo una volta
+- Z-index 50 per overlay completo
+
+**Bug Fix:**
+- Problema: Animazione si fermava a "Eccoti."
+- Causa: Logica advancement linee con 3 condizioni separate
+- Fix: Unificato pausa + advancement in singola condizione
+
+### 🖼️ Sistema Indizi con Immagini (4 Dicembre 2025)
+**Feature:** Card indizi quadrate con immagini rivelate gradualmente
+
+**Database:**
+- Aggiunta colonna `image_url` a `game_clues` table
+- RLS policies aggiornate con `enable_rls_game_tables_v2.sql`
+
+**File Structure:**
+- Folder: `public/game-clues/`
+- Naming: `sfida-{N}-indizio-{M}.{ext}`
+- Formati: .jpg, .webp supportati
+
+**Immagini Sfida 2 (Febbraio - Velocità):**
+- ✅ `sfida-2-indizio-1.jpg` - Cronometro/tempo (istockphoto)
+- ✅ `sfida-2-indizio-2.jpg` - Cerchi in metallo
+- ✅ `sfida-2-indizio-3.webp` - Saetta McQueen #95
+
+**Scripts Creati:**
+- `scripts/check-challenge-clues.mjs` - Verifica immagini caricate per sfida
+- `scripts/update-clue-image.mjs` - Aggiorna image_url nel database
+- Aggiornato path da `/indizi/` a `/game-clues/`
+
+**Testing:**
+```bash
+node scripts/check-challenge-clues.mjs 2
+# Output: 3/3 immagini caricate ✅
+```
+
+### 📚 Documentazione Completa Journey (4 Dicembre 2025)
+**File:** `GUIDA_COMPLETA_JOURNEY_PARTECIPANTI.md` (500+ righe)
+
+**Contenuto:**
+- 7 fasi da Dicembre 2025 a Gennaio 2027
+- 22 template email con testo esatto
+- Timeline completo tutti i touchpoint
+- FAQ per partecipanti
+- Checklist pre-launch
+- Note tecniche implementazione
+
+**Fasi Documentate:**
+1. Pre-evento (Dicembre 2025)
+2. Cerimonia Apertura (11 Gennaio 2026)
+3. Pre-first challenge (12-31 Gennaio)
+4. Sistema mensile (Febbraio 2026 - Gennaio 2027)
+5. Post-challenge 12
+6. Serata finale (23 Gennaio 2027)
+7. Caccia valigetta (24 Gennaio 2027)
+
+### 🔧 Fix Toggle Landing Page Buttons (3 Dicembre)
 **Problema:** Toggle admin non funzionavano, modifiche non salvate
 **Causa:** `SettingsTab` scriveva su `game_phases`, `LandingPage` leggeva da `game_settings`
 **Soluzione:** Unificato su `game_settings` table
@@ -138,6 +219,7 @@ VALUES
 - ✅ Migliorati commenti per clarity index/numero
 
 ### Documentazione Creata
+- ✅ `GUIDA_COMPLETA_JOURNEY_PARTECIPANTI.md` (500+ righe master doc journey)
 - ✅ `RESOCONTO_LAVORO_3_DIC_2025.md` (report dettagliato)
 - ✅ `SESSIONE_AUTONOMA_COMPLETATA.md` (overview rapida)
 - ✅ `database/MIGRATIONS_LOG.md` (log migrations)
@@ -370,10 +452,11 @@ node scripts/populate-answer-codes.mjs
 
 **Repository:** https://github.com/Matteo-Zaramella/my-hub
 **Vercel:** Auto-deploy da GitHub main branch
-**Ultimo commit:** eaf45f6 (3 Dicembre 2025, 17:45 - Fix TypeScript minigames)
+**Ultimo commit:** 5ac96a1 (5 Dicembre 2025, 01:00 - Terminal animation + sistema indizi immagini)
 **URL produzione:** https://my-hub-five.vercel.app/
 
-**Deploy status:** ✅ Fix TypeScript applicato, nuovo deploy in corso
+**Deploy status:** ✅ Terminal welcome animation + sistema indizi deployato
+**Files changed:** 86 files, 8047 insertions(+), 293 deletions(-)
 
 **Per verificare deploy:**
 ```bash
