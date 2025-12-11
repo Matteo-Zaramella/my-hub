@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function SettingsTab() {
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
+  const [maintenanceMode, setMaintenanceMode] = useState(false)
   const [registrationEnabled, setRegistrationEnabled] = useState(true)
   const [wishlistEnabled, setWishlistEnabled] = useState(true)
   const [passwordInputEnabled, setPasswordInputEnabled] = useState(false)
@@ -19,6 +20,18 @@ export default function SettingsTab() {
 
   const loadSettings = async () => {
     try {
+      // Load maintenance mode from single row table
+      const { data: maintenanceData, error: maintenanceError } = await supabase
+        .from('game_settings')
+        .select('maintenance_mode')
+        .eq('id', 1)
+        .single()
+
+      if (!maintenanceError && maintenanceData) {
+        setMaintenanceMode(maintenanceData.maintenance_mode ?? false)
+      }
+
+      // Load other settings
       const { data, error } = await supabase
         .from('game_settings')
         .select('setting_key, setting_value')
@@ -46,6 +59,25 @@ export default function SettingsTab() {
       console.error('Error loading settings:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const updateMaintenanceMode = async (value: boolean) => {
+    setUpdating(true)
+    try {
+      const { error } = await supabase
+        .from('game_settings')
+        .update({ maintenance_mode: value })
+        .eq('id', 1)
+
+      if (error) throw error
+
+      setMaintenanceMode(value)
+    } catch (error) {
+      console.error('Error updating maintenance mode:', error)
+      alert('Errore durante l\'aggiornamento della modalità manutenzione')
+    } finally {
+      setUpdating(false)
     }
   }
 
@@ -89,6 +121,36 @@ export default function SettingsTab() {
         <p className="text-white/60">
           Attiva o disattiva i pulsanti numerati sulla landing page
         </p>
+      </div>
+
+      {/* Maintenance Mode Toggle - Prominent */}
+      <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-white font-semibold text-xl flex items-center gap-2">
+              🚧 Modalità Manutenzione
+            </h3>
+            <p className="text-white/60 text-sm mt-2">
+              Attiva la schermata "Work in Progress" con messaggio casuale dell'Entità AI
+            </p>
+            <p className="text-white/40 text-xs mt-1">
+              Quando attiva, i visitatori vedranno uno schermo nero con un messaggio casuale
+            </p>
+          </div>
+          <button
+            onClick={() => updateMaintenanceMode(!maintenanceMode)}
+            disabled={updating}
+            className={`relative inline-flex h-10 w-16 items-center rounded-full transition-colors ${
+              maintenanceMode ? 'bg-red-600' : 'bg-gray-600'
+            } ${updating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          >
+            <span
+              className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform ${
+                maintenanceMode ? 'translate-x-7' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Toggle Controls */}
