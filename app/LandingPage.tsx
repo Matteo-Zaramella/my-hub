@@ -361,9 +361,9 @@ export default function LandingPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-black">
       {/* Terminal Welcome Animation - First visit only */}
-      {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} />}
-      {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati */}
-      {cluesFound < 10 && (
+      {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} daysRemaining={timeLeft.days} />}
+      {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati O quando terminal è visibile */}
+      {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full h-full max-w-[100vh] max-h-screen grid grid-cols-10 grid-rows-10 gap-0 p-1 sm:p-2 md:p-3 lg:p-4 aspect-square">
           {Array.from({ length: totalCircles }, (_, index) => {
@@ -450,8 +450,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Countdown Timer - Center (4x4 circles area) - Nascosto quando countdown finito */}
-      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && (
+      {/* Countdown Timer - Center (4x4 circles area) - Nascosto quando countdown finito O terminal visibile */}
+      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
           <div className="grid grid-cols-2 gap-1 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Days */}

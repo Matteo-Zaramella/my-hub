@@ -33,8 +33,10 @@ interface WishlistItem {
 
 const CATEGORIE_LABELS: Record<string, string> = {
   elettrodomestici: 'Elettrodomestici',
+  elettronica: 'Elettronica',
   bici: 'Bici',
   integratori: 'Integratori',
+  sport: 'Sport',
   vestiti: 'Vestiti',
   altro: 'Altro'
 }
@@ -132,15 +134,7 @@ export default function PublicWishlistPage() {
     return acc
   }, {} as Record<string, WishlistItem[]>)
 
-  const handleColorChange = (itemId: number, colorIndex: number) => {
-    setSelectedColors(prev => ({ ...prev, [itemId]: colorIndex }))
-  }
-
   const getCurrentImageUrl = (item: WishlistItem) => {
-    if (item.colori_disponibili && item.colori_disponibili.length > 0) {
-      const selectedIndex = selectedColors[item.id] ?? 0
-      return item.colori_disponibili[selectedIndex]?.immagine_url || item.immagine_url
-    }
     return item.immagine_url
   }
 
@@ -186,7 +180,6 @@ export default function PublicWishlistPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {categoryItems.map((item) => {
                     const currentImageUrl = getCurrentImageUrl(item)
-                    const selectedColorIndex = selectedColors[item.id] ?? 0
 
                     return (
                       <div
@@ -224,64 +217,25 @@ export default function PublicWishlistPage() {
                             {item.nome}
                           </h3>
 
-                          {item.descrizione && (
-                            <p className="text-white/60 text-sm mb-4 line-clamp-3">
-                              {item.descrizione}
-                            </p>
-                          )}
-
                           {/* Taglie (solo vestiti) */}
                           {item.categoria === 'vestiti' && item.taglie && (
                             <div className="mb-4 text-xs text-white/50 space-y-1">
-                              {item.taglie.pantaloni && <p>Pantaloni: {item.taglie.pantaloni}</p>}
-                              {item.taglie.maglie && <p>Maglie: {item.taglie.maglie}</p>}
-                              {item.taglie.tshirt && <p>T-shirt: {item.taglie.tshirt}</p>}
-                              {item.taglie.colori_preferiti && item.taglie.colori_preferiti.length > 0 && (
-                                <p>Colori preferiti: {item.taglie.colori_preferiti.join(', ')}</p>
-                              )}
+                              {item.taglie.pantaloni && <p>Taglia: {item.taglie.pantaloni}</p>}
+                              {item.taglie.maglie && <p>Taglia: {item.taglie.maglie}</p>}
+                              {item.taglie.tshirt && <p>Taglia: {item.taglie.tshirt}</p>}
                             </div>
                           )}
 
-                          {/* Color Selector */}
-                          {item.colori_disponibili && item.colori_disponibili.length > 1 && (
-                            <div className="mb-4">
-                              <p className="text-xs text-white/50 mb-2">Colori disponibili:</p>
-                              <div className="flex gap-2 flex-wrap">
-                                {item.colori_disponibili.map((colorVariant, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => handleColorChange(item.id, index)}
-                                    className={`w-8 h-8 rounded-full border-2 transition-all ${
-                                      selectedColorIndex === index
-                                        ? 'border-white scale-110'
-                                        : 'border-white/30 hover:border-white/50'
-                                    }`}
-                                    style={{ backgroundColor: colorVariant.hex }}
-                                    title={colorVariant.colore}
-                                  />
-                                ))}
-                              </div>
-                            </div>
+                          {item.link && (
+                            <a
+                              href={item.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block px-4 py-2 border border-white/20 rounded hover:bg-white hover:text-black transition-colors text-sm"
+                            >
+                              Vedi
+                            </a>
                           )}
-
-                          <div className="flex items-center justify-between">
-                            {item.prezzo && (
-                              <span className="text-white/80 font-light">
-                                €{item.prezzo.toFixed(2)}
-                              </span>
-                            )}
-
-                            {item.link && (
-                              <a
-                                href={item.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ml-auto px-4 py-2 border border-white/20 rounded hover:bg-white hover:text-black transition-colors text-sm"
-                              >
-                                Vedi
-                              </a>
-                            )}
-                          </div>
                         </div>
                       </div>
                     )
