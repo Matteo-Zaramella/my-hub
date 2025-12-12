@@ -49,6 +49,7 @@ mcp-config*.json
 
 # Database dumps and backups
 *.sql
+!database/*.sql
 backups/
 
 # Claude specific

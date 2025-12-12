@@ -33,8 +33,11 @@ export default function MaintenanceWrapper({ children }: { children: React.React
     }
   }
 
-  // Allow admin to access dashboard even during maintenance
-  const isAdminRoute = pathname?.startsWith('/dashboard') || pathname?.startsWith('/game')
+  // Allow admin to access dashboard, game, and login even during maintenance
+  const isAdminRoute = pathname?.startsWith('/dashboard') ||
+                       pathname?.startsWith('/game') ||
+                       pathname?.startsWith('/login') ||
+                       pathname?.startsWith('/signup')
 
   if (loading) {
     return null // Or a loading spinner

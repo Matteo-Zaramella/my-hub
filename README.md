@@ -58,6 +58,88 @@ npm run dev
 
 Apri [http://localhost:3000](http://localhost:3000) nel browser.
 
+---
+
+## 🔧 Sviluppo Locale - Database DEV/PROD
+
+**Configurazione:** Dicembre 2025 - Database separati per sviluppo e produzione
+
+### 🚀 Quick Start
+
+**Per sviluppo normale (database DEV):**
+```bash
+# Doppio click su:
+.admin/dev-server.bat
+
+# Oppure da terminale:
+npm run dev  # porta 3000, database DEV
+```
+
+**Per test con dati reali (database PROD):**
+```bash
+# Doppio click su:
+.admin/prod-server.bat
+
+# ⚠️ Usa solo quando strettamente necessario!
+```
+
+### 📋 Script Amministrativi
+
+Tutti gli script sono in `.admin/`:
+- `dev-server.bat` - Avvia server DEV (porta 3000, database DEV)
+- `prod-server.bat` - Avvia server PROD (porta 3500, database PROD)
+- `stop-servers.bat` - Ferma tutti i server
+- `dev-server-background.bat` - Avvia DEV in background (no finestre)
+- `prod-server-background.bat` - Avvia PROD in background (no finestre)
+- `export-schema.bat` - Esporta schema database
+
+### 📚 Documentazione Completa
+
+Tutta la documentazione è organizzata in `/docs/`:
+
+**[📖 Vai alla Documentazione Completa](./docs/README.md)**
+
+- **[🚀 Getting Started](./docs/01-getting-started/)** - Guide per iniziare
+- **[🗄️ Database](./docs/02-database/)** - Setup e gestione database
+- **[🎮 Game](./docs/03-game/)** - Documentazione gioco 2026
+- **[🔧 Maintenance](./docs/04-maintenance/)** - Manutenzione progetto
+
+### ⚠️ IMPORTANTE
+
+- **Sviluppo:** Usa sempre database DEV (porta 3000)
+- **Produzione:** Database PROD (porta 3500) solo per test urgenti
+- **Vercel:** Usa automaticamente database PROD (variabili env dashboard)
+
+---
+
+## 📁 Struttura Progetto
+
+```
+my-hub/
+├── .admin/              # Script amministrativi e sviluppo
+│   ├── dev-server.bat   # Avvia server DEV (porta 3000)
+│   ├── prod-server.bat  # Avvia server PROD (porta 3500)
+│   └── ...
+├── docs/                # Documentazione completa
+│   ├── 01-getting-started/
+│   ├── 02-database/
+│   ├── 03-game/
+│   └── 04-maintenance/
+├── database/            # Script SQL
+├── app/                 # Next.js App Router
+├── public/              # Asset pubblici
+├── scripts/             # Utility scripts
+├── _archives/           # Archivi storici
+│   ├── 2025-11-november/
+│   └── to-verify/
+├── README.md            # Questo file
+└── package.json
+```
+
+**[📖 Vedi Struttura Completa](./docs/README.md)**
+
+---
+
 ## 🌍 Variabili d'Ambiente
 
 Il file `.env.local` contiene:
@@ -138,4 +220,4 @@ Per far funzionare la chat:
 
 ---
 
-**Versione**: 2.1.0 | **Data**: 5 Dicembre 2025
+**Versione**: 2.3.0 | **Data**: 12 Dicembre 2025 | **Update**: Riorganizzazione completa progetto, struttura docs/, script in .admin/

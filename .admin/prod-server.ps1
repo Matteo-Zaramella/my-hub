@@ -1,0 +1,10 @@
+# Script PowerShell per avviare server PROD sulla porta 3500
+# con database di PRODUZIONE
+
+$env:PORT = "3500"
+$env:NEXT_PUBLIC_SUPABASE_URL = "https://wuvuapmjclahbmngntku.supabase.co"
+$env:NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dnVhcG1qY2xhaGJtbmdudGt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1MzAyNDQsImV4cCI6MjA3NjEwNjI0NH0.12asA4yGSUdP_zkfGGZyv7vOX6Ncq9GhkIpBD1tcscc"
+$env:SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dnVhcG1qY2xhaGJtbmdudGt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDUzMDI0NCwiZXhwIjoyMDc2MTA2MjQ0fQ.c1eqO_Y2NH_bgV-VC6KJyk3H8LZEYza6Z0bBrKI1Zac"
+
+Set-Location "D:\Claude\my-hub"
+npm run dev
