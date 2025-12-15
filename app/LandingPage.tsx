@@ -158,7 +158,10 @@ export default function LandingPage() {
       .single()
 
     if (error) {
-      console.error('Error checking user registration:', error)
+      // Silently ignore "no rows found" errors (user not logged in or invalid code)
+      if (error.code !== 'PGRST116') {
+        console.error('Error checking user registration:', error)
+      }
       return
     }
 
@@ -362,6 +365,47 @@ export default function LandingPage() {
     <div className="relative h-screen w-screen overflow-hidden bg-black">
       {/* Terminal Welcome Animation - First visit only */}
       {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} daysRemaining={timeLeft.days} />}
+
+      {/* Wishlist Button - Top Left */}
+      {!showTerminalWelcome && welcomeCompleted && (
+        <button
+          onClick={() => router.push('/wishlist-public')}
+          className="fixed top-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
+        >
+          <div className="text-5xl">🎁</div>
+        </button>
+      )}
+
+      {/* Login Button - Top Right */}
+      {!showTerminalWelcome && welcomeCompleted && (
+        <button
+          onClick={handleAdminAccess}
+          className="fixed top-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
+        >
+          <div className="text-5xl">👤</div>
+        </button>
+      )}
+
+      {/* Minigame Button - Bottom Left */}
+      {!showTerminalWelcome && welcomeCompleted && minigameButtonEnabled && (
+        <button
+          onClick={() => router.push('/minigames')}
+          className="fixed bottom-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
+        >
+          <div className="text-5xl">🕹️</div>
+        </button>
+      )}
+
+      {/* Password Input Button - Bottom Right */}
+      {!showTerminalWelcome && welcomeCompleted && passwordInputEnabled && (
+        <button
+          onClick={handleGameAccess}
+          className="fixed bottom-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
+        >
+          <div className="text-5xl">🚪</div>
+        </button>
+      )}
+
       {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati O quando terminal è visibile */}
       {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -371,16 +415,8 @@ export default function LandingPage() {
             const row = Math.floor(index / gridSize)
             const col = index % gridSize
 
-            // INDEX 0 = NUMERO 1 (first circle, first row) - Public Wishlist
-            const isWishlist = index === 0
-            // INDEX 1 = NUMERO 2 (second circle, first row) - Registration form
-            const isRegistration = index === 1
             // INDEX 9 (top right corner) - Admin access (always visible)
             const isAdmin = index === 9
-            // INDEX 94 = NUMERO 95 (Saetta McQueen) - Multi Minigame Febbraio
-            const isMultiMinigame = index === 94
-            // INDEX 99 = NUMERO 100 (bottom right corner) - Game password access
-            const isGame = index === 99
 
             // Hide circles in the center 4x4 area (rows 3-6, cols 3-6) SOLO se il countdown non è finito
             const isInTimerArea = row >= 3 && row <= 6 && col >= 3 && col <= 6
@@ -390,23 +426,8 @@ export default function LandingPage() {
               return <div key={index} className="flex items-center justify-center"></div>
             }
 
-          // Determine circle fill and number display
+          // Determine circle fill
           let circleFill = ''
-          let showNumber = false
-          let buttonNumber = ''
-
-          // Cerchio wishlist (posizione 0) - numero 1 SOLO se abilitato
-          if (isWishlist && wishlistEnabled) {
-            showNumber = true
-            buttonNumber = '1'
-          } else if (isRegistration && !userRegistered && registrationFormEnabled) {
-            // Cerchio iscrizione (posizione 10) - numero 2 SOLO se form abilitato E utente NON registrato
-            showNumber = true
-            buttonNumber = '2'
-          }
-
-          // Cerchio 95 (Saetta McQueen) - SEMPRE invisibile, toggle controlla solo se è cliccabile
-          // Non usiamo else if perché vogliamo che rimanga sempre nero
 
           if (ceremonyActive) {
             // Illumina le colonne SOLO se la cerimonia è attiva
@@ -425,25 +446,13 @@ export default function LandingPage() {
           }
 
             return (
-              <button
+              <div
                 key={index}
-                onClick={() => {
-                  if (isRegistration && registrationFormEnabled) setShowRegistrationForm(true)
-                  if (isWishlist && wishlistEnabled) router.push('/wishlist-public')
-                  if (isAdmin) handleAdminAccess()
-                  if (isMultiMinigame && minigameButtonEnabled) router.push('/minigames')
-                  if (isGame && passwordInputEnabled) handleGameAccess()
-                }}
                 className="flex items-center justify-center w-full aspect-square p-0.5 sm:p-1 md:p-1.5 lg:p-2" style={{height: 'auto'}}
               >
                 <div className={`w-full h-full rounded-full border border-white sm:border-2 ${circleFill} transition-colors duration-500 flex items-center justify-center`}>
-                  {showNumber && (
-                    <span className="text-white font-bold text-xs sm:text-sm md:text-base lg:text-lg bg-black rounded-full w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 flex items-center justify-center">
-                      {buttonNumber}
-                    </span>
-                  )}
                 </div>
-              </button>
+              </div>
             )
           })}
           </div>

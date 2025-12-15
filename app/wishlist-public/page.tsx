@@ -53,29 +53,44 @@ export default function PublicWishlistPage() {
   }, [])
 
   async function loadPublicItems() {
-    const { data, error } = await supabase
-      .from('wishlist_items')
-      .select('id, nome, descrizione, link, prezzo, immagine_url, pubblico, categoria, taglie, colori_disponibili, colore_selezionato')
-      .eq('pubblico', true)
-      .order('categoria', { ascending: true })
-      .order('created_at', { ascending: false })
+    try {
+      // Try with RLS bypass for public items
+      const { data, error } = await supabase
+        .from('wishlist_items')
+        .select('id, nome, descrizione, link, prezzo, immagine_url, pubblico, categoria, taglie, colori_disponibili, colore_selezionato')
+        .eq('pubblico', true)
+        .order('categoria', { ascending: true })
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('Error loading public wishlist:', error)
+      console.log('Wishlist query result:', { data, error, hasData: !!data, dataLength: data?.length })
+
+      if (error) {
+        console.error('Error loading public wishlist:', error)
+        // Fallback: show empty list
+        setItems([])
+        setLoading(false)
+        return
+      }
+
+      if (data) {
+        console.log('Loaded wishlist items:', data.length)
+        setItems(data)
+        // Extract dominant colors for each item with image
+        data.forEach(item => {
+          if (item.immagine_url) {
+            extractDominantColor(item.id, item.immagine_url)
+          }
+        })
+      } else {
+        console.log('No data returned from query')
+        setItems([])
+      }
       setLoading(false)
-      return
+    } catch (err) {
+      console.error('Exception loading wishlist:', err)
+      setItems([])
+      setLoading(false)
     }
-
-    if (data) {
-      setItems(data)
-      // Extract dominant colors for each item with image
-      data.forEach(item => {
-        if (item.immagine_url) {
-          extractDominantColor(item.id, item.immagine_url)
-        }
-      })
-    }
-    setLoading(false)
   }
 
   function extractDominantColor(itemId: number, imageUrl: string) {

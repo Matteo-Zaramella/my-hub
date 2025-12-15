@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 
 const AI_MESSAGES = [
   "Il sistema non è ancora attivo.",
@@ -20,6 +21,7 @@ const PAUSE_AFTER_TYPING = 2000 // pausa dopo completamento scrittura
 const BACKSPACE_DELAY = 200 // pausa prima di iniziare a cancellare
 
 export default function MaintenanceScreen() {
+  const router = useRouter()
   const [displayText, setDisplayText] = useState('')
   const [showCursor, setShowCursor] = useState(true)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -86,6 +88,14 @@ export default function MaintenanceScreen() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+      {/* Wishlist Button - Top Left */}
+      <button
+        onClick={() => router.push('/wishlist-public')}
+        className="fixed top-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
+      >
+        <div className="text-5xl">🎁</div>
+      </button>
+
       <div className="text-center px-8">
         <div className="font-mono text-white text-2xl md:text-4xl">
           <span>{displayText}</span>
