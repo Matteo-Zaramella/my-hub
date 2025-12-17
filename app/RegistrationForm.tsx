@@ -252,7 +252,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="NOME"
               required
-              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+              className="w-full px-6 py-4 bg-transparent border border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none transition-colors uppercase"
             />
 
             <input
@@ -260,7 +260,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
               value={middleName}
               onChange={(e) => setMiddleName(e.target.value)}
               placeholder="SECONDO NOME"
-              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+              className="w-full px-6 py-4 bg-transparent border border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none transition-colors uppercase"
             />
 
             <input
@@ -269,7 +269,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
               onChange={(e) => setLastName(e.target.value)}
               placeholder="COGNOME"
               required
-              className="w-full px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none focus:border-white/60 transition-colors uppercase"
+              className="w-full px-6 py-4 bg-transparent border border-white rounded-lg text-white text-center text-xl placeholder-white/30 focus:outline-none transition-colors uppercase"
             />
 
             {error && (
@@ -279,7 +279,7 @@ export default function RegistrationForm({ onClose, onSuccess, participantCode }
             <button
               type="submit"
               disabled={loading || !firstName || !lastName}
-              className="w-16 h-16 bg-white rounded-lg hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all mx-auto mt-3"
+              className="w-16 h-16 bg-white rounded-lg hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition mx-auto"
             />
           </form>
         )}

@@ -50,6 +50,7 @@ export default function TodoDashboard({ initialProjects, initialTasks }: TodoDas
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [showNewTaskForm, setShowNewTaskForm] = useState(false)
   const [showNewProjectForm, setShowNewProjectForm] = useState(false)
+  const [draggedTask, setDraggedTask] = useState<string | null>(null)
   const [newTask, setNewTask] = useState({
     titolo: '',
     descrizione: '',
@@ -142,6 +143,25 @@ export default function TodoDashboard({ initialProjects, initialTasks }: TodoDas
     if (!error) {
       setTasks(tasks.filter(t => t.id !== taskId))
     }
+  }
+
+  function handleDragStart(taskId: string) {
+    setDraggedTask(taskId)
+  }
+
+  function handleDragEnd() {
+    setDraggedTask(null)
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault()
+  }
+
+  async function handleDrop(newStatus: string) {
+    if (!draggedTask) return
+
+    await handleUpdateTaskStatus(draggedTask, newStatus)
+    setDraggedTask(null)
   }
 
   return (
@@ -297,7 +317,14 @@ export default function TodoDashboard({ initialProjects, initialTasks }: TodoDas
           {STATI_TASK.map((stato) => {
             const tasksInStatus = filteredTasks.filter(t => t.stato === stato.value)
             return (
-              <div key={stato.value} className="bg-white/5 p-4 rounded-lg">
+              <div
+                key={stato.value}
+                className={`bg-white/5 p-4 rounded-lg transition-colors ${
+                  draggedTask ? 'border-2 border-dashed border-white/20' : ''
+                }`}
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(stato.value)}
+              >
                 <div className="flex items-center gap-2 mb-4">
                   <div className={`w-3 h-3 rounded-full ${stato.color}`} />
                   <h3 className="font-medium text-white">{stato.label}</h3>
@@ -309,7 +336,15 @@ export default function TodoDashboard({ initialProjects, initialTasks }: TodoDas
                     const project = getProjectById(task.project_id)
                     const priorita = PRIORITA.find(p => p.value === task.priorita)
                     return (
-                      <div key={task.id} className="bg-white/10 p-3 rounded space-y-2">
+                      <div
+                        key={task.id}
+                        className={`bg-white/10 p-3 rounded space-y-2 cursor-move transition-opacity ${
+                          draggedTask === task.id ? 'opacity-50' : 'opacity-100'
+                        }`}
+                        draggable
+                        onDragStart={() => handleDragStart(task.id)}
+                        onDragEnd={handleDragEnd}
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <div className="font-medium text-white text-sm">{task.titolo}</div>

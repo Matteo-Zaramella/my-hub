@@ -29,6 +29,15 @@ export default function MaintenanceScreen() {
   const isTypingRef = useRef(true)
   const selectedMessageRef = useRef('')
 
+  // Check participant session - redirect to auth if not logged in
+  useEffect(() => {
+    const session = localStorage.getItem('participant_session')
+    if (!session) {
+      router.push('/auth')
+      return
+    }
+  }, [router])
+
   useEffect(() => {
     // Select random message once
     const randomIndex = Math.floor(Math.random() * AI_MESSAGES.length)

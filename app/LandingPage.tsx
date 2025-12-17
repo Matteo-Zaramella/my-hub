@@ -40,6 +40,16 @@ export default function LandingPage() {
 
   const supabase = createClient()
 
+  // Check participant session - redirect to auth if not logged in
+  useEffect(() => {
+    const session = localStorage.getItem('participant_session')
+    if (!session) {
+      // No session, redirect to auth page
+      router.push('/auth')
+      return
+    }
+  }, [router])
+
   // Check if first visit for terminal welcome animation
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
