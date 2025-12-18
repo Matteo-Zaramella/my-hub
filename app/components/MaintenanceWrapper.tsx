@@ -19,12 +19,12 @@ export default function MaintenanceWrapper({ children }: { children: React.React
     try {
       const { data, error } = await supabase
         .from('game_settings')
-        .select('maintenance_mode')
-        .eq('id', 1)
+        .select('setting_value')
+        .eq('setting_key', 'maintenance_mode')
         .single()
 
       if (!error && data) {
-        setMaintenanceMode(data.maintenance_mode ?? false)
+        setMaintenanceMode(data.setting_value ?? false)
       }
     } catch (error) {
       console.error('Error checking maintenance mode:', error)
