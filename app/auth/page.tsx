@@ -147,18 +147,18 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+      <div className="max-w-lg w-full">
         {/* Toggle Login/Register */}
-        <div className="flex gap-4 mb-8 justify-center">
+        <div className="flex gap-6 mb-12 justify-center">
           <button
             onClick={() => {
               setIsLogin(true)
               setError('')
             }}
-            className={`w-32 h-32 border-4 transition ${
+            className={`w-20 h-20 border transition ${
               isLogin
                 ? 'border-white'
-                : 'border-white/30 hover:border-white/50'
+                : 'border-white/20 hover:border-white/40'
             }`}
           />
           <button
@@ -166,29 +166,29 @@ export default function AuthPage() {
               setIsLogin(false)
               setError('')
             }}
-            className={`w-32 h-32 border-4 transition ${
+            className={`w-20 h-20 border transition ${
               !isLogin
                 ? 'border-white'
-                : 'border-white/30 hover:border-white/50'
+                : 'border-white/20 hover:border-white/40'
             }`}
           />
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="text-red-400 text-center mb-4 text-sm">
+          <div className="text-red-400 text-center mb-6 text-sm">
             {error}
           </div>
         )}
 
         {/* Login Form */}
         {isLogin && (
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-5">
             <input
               type="text"
               value={loginData.identifier}
               onChange={(e) => setLoginData({ ...loginData, identifier: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="NICKNAME O EMAIL"
               required
             />
@@ -197,7 +197,7 @@ export default function AuthPage() {
               type="password"
               value={loginData.password}
               onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="PASSWORD"
               required
             />
@@ -205,19 +205,19 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-32 h-32 border-4 border-white hover:bg-white/10 disabled:opacity-50 transition mx-auto block"
+              className="w-16 h-16 bg-white hover:bg-white/90 disabled:opacity-50 transition mx-auto block mt-8"
             />
           </form>
         )}
 
         {/* Register Form */}
         {!isLogin && (
-          <form onSubmit={handleRegister} className="space-y-6">
+          <form onSubmit={handleRegister} className="space-y-5">
             <input
               type="text"
               value={registerData.name}
               onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="NOME COMPLETO"
               required
             />
@@ -226,7 +226,7 @@ export default function AuthPage() {
               type="text"
               value={registerData.nickname}
               onChange={(e) => setRegisterData({ ...registerData, nickname: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="NICKNAME"
               required
             />
@@ -235,7 +235,7 @@ export default function AuthPage() {
               type="email"
               value={registerData.email}
               onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="EMAIL"
               required
             />
@@ -244,7 +244,7 @@ export default function AuthPage() {
               type="password"
               value={registerData.password}
               onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="PASSWORD"
               required
             />
@@ -253,7 +253,7 @@ export default function AuthPage() {
               type="password"
               value={registerData.confirmPassword}
               onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-              className="w-full bg-transparent text-white px-6 py-4 border-4 border-white focus:outline-none text-lg"
+              className="w-full bg-transparent border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-white/40 placeholder-white/20"
               placeholder="CONFERMA PASSWORD"
               required
             />
@@ -261,7 +261,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-32 h-32 border-4 border-white hover:bg-white/10 disabled:opacity-50 transition mx-auto block"
+              className="w-16 h-16 bg-white hover:bg-white/90 disabled:opacity-50 transition mx-auto block mt-8"
             />
           </form>
         )}

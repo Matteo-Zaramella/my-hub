@@ -40,15 +40,34 @@ export default function LandingPage() {
 
   const supabase = createClient()
 
-  // Check participant session - redirect to auth if not logged in
+  // Check participant session - redirect to auth if needed
   useEffect(() => {
-    const session = localStorage.getItem('participant_session')
-    if (!session) {
-      // No session, redirect to auth page
-      router.push('/auth')
-      return
+    async function checkAuth() {
+      const session = localStorage.getItem('participant_session')
+
+      // If user has a session, they're logged in - allow access
+      if (session) {
+        return
+      }
+
+      // No session - check if bypass is enabled
+      const { data: authSetting } = await supabase
+        .from('game_settings')
+        .select('setting_value')
+        .eq('setting_key', 'participant_auth_enabled')
+        .single()
+
+      const bypassEnabled = authSetting?.setting_value === false
+
+      // If bypass is NOT enabled, redirect to auth
+      if (!bypassEnabled) {
+        router.push('/auth')
+      }
+      // If bypass IS enabled, user can stay on landing without login
     }
-  }, [router])
+
+    checkAuth()
+  }, [router, supabase])
 
   // Check if first visit for terminal welcome animation
   useEffect(() => {
