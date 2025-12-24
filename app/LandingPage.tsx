@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import RegistrationForm from './RegistrationForm'
+import RegistrationForm from './components/RegistrationForm'
 import TerminalWelcome from './components/TerminalWelcome'
 
 export default function LandingPage() {
@@ -539,16 +539,25 @@ export default function LandingPage() {
 
       {/* Registration Form Modal */}
       {showRegistrationForm && (
-        <RegistrationForm
-          onClose={() => setShowRegistrationForm(false)}
-          onSuccess={() => {
-            setUserRegistered(true)
-            if (participantCode) {
-              checkUserRegistration(participantCode)
-            }
-          }}
-          participantCode={participantCode}
-        />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="relative max-w-2xl w-full">
+            <button
+              onClick={() => setShowRegistrationForm(false)}
+              className="absolute -top-12 right-0 text-white/60 hover:text-white text-2xl"
+            >
+              ✕
+            </button>
+            <RegistrationForm
+              onSuccess={(code) => {
+                setShowRegistrationForm(false)
+                setUserRegistered(true)
+                localStorage.setItem('registrationCompleted', code)
+                // Redirect to game area login
+                router.push('/game/area')
+              }}
+            />
+          </div>
+        </div>
       )}
     </div>
   )
