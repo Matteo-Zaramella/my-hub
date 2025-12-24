@@ -212,7 +212,7 @@ export default function LandingPage() {
         const now = new Date()
 
         // Cerimonia di apertura: 24/01/2026 → 26/01/2026 23:59
-        const ceremonyStart = new Date('2026-01-24T00:00:00')
+        const ceremonyStart = new Date('2026-01-25T00:00:00') // Mezzanotte tra 24 e 25
         const ceremonyEnd = new Date('2026-01-26T23:59:59')
 
         let targetDate: Date | null = null
@@ -220,7 +220,7 @@ export default function LandingPage() {
 
         // Se non è ancora iniziata la cerimonia
         if (now < ceremonyStart) {
-          targetDate = ceremonyEnd
+          targetDate = ceremonyStart // Countdown punta all'inizio (25/01 00:00)
           eventStartDate = ceremonyStart
         }
         // Se la cerimonia è in corso
