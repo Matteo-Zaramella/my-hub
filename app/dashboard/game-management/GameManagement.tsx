@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import OpeningCeremonyClues from './OpeningCeremonyClues'
 import ChallengesManagement from './ChallengesManagement'
-import ParticipantsTab from './ParticipantsTab'
 import ChecklistTab from './ChecklistTab'
 import GamePhasesTab from './GamePhasesTab'
 import SettingsTab from './SettingsTab'
@@ -46,13 +45,12 @@ interface GameManagementProps {
 }
 
 export default function GameManagement({ gameConfig, challenges }: GameManagementProps) {
-  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'participants' | 'checklist' | 'phases' | 'settings' | 'gamearea'>('ceremony')
+  const [activeTab, setActiveTab] = useState<'ceremony' | 'challenges' | 'checklist' | 'phases' | 'settings' | 'gamearea'>('ceremony')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const menuItems = [
     { id: 'ceremony' as const, icon: '🎉', label: 'Cerimonia Apertura' },
     { id: 'challenges' as const, icon: '🎯', label: 'Sfide Mensili' },
-    { id: 'participants' as const, icon: '👥', label: 'Partecipanti' },
     { id: 'checklist' as const, icon: '✅', label: 'Checklist' },
     { id: 'phases' as const, icon: '🎯', label: 'Fasi del Gioco' },
     { id: 'settings' as const, icon: '⚙️', label: 'Impostazioni' },
@@ -146,7 +144,6 @@ export default function GameManagement({ gameConfig, challenges }: GameManagemen
         <main className="flex-1 min-w-0">
           {activeTab === 'ceremony' && <OpeningCeremonyClues />}
           {activeTab === 'challenges' && <ChallengesManagement challenges={challenges} />}
-          {activeTab === 'participants' && <ParticipantsTab />}
           {activeTab === 'checklist' && <ChecklistTab />}
           {activeTab === 'phases' && <GamePhasesTab />}
           {activeTab === 'settings' && <SettingsTab />}
