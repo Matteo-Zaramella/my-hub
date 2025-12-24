@@ -319,7 +319,7 @@ interface Participant {
 
 export default function GameAreaWithChat() {
   const [participant, setParticipant] = useState<Participant | null>(null)
-  const [activeTab, setActiveTab] = useState<'chat' | 'clues' | 'validate' | 'private'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | 'clues' | 'validate' | 'private' | 'wishlist'>('chat')
 
   // Carica partecipante da localStorage se esiste
   useEffect(() => {
@@ -418,6 +418,16 @@ export default function GameAreaWithChat() {
             >
               🔒 Privato
             </button>
+            <button
+              onClick={() => setActiveTab('wishlist')}
+              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+                activeTab === 'wishlist'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              🎁 Wishlist
+            </button>
           </div>
         </div>
       </div>
@@ -445,6 +455,18 @@ export default function GameAreaWithChat() {
 
         {/* Private Tab */}
         {activeTab === 'private' && <PrivateSection />}
+
+        {/* Wishlist Tab */}
+        {activeTab === 'wishlist' && (
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+              🎁 Wishlist
+            </h2>
+            <p className="text-white/80 text-lg">
+              Sezione wishlist in arrivo...
+            </p>
+          </div>
+        )}
       </main>
 
       {/* Footer Info */}
