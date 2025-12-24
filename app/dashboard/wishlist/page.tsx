@@ -11,16 +11,25 @@ export default async function WishlistPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // ISOLATED: No auth required for dashboard
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   // Fetch wishlist items
-  const { data: items, error } = await supabase
-    .from('wishlist_items')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+  let items = null
+  let error = null
+
+  if (user) {
+    const result = await supabase
+      .from('wishlist_items')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    items = result.data
+    error = result.error
+  }
 
   if (error) {
     console.error('Error fetching wishlist:', error)

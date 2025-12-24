@@ -11,21 +11,28 @@ export default async function PastiPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // ISOLATED: No auth required for dashboard
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   // Fetch all pasti (last 365 days for filtering)
   const oneYearAgo = new Date()
   oneYearAgo.setDate(oneYearAgo.getDate() - 365)
 
-  const { data: pasti } = await supabase
-    .from('pasti')
-    .select('*')
-    .eq('user_id', user.id)
-    .gte('data', oneYearAgo.toISOString().split('T')[0])
-    .order('data', { ascending: false })
-    .order('created_at', { ascending: false })
+  let pasti = null
+
+  if (user) {
+    const result = await supabase
+      .from('pasti')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('data', oneYearAgo.toISOString().split('T')[0])
+      .order('data', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    pasti = result.data
+  }
 
   // Fetch meal presets
   const { data: presets } = await supabase

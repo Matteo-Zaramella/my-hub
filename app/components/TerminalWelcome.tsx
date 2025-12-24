@@ -7,43 +7,44 @@ interface TerminalWelcomeProps {
   daysRemaining: number
 }
 
-// Funzione per generare i messaggi dinamicamente
-const getLines = (days: number) => [
-  'Ti ho selezionato.',
-  `Hai ${days} giorni per scoprire il mio segreto.`,
-  'Le tue azioni determineranno l\'esito.',
-  'Non tutto ti sarà rivelato.'
+// Messaggio di benvenuto - 6 righe (tono misterioso/entità)
+const LINES = [
+  'Benvenuto.',
+  'Sei stato scelto.',
+  'Registrati per accedere.',
+  'Riceverai un codice: non perderlo.',
+  'Tutto ciò che cerchi è all\'interno.',
+  'Il gioco inizia ora.'
 ]
 
-// Velocità e pause
-const TYPING_SPEED = 50 // ms per carattere
-const PAUSE_AFTER_LINE = 1500 // pausa dopo completamento riga
-const BACKSPACE_DELAY = 200 // pausa prima di iniziare a cancellare
-const FINAL_PAUSE = 1000 // pausa finale
+// Ritmi e velocità (in millisecondi)
+const TYPING_SPEED = 60 // Velocità per ogni lettera (uguale per tutte)
+const PAUSE_BETWEEN_LINES = 800 // Pausa dopo ogni riga completata prima della successiva
+const FINAL_PAUSE = 2500 // Pausa finale prima di mostrare la landing page
+const INITIAL_DELAY = 1500 // Schermo nero iniziale
 
-export default function TerminalWelcome({ onComplete, daysRemaining }: TerminalWelcomeProps) {
-  const [displayText, setDisplayText] = useState('')
+export default function TerminalWelcome({ onComplete }: TerminalWelcomeProps) {
+  const [currentText, setCurrentText] = useState('') // Testo corrente visualizzato
   const [showCursor, setShowCursor] = useState(true)
   const [animationStarted, setAnimationStarted] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const lineIndexRef = useRef(0)
-  const charIndexRef = useRef(0)
-  const isTypingRef = useRef(true)
+  const currentLineRef = useRef(0) // Quale riga stiamo mostrando
+  const currentCharRef = useRef(0) // Quale carattere
+  const isDeletingRef = useRef(false) // Sta cancellando o scrivendo
   const onCompleteRef = useRef(onComplete)
-  const LINES = getLines(daysRemaining)
 
   // Aggiorna la ref quando onComplete cambia
   useEffect(() => {
     onCompleteRef.current = onComplete
   }, [onComplete])
 
-  // Avvia animazione dopo 2 secondi di schermo nero
+  // Avvia animazione dopo schermo nero iniziale
   useEffect(() => {
-    const initialDelay = setTimeout(() => {
+    const initialTimer = setTimeout(() => {
       setAnimationStarted(true)
-    }, 2000)
+    }, INITIAL_DELAY)
 
-    return () => clearTimeout(initialDelay)
+    return () => clearTimeout(initialTimer)
   }, [])
 
   // Cursore lampeggiante
@@ -55,45 +56,54 @@ export default function TerminalWelcome({ onComplete, daysRemaining }: TerminalW
     return () => clearInterval(cursorInterval)
   }, [])
 
-  // Animazione typing con refs per evitare re-render
+  // Animazione typing - ogni riga appare e scompare singolarmente
   useEffect(() => {
     if (!animationStarted) return
 
     const animate = () => {
       // Tutte le righe completate
-      if (lineIndexRef.current >= LINES.length) {
+      if (currentLineRef.current >= LINES.length) {
         timeoutRef.current = setTimeout(() => {
           onCompleteRef.current()
         }, FINAL_PAUSE)
         return
       }
 
-      const currentLine = LINES[lineIndexRef.current]
+      const currentLine = LINES[currentLineRef.current]
+      const isDeleting = isDeletingRef.current
 
-      if (isTypingRef.current) {
-        // Fase TYPING
-        if (charIndexRef.current < currentLine.length) {
-          setDisplayText(currentLine.slice(0, charIndexRef.current + 1))
-          charIndexRef.current++
+      // FASE SCRITTURA
+      if (!isDeleting) {
+        // Riga ancora da scrivere
+        if (currentCharRef.current < currentLine.length) {
+          setCurrentText(currentLine.slice(0, currentCharRef.current + 1))
+          currentCharRef.current++
           timeoutRef.current = setTimeout(animate, TYPING_SPEED)
-        } else {
-          // Fine typing, pausa prima di cancellare
-          timeoutRef.current = setTimeout(() => {
-            isTypingRef.current = false
-            animate()
-          }, PAUSE_AFTER_LINE)
         }
-      } else {
-        // Fase BACKSPACE: cancella carattere per carattere
-        if (charIndexRef.current > 0) {
-          charIndexRef.current--
-          setDisplayText(currentLine.slice(0, charIndexRef.current))
+        // Riga completata → pausa e poi inizia a cancellare
+        else {
+          timeoutRef.current = setTimeout(() => {
+            isDeletingRef.current = true
+            animate()
+          }, PAUSE_BETWEEN_LINES)
+        }
+      }
+      // FASE CANCELLAZIONE
+      else {
+        // Riga ancora da cancellare
+        if (currentCharRef.current > 0) {
+          currentCharRef.current--
+          setCurrentText(currentLine.slice(0, currentCharRef.current))
           timeoutRef.current = setTimeout(animate, TYPING_SPEED)
-        } else {
-          // Testo completamente cancellato, passa alla riga successiva
-          lineIndexRef.current++
-          isTypingRef.current = true
-          timeoutRef.current = setTimeout(animate, BACKSPACE_DELAY)
+        }
+        // Riga completamente cancellata → passa alla successiva
+        else {
+          timeoutRef.current = setTimeout(() => {
+            isDeletingRef.current = false
+            currentLineRef.current++
+            currentCharRef.current = 0
+            animate()
+          }, PAUSE_BETWEEN_LINES)
         }
       }
     }
@@ -105,19 +115,36 @@ export default function TerminalWelcome({ onComplete, daysRemaining }: TerminalW
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [animationStarted]) // Esegui quando animazione parte
+  }, [animationStarted])
+
+  // Funzione per saltare l'animazione (opzionale)
+  const handleSkip = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    onCompleteRef.current()
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
       {/* Contenuto terminal */}
-      <div className="text-center px-8">
-        <div className="font-mono text-white text-2xl md:text-4xl">
-          <span>{displayText}</span>
+      <div className="text-center px-8 max-w-4xl">
+        <div className="font-mono text-white text-xl md:text-3xl lg:text-4xl">
+          {currentText}
+          {/* Cursore lampeggiante */}
           <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
             _
           </span>
         </div>
       </div>
+
+      {/* Pulsante Skip (nascosto per ora, scommentare se necessario) */}
+      {/* <button
+        onClick={handleSkip}
+        className="absolute bottom-8 right-8 text-white/50 hover:text-white text-sm transition"
+      >
+        Salta →
+      </button> */}
     </div>
   )
 }

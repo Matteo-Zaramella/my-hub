@@ -10,9 +10,10 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // ISOLATED: No auth required for dashboard
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
@@ -28,13 +29,26 @@ export default async function ProfilePage() {
         </div>
       </header>
 
+      {!user && (
+        <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+            <div className="text-6xl mb-4">🔒</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Accesso richiesto</h2>
+            <p className="text-gray-600">
+              Questa sezione richiede l'autenticazione per modificare email e password.
+            </p>
+          </div>
+        </main>
+      )}
+
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-6 border border-purple-200/50">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              {user.email?.[0].toUpperCase()}
-            </div>
+      {user && (
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-6 border border-purple-200/50">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                {user.email?.[0].toUpperCase()}
+              </div>
             <div>
               <h2 className="text-xl font-bold text-gray-800">Il Tuo Profilo</h2>
               <p className="text-gray-600 text-sm">Gestisci le tue credenziali e impostazioni</p>
@@ -93,7 +107,8 @@ export default async function ProfilePage() {
             </div>
           </div>
         </div>
-      </main>
+        </main>
+      )}
     </div>
   )
 }

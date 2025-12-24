@@ -10,9 +10,10 @@ export default async function GameManagementPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // ISOLATED: No auth required for dashboard
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   // Fetch game config
   const { data: gameConfig } = await supabase

@@ -11,24 +11,33 @@ export default async function FitnessPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // ISOLATED: No auth required for dashboard
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   // Fetch workout sessions (last 365 days for filtering)
   const oneYearAgo = new Date()
   oneYearAgo.setDate(oneYearAgo.getDate() - 365)
 
-  const { data: sessions, error } = await supabase
-    .from('workout_sessions')
-    .select(`
-      *,
-      workout_exercises (*)
-    `)
-    .eq('user_id', user.id)
-    .gte('data', oneYearAgo.toISOString().split('T')[0])
-    .order('data', { ascending: false })
-    .order('created_at', { ascending: false })
+  let sessions = null
+  let error = null
+
+  if (user) {
+    const result = await supabase
+      .from('workout_sessions')
+      .select(`
+        *,
+        workout_exercises (*)
+      `)
+      .eq('user_id', user.id)
+      .gte('data', oneYearAgo.toISOString().split('T')[0])
+      .order('data', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    sessions = result.data
+    error = result.error
+  }
 
   if (error) {
     console.error('Error fetching workout sessions:', error)

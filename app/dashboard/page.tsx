@@ -19,16 +19,21 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
-    redirect('/login')
-  }
+  // TEMPORARY: Allow access without authentication
+  // if (!user) {
+  //   redirect('/login')
+  // }
 
   // Get user data from users table
-  const { data: userData } = await supabase
-    .from('users')
-    .select('username')
-    .eq('id', user.id)
-    .single()
+  let userData = null
+  if (user) {
+    const { data } = await supabase
+      .from('users')
+      .select('username')
+      .eq('id', user.id)
+      .single()
+    userData = data
+  }
 
   const handleSignOut = async () => {
     'use server'
@@ -45,13 +50,15 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold text-white">My Hub</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-white/60">
-              Ciao, <span className="font-medium text-white">{userData?.username || user.email}</span>
+              Ciao, <span className="font-medium text-white">{userData?.username || user?.email || 'Ospite'}</span>
             </span>
-            <form action={handleSignOut}>
-              <button className="text-sm text-red-500 hover:text-red-400 font-medium transition">
-                Esci
-              </button>
-            </form>
+            {user && (
+              <form action={handleSignOut}>
+                <button className="text-sm text-red-500 hover:text-red-400 font-medium transition">
+                  Esci
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </header>
