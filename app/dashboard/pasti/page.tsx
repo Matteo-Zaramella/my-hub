@@ -35,11 +35,17 @@ export default async function PastiPage() {
   }
 
   // Fetch meal presets
-  const { data: presets } = await supabase
-    .from('meal_presets')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('meal_type', { ascending: true })
+  let presets = null
+
+  if (user) {
+    const result = await supabase
+      .from('meal_presets')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('meal_type', { ascending: true })
+
+    presets = result.data
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50">
