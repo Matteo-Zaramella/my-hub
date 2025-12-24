@@ -57,7 +57,7 @@ export default async function PresetPage() {
           </ul>
         </div>
 
-        <PresetManagement initialPresets={presets || []} userId={user.id} />
+        <PresetManagement initialPresets={presets || []} userId={user?.id ?? ''} />
       </main>
     </div>
   )
