@@ -7,11 +7,11 @@ interface TerminalWelcomeProps {
   daysRemaining: number
 }
 
-// Messaggio di benvenuto - 6 righe (tono misterioso/entità)
+// Messaggio di benvenuto - 6 righe (tono misterioso/entità - neutro)
 const LINES = [
-  'Benvenuto.',
-  'Sei stato scelto.',
-  'Registrati per accedere.',
+  'Accesso garantito.',
+  'Registrazione richiesta.',
+  'Compila il modulo.',
   'Riceverai un codice: non perderlo.',
   'Tutto ciò che cerchi è all\'interno.',
   'Il gioco inizia ora.'
