@@ -348,7 +348,7 @@ export default function GameAreaWithChat() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 text-white">
       {/* Header */}
       <header className="bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center gap-4">
             {/* Logo e Titolo */}
             <div className="flex items-center gap-4">
@@ -423,7 +423,7 @@ export default function GameAreaWithChat() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Chat Tab */}
         {activeTab === 'chat' && (
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden">
@@ -449,7 +449,7 @@ export default function GameAreaWithChat() {
 
       {/* Footer Info */}
       <footer className="border-t border-white/10 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/50">
             <div>
               <p>
