@@ -554,9 +554,9 @@ export default function LandingPage() {
                 setShowAuthChoice(false)
                 setShowRegistrationForm(true)
               }}
-              className="flex-1 aspect-square max-w-[280px] md:max-w-[320px] mx-auto bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+              className="flex-1 aspect-square max-w-[200px] md:max-w-[280px] mx-auto bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
             >
-              <div className="text-white text-2xl md:text-3xl font-bold">REGISTRATI</div>
+              <div className="text-white text-xl md:text-2xl font-bold">REGISTRATI</div>
             </button>
 
             {/* Quadrato ACCEDI */}
@@ -565,9 +565,9 @@ export default function LandingPage() {
                 setShowAuthChoice(false)
                 setShowLoginForm(true)
               }}
-              className="flex-1 aspect-square max-w-[280px] md:max-w-[320px] mx-auto bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+              className="flex-1 aspect-square max-w-[200px] md:max-w-[280px] mx-auto bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
             >
-              <div className="text-white text-2xl md:text-3xl font-bold">ACCEDI</div>
+              <div className="text-white text-xl md:text-2xl font-bold">ACCEDI</div>
             </button>
           </div>
         </div>
@@ -594,7 +594,7 @@ export default function LandingPage() {
 
       {/* Login Form - Solo codice 8 caratteri */}
       {showLoginForm && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4 md:p-8">
           <div className="w-full max-w-4xl">
             <form
               onSubmit={async (e) => {
@@ -628,9 +628,9 @@ export default function LandingPage() {
                   setLoginLoading(false)
                 }
               }}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4 md:gap-6"
             >
-              <div className="flex gap-6 items-center">
+              <div className="flex gap-3 md:gap-6 items-center">
                 {/* Freccia indietro */}
                 <button
                   type="button"
@@ -640,9 +640,9 @@ export default function LandingPage() {
                     setLoginCode('')
                     setLoginError('')
                   }}
-                  className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+                  className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
                 >
-                  <div className="text-white text-4xl">←</div>
+                  <div className="text-white text-2xl md:text-4xl">←</div>
                 </button>
 
                 <input
@@ -651,22 +651,22 @@ export default function LandingPage() {
                   onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
                   placeholder="Codice 8 caratteri"
                   maxLength={8}
-                  className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
+                  className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
                   autoFocus
                 />
 
                 <button
                   type="submit"
                   disabled={loginLoading || loginCode.length !== 8}
-                  className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors disabled:opacity-30"
+                  className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
                 >
-                  <div className="text-white text-4xl">{loginLoading ? '...' : '→'}</div>
+                  <div className="text-white text-2xl md:text-4xl">{loginLoading ? '...' : '→'}</div>
                 </button>
               </div>
 
               {/* Error message */}
               {loginError && (
-                <div className="text-red-500 text-center text-lg">{loginError}</div>
+                <div className="text-red-500 text-center text-sm md:text-lg">{loginError}</div>
               )}
             </form>
           </div>

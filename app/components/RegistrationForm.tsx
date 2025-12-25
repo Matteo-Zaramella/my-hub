@@ -251,15 +251,15 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             onChange={(e) => handleChange(e.target.value)}
             placeholder={STEP_LABELS.otp}
             maxLength={6}
-            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 text-center tracking-widest"
+            className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-lg md:text-2xl focus:outline-none placeholder:text-white/30 text-center tracking-widest"
             autoFocus
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center disabled:opacity-50"
+            className="w-14 h-14 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center disabled:opacity-50 hover:bg-white/20 transition"
           >
-            <div className="text-white text-4xl">→</div>
+            <div className="text-white text-2xl md:text-4xl">→</div>
           </button>
         </>
       )
@@ -268,14 +268,14 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
     // Step password (ultimo) - due input insieme
     if (currentStep === 'password') {
       return (
-        <>
+        <div className="flex flex-col md:flex-row gap-3 md:gap-6 w-full items-center">
           {/* Freccia indietro */}
           <button
             type="button"
             onClick={handleBack}
-            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+            className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center self-start md:self-auto hover:bg-white/20 transition"
           >
-            <div className="text-white text-4xl">←</div>
+            <div className="text-white text-2xl md:text-4xl">←</div>
           </button>
 
           {/* Password */}
@@ -284,7 +284,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             value={formData.password}
             onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
             placeholder="Password"
-            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
             autoFocus
           />
 
@@ -294,18 +294,18 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             value={formData.confirmPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
             placeholder="Conferma password"
-            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
           />
 
           {/* Pulsante bianco pieno */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-12 py-6 bg-white rounded-2xl text-black text-xl font-bold disabled:opacity-50"
+            className="w-full md:w-auto px-8 py-3 md:px-12 md:py-6 bg-white rounded-xl md:rounded-2xl text-black text-lg md:text-xl font-bold disabled:opacity-50 hover:bg-white/90 transition"
           >
             INVIA
           </button>
-        </>
+        </div>
       )
     }
 
@@ -319,9 +319,9 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
           <button
             type="button"
             onClick={handleBack}
-            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+            className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition"
           >
-            <div className="text-white text-4xl">←</div>
+            <div className="text-white text-2xl md:text-4xl">←</div>
           </button>
         )}
 
@@ -330,7 +330,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
           value={currentValue}
           onChange={(e) => handleChange(e.target.value)}
           placeholder={STEP_LABELS[currentStep]}
-          className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+          className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
           autoFocus
         />
 
@@ -338,20 +338,20 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center disabled:opacity-50"
+          className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center disabled:opacity-50 hover:bg-white/20 transition"
         >
-          <div className="text-white text-4xl">→</div>
+          <div className="text-white text-2xl md:text-4xl">→</div>
         </button>
       </>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
+    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-4xl">
-        <form onSubmit={handleSubmit} className="flex gap-6 items-center">
+        <form onSubmit={handleSubmit} className="flex gap-3 md:gap-6 items-center">
           <div
-            className={`flex-1 flex gap-6 transition-all duration-500 ${
+            className={`flex-1 flex gap-3 md:gap-6 transition-all duration-500 ${
               slideDirection === 'left' ? 'animate-slide-in-left' : 'animate-slide-in-right'
             }`}
             key={currentStepIndex}
@@ -362,7 +362,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
 
         {/* Errore */}
         {error && (
-          <div className="mt-6 text-red-400 text-center text-lg">
+          <div className="mt-4 md:mt-6 text-red-400 text-center text-sm md:text-lg">
             {error}
           </div>
         )}
