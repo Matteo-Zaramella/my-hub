@@ -21,15 +21,17 @@ export default function LandingPage() {
   })
   const [participantCode, setParticipantCode] = useState<string | null>(null)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
+  const [showLoginForm, setShowLoginForm] = useState(false)
   const [userRegistered, setUserRegistered] = useState(false) // Registrazione personale dell'utente
+  const [showAuthChoice, setShowAuthChoice] = useState(false) // Scelta tra registrati/accedi
   const [ceremonyActive, setCeremonyActive] = useState(false) // Controllo se la cerimonia è attiva
-  const [registrationFormEnabled, setRegistrationFormEnabled] = useState(false) // Form registrazione homepage
+  const [registrationFormEnabled, setRegistrationFormEnabled] = useState(true) // Form registrazione homepage (default true)
   const [wishlistEnabled, setWishlistEnabled] = useState(true) // Wishlist pubblica
   const [passwordInputEnabled, setPasswordInputEnabled] = useState(false) // Barra inserimento password
   const [minigameButtonEnabled, setMinigameButtonEnabled] = useState(false) // Cerchio 95 Saetta McQueen
 
   // Terminal welcome animation
-  const [showTerminalWelcome, setShowTerminalWelcome] = useState(false)
+  const [showTerminalWelcome, setShowTerminalWelcome] = useState(true) // Inizia sempre mostrando il welcome
   const [welcomeCompleted, setWelcomeCompleted] = useState(false)
 
   // Load ceremony clues from admin panel
@@ -40,13 +42,13 @@ export default function LandingPage() {
 
   const supabase = createClient()
 
-  // Check if first visit for terminal welcome animation
+  // Check localStorage on client mount
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
-    if (!hasSeenWelcome) {
-      setShowTerminalWelcome(true)
-    } else {
+    if (hasSeenWelcome) {
+      setShowTerminalWelcome(false)
       setWelcomeCompleted(true)
+      setShowAuthChoice(true) // Mostra direttamente la scelta se ha già visto il welcome
     }
   }, [])
 
@@ -55,6 +57,7 @@ export default function LandingPage() {
     localStorage.setItem('hasSeenWelcome', 'true')
     setShowTerminalWelcome(false)
     setWelcomeCompleted(true)
+    setShowAuthChoice(true) // Mostra scelta registrati/accedi
   }
 
   // Load participant code and clues from database
@@ -367,7 +370,7 @@ export default function LandingPage() {
       {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} daysRemaining={timeLeft.days} />}
 
       {/* Wishlist Button - Top Left */}
-      {!showTerminalWelcome && welcomeCompleted && (
+      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && wishlistEnabled && (
         <button
           onClick={() => router.push('/wishlist-public')}
           className="fixed top-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -377,7 +380,7 @@ export default function LandingPage() {
       )}
 
       {/* Login Button - Top Right */}
-      {!showTerminalWelcome && welcomeCompleted && (
+      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
         <button
           onClick={handleAdminAccess}
           className="fixed top-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -387,7 +390,7 @@ export default function LandingPage() {
       )}
 
       {/* Minigame Button - Bottom Left */}
-      {!showTerminalWelcome && welcomeCompleted && minigameButtonEnabled && (
+      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && minigameButtonEnabled && (
         <button
           onClick={() => router.push('/minigames')}
           className="fixed bottom-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -397,7 +400,7 @@ export default function LandingPage() {
       )}
 
       {/* Password Input Button - Bottom Right */}
-      {!showTerminalWelcome && welcomeCompleted && passwordInputEnabled && (
+      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && passwordInputEnabled && (
         <button
           onClick={handleGameAccess}
           className="fixed bottom-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -406,8 +409,9 @@ export default function LandingPage() {
         </button>
       )}
 
-      {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati O quando terminal è visibile */}
-      {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && (
+
+      {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati O quando terminal è visibile O scelta auth */}
+      {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full h-full max-w-[100vh] max-h-screen grid grid-cols-10 grid-rows-10 gap-0 p-1 sm:p-2 md:p-3 lg:p-4 aspect-square">
           {Array.from({ length: totalCircles }, (_, index) => {
@@ -459,8 +463,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Countdown Timer - Center (4x4 circles area) - Nascosto quando countdown finito O terminal visibile */}
-      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && (
+      {/* Countdown Timer - Center (4x4 circles area) - Nascosto quando countdown finito O terminal visibile O scelta auth */}
+      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
           <div className="grid grid-cols-2 gap-1 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Days */}
@@ -537,25 +541,94 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Registration Form Modal */}
-      {showRegistrationForm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="relative max-w-2xl w-full">
+      {/* Auth Choice - Registrati o Accedi */}
+      {showAuthChoice && !showRegistrationForm && !showLoginForm && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
+          <div className="flex gap-8">
+            {/* Quadrato REGISTRATI */}
             <button
-              onClick={() => setShowRegistrationForm(false)}
-              className="absolute -top-12 right-0 text-white/60 hover:text-white text-2xl"
-            >
-              ✕
-            </button>
-            <RegistrationForm
-              onSuccess={(code) => {
-                setShowRegistrationForm(false)
-                setUserRegistered(true)
-                localStorage.setItem('registrationCompleted', code)
-                // Redirect to game area login
-                router.push('/game/area')
+              onClick={() => {
+                setShowAuthChoice(false)
+                setShowRegistrationForm(true)
               }}
-            />
+              className="w-80 h-80 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+            >
+              <div className="text-white text-3xl font-bold">REGISTRATI</div>
+            </button>
+
+            {/* Quadrato ACCEDI */}
+            <button
+              onClick={() => {
+                setShowAuthChoice(false)
+                setShowLoginForm(true)
+              }}
+              className="w-80 h-80 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+            >
+              <div className="text-white text-3xl font-bold">ACCEDI</div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Form */}
+      {showRegistrationForm && (
+        <RegistrationForm
+          onSuccess={(code) => {
+            setShowRegistrationForm(false)
+            setUserRegistered(true)
+            localStorage.setItem('registrationCompleted', code)
+            // Redirect to game area login
+            router.push('/game/area')
+          }}
+          onBack={() => {
+            setShowRegistrationForm(false)
+            setShowAuthChoice(true)
+          }}
+        />
+      )}
+
+      {/* Login Form */}
+      {showLoginForm && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
+          <div className="w-full max-w-4xl">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const code = (e.target as any).code.value
+                if (code && code.length === 8) {
+                  localStorage.setItem('participantCode', code)
+                  router.push('/game/area')
+                }
+              }}
+              className="flex gap-6 items-center"
+            >
+              {/* Freccia indietro per tornare alla scelta */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLoginForm(false)
+                  setShowAuthChoice(true)
+                }}
+                className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+              >
+                <div className="text-white text-4xl">←</div>
+              </button>
+
+              <input
+                type="text"
+                name="code"
+                placeholder="Codice 8 caratteri"
+                maxLength={8}
+                className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+              >
+                <div className="text-white text-4xl">→</div>
+              </button>
+            </form>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import EntityText from './EntityText'
 
 interface TerminalWelcomeProps {
   onComplete: () => void

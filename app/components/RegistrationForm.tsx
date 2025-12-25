@@ -1,21 +1,63 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 interface RegistrationFormProps {
   onSuccess: (participantCode: string) => void
+  onBack?: () => void
 }
 
-export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
-  const supabase = createClient()
+type Step =
+  | 'firstName'
+  | 'lastName'
+  | 'email'
+  | 'instagram'
+  | 'nickname'
+  | 'message'
+  | 'password'
+  | 'confirmPassword'
+  | 'otp'
+  | 'success'
 
-  // Step 1: Form dati
-  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+const STEPS: Step[] = [
+  'firstName',
+  'lastName',
+  'email',
+  'instagram',
+  'nickname',
+  'message',
+  'password', // password e confirmPassword insieme
+]
 
-  // Form data
+const STEP_LABELS: Record<Step, string> = {
+  firstName: 'Nome',
+  lastName: 'Cognome',
+  email: 'Email',
+  instagram: 'Instagram (opzionale)',
+  nickname: 'Nickname',
+  message: 'Messaggio personale (opzionale)',
+  password: 'Password',
+  confirmPassword: 'Conferma password',
+  otp: 'Codice OTP',
+  success: ''
+}
+
+const STEP_TYPES: Record<Step, string> = {
+  firstName: 'text',
+  lastName: 'text',
+  email: 'email',
+  instagram: 'text',
+  nickname: 'text',
+  message: 'text',
+  password: 'password',
+  confirmPassword: 'password',
+  otp: 'text',
+  success: 'text'
+}
+
+export default function RegistrationForm({ onSuccess, onBack }: RegistrationFormProps) {
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left')
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -26,79 +68,112 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     password: '',
     confirmPassword: '',
   })
-
-  // OTP
   const [otp, setOtp] = useState('')
-  const [pendingEmail, setPendingEmail] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [participantCode, setParticipantCode] = useState('')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+  const currentStep = STEPS[currentStepIndex] as Step
+
+  const handleNext = async () => {
     setError('')
+
+    // Se è lo step password (ultimo), valida entrambe le password
+    if (currentStep === 'password') {
+      if (!formData.password || formData.password.length < 8) {
+        setError('Password minimo 8 caratteri')
+        return
+      }
+      if (!formData.confirmPassword) {
+        setError('Conferma la password')
+        return
+      }
+      if (formData.password !== formData.confirmPassword) {
+        setError('Le password non coincidono')
+        return
+      }
+      // Invia OTP
+      await sendOTP()
+      return
+    }
+
+    // Validazioni per altri step
+    const value = formData[currentStep as keyof typeof formData]
+
+    // Campi obbligatori
+    if (currentStep !== 'instagram' && currentStep !== 'message' && !value) {
+      setError('Campo obbligatorio')
+      return
+    }
+
+    // Validazione email
+    if (currentStep === 'email' && !value.includes('@')) {
+      setError('Email non valida')
+      return
+    }
+
+    // Procedi al prossimo step
+    setSlideDirection('left')
+    setTimeout(() => {
+      setCurrentStepIndex(prev => prev + 1)
+    }, 100)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    // Validazione
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.nickname || !formData.password) {
-      setError('Compila tutti i campi obbligatori.')
-      setLoading(false)
-      return
+  const handleBack = () => {
+    if (currentStepIndex === 0 && onBack) {
+      // Prima slide - torna alla scelta auth
+      onBack()
+    } else if (currentStepIndex > 0) {
+      // Slide successive - torna indietro
+      setSlideDirection('right')
+      setError('')
+      setTimeout(() => {
+        setCurrentStepIndex(prev => prev - 1)
+      }, 100)
     }
+  }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Le password non coincidono.')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 8) {
-      setError('Password minimo 8 caratteri.')
-      setLoading(false)
-      return
-    }
-
+  const sendOTP = async () => {
+    setIsSubmitting(true)
     try {
-      // Invia OTP via email
       const response = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Errore invio codice')
+        const data = await response.json()
+        setError(data.error || 'Errore invio OTP')
+        setIsSubmitting(false)
+        return
       }
 
-      setPendingEmail(formData.email)
-      setStep('otp')
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+      // Vai allo step OTP
+      setSlideDirection('left')
+      setTimeout(() => {
+        setCurrentStepIndex(STEPS.length) // OTP step
+        setIsSubmitting(false)
+      }, 100)
+    } catch (err) {
+      setError('Errore di rete')
+      setIsSubmitting(false)
     }
   }
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+  const verifyOTP = async () => {
+    if (!otp || otp.length !== 6) {
+      setError('Inserisci un codice a 6 cifre')
+      return
+    }
 
+    setIsSubmitting(true)
     try {
-      // Verifica OTP
       const response = await fetch('/api/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: pendingEmail,
+          email: formData.email,
           otp,
           registrationData: formData
         })
@@ -107,176 +182,223 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Codice errato')
+        setError(data.error || 'Codice errato')
+        setIsSubmitting(false)
+        return
       }
 
-      // OTP corretto → partecipante creato
+      // Success!
       setParticipantCode(data.participantCode)
-      setStep('success')
-
-      // Chiama callback dopo 3 secondi
+      setSlideDirection('left')
       setTimeout(() => {
-        onSuccess(data.participantCode)
-      }, 3000)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+        setCurrentStepIndex(STEPS.length + 1) // Success step
+        setIsSubmitting(false)
+        setTimeout(() => {
+          onSuccess(data.participantCode)
+        }, 3000)
+      }, 100)
+    } catch (err) {
+      setError('Errore di rete')
+      setIsSubmitting(false)
     }
   }
 
-  // Step 1: Form registrazione
-  if (step === 'form') {
-    return (
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-auto">
-        <h2 className="text-3xl font-bold mb-6 text-center">Registrazione</h2>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="firstName"
-            placeholder="Nome"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Cognome"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          <input
-            type="text"
-            name="instagram"
-            placeholder="Instagram (opzionale)"
-            value={formData.instagram}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-          />
-
-          <input
-            type="text"
-            name="nickname"
-            placeholder="Nickname"
-            value={formData.nickname}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          <textarea
-            name="message"
-            placeholder="Messaggio personalizzato (opzionale)"
-            value={formData.message}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500 resize-none"
-          />
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Crea password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Conferma password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
-          />
-
-          {error && (
-            <div className="text-red-400 text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Invio...' : 'Registrati'}
-          </button>
-        </form>
-      </div>
-    )
+    if (currentStepIndex === STEPS.length) {
+      // Step OTP
+      verifyOTP()
+    } else {
+      handleNext()
+    }
   }
 
-  // Step 2: Verifica OTP
-  if (step === 'otp') {
-    return (
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-auto">
-        <h2 className="text-3xl font-bold mb-4 text-center">Verifica Email</h2>
-        <p className="text-white/80 mb-6 text-center">
-          Codice inviato.<br />
-          Controlla {pendingEmail}
-        </p>
+  const handleChange = (value: string) => {
+    if (currentStepIndex === STEPS.length) {
+      // OTP step
+      setOtp(value)
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [currentStep]: value
+      }))
+    }
+    setError('')
+  }
 
-        <form onSubmit={handleVerifyOTP} className="space-y-4">
+  // Rendering dello step corrente
+  const renderStep = () => {
+    // Success screen
+    if (currentStepIndex === STEPS.length + 1) {
+      return (
+        <div className="text-center w-full">
+          <div className="text-6xl mb-8">✓</div>
+          <div className="text-2xl text-white mb-4">Registrazione completata</div>
+          <div className="text-white/60 mb-2">Il tuo codice:</div>
+          <div className="text-4xl font-bold text-white">{participantCode}</div>
+        </div>
+      )
+    }
+
+    // OTP step
+    if (currentStepIndex === STEPS.length) {
+      return (
+        <>
           <input
             type="text"
-            placeholder="Inserisci codice"
             value={otp}
-            onChange={(e) => setOtp(e.target.value)}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={STEP_LABELS.otp}
             maxLength={6}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white text-center text-2xl tracking-widest placeholder:text-white/40 focus:outline-none focus:border-purple-500"
-            required
+            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 text-center tracking-widest"
+            autoFocus
           />
-
-          {error && (
-            <div className="text-red-400 text-sm text-center">
-              {error}
-            </div>
-          )}
-
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+            disabled={isSubmitting}
+            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center disabled:opacity-50"
           >
-            {loading ? 'Verifica...' : 'Conferma'}
+            <div className="text-white text-4xl">→</div>
           </button>
-        </form>
-      </div>
+        </>
+      )
+    }
+
+    // Step password (ultimo) - due input insieme
+    if (currentStep === 'password') {
+      return (
+        <>
+          {/* Freccia indietro */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+          >
+            <div className="text-white text-4xl">←</div>
+          </button>
+
+          {/* Password */}
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+            placeholder="Password"
+            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+            autoFocus
+          />
+
+          {/* Conferma password */}
+          <input
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+            placeholder="Conferma password"
+            className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+          />
+
+          {/* Pulsante bianco pieno */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-12 py-6 bg-white rounded-2xl text-black text-xl font-bold disabled:opacity-50"
+          >
+            INVIA
+          </button>
+        </>
+      )
+    }
+
+    // Input step normale
+    const currentValue = formData[currentStep as keyof typeof formData]
+
+    return (
+      <>
+        {/* Freccia indietro (sempre visibile se c'è onBack o se non è la prima slide) */}
+        {(currentStepIndex > 0 || onBack) && (
+          <button
+            type="button"
+            onClick={handleBack}
+            className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
+          >
+            <div className="text-white text-4xl">←</div>
+          </button>
+        )}
+
+        <input
+          type={STEP_TYPES[currentStep]}
+          value={currentValue}
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder={STEP_LABELS[currentStep]}
+          className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30"
+          autoFocus
+        />
+
+        {/* Freccia avanti */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center disabled:opacity-50"
+        >
+          <div className="text-white text-4xl">→</div>
+        </button>
+      </>
     )
   }
 
-  // Step 3: Successo
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 max-w-md mx-auto text-center">
-      <h2 className="text-3xl font-bold mb-4">Email verificata.</h2>
-      <p className="text-white/80 mb-6">
-        Il tuo codice: <span className="font-mono font-bold text-2xl text-purple-400">{participantCode}</span>
-      </p>
-      <p className="text-white/60 text-sm">
-        Conservalo.
-      </p>
+    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
+      <div className="w-full max-w-4xl">
+        <form onSubmit={handleSubmit} className="flex gap-6 items-center">
+          <div
+            className={`flex-1 flex gap-6 transition-all duration-500 ${
+              slideDirection === 'left' ? 'animate-slide-in-left' : 'animate-slide-in-right'
+            }`}
+            key={currentStepIndex}
+          >
+            {renderStep()}
+          </div>
+        </form>
+
+        {/* Errore */}
+        {error && (
+          <div className="mt-6 text-red-400 text-center text-lg">
+            {error}
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        @keyframes slide-in-left {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes slide-in-right {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .animate-slide-in-left {
+          animation: slide-in-left 0.5s ease-out;
+        }
+
+        .animate-slide-in-right {
+          animation: slide-in-right 0.5s ease-out;
+        }
+      `}</style>
     </div>
   )
 }
