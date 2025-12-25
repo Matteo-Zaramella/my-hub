@@ -131,7 +131,7 @@ export default function TerminalWelcome({ onComplete }: TerminalWelcomeProps) {
       {/* Contenuto terminal */}
       <div className="text-center px-8 max-w-4xl">
         <div className="font-mono text-white text-xl md:text-3xl lg:text-4xl">
-          {currentText}
+          <EntityText>{currentText}</EntityText>
           {/* Cursore lampeggiante */}
           <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
             _

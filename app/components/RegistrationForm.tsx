@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 interface RegistrationFormProps {
-  onSuccess: (participantCode: string) => void
+  onSuccess: (participantCode: string, participant: any) => void
   onBack?: () => void
 }
 
@@ -194,7 +194,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
         setCurrentStepIndex(STEPS.length + 1) // Success step
         setIsSubmitting(false)
         setTimeout(() => {
-          onSuccess(data.participantCode)
+          onSuccess(data.participantCode, data.participant)
         }, 3000)
       }, 100)
     } catch (err) {

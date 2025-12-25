@@ -32,30 +32,40 @@ export async function POST(request: Request) {
     const expiresAt = new Date()
     expiresAt.setMinutes(expiresAt.getMinutes() + 10)
 
-    await supabase
+    const { error: upsertError } = await supabase
       .from('otp_codes')
       .upsert({
         email,
         code: otp,
         expires_at: expiresAt.toISOString(),
         created_at: new Date().toISOString()
-      })
+      }, { onConflict: 'email' })
+
+    if (upsertError) {
+      console.error('Error saving OTP:', upsertError)
+      return NextResponse.json({ error: 'Errore salvataggio codice' }, { status: 500 })
+    }
+
+    console.log('OTP saved successfully for:', email)
 
     // Invia email OTP
-    await resend.emails.send({
-      from: 'A Tutto Reality <noreply@matteozaramella.com>',
+    console.log('Sending OTP to:', email)
+    console.log('OTP code:', otp)
+
+    const emailResult = await resend.emails.send({
+      from: 'Sistema <noreply@matteozaramella.com>',
       to: email,
       subject: 'Codice di verifica',
       html: `
         <div style="font-family: monospace; padding: 20px; background: #000; color: #fff;">
           <h2>Codice di verifica</h2>
-          <p>Il tuo codice di verifica è: <strong style="font-size: 24px; color: #a855f7;">${otp}</strong></p>
-          <p style="color: #999;">Inseriscilo entro 10 minuti.</p>
-          <hr style="border-color: #333; margin: 20px 0;">
-          <p style="color: #666;">L'Entità<br>A Tutto Reality: La Rivoluzione</p>
+          <p>Il tuo codice: <strong style="font-size: 24px; color: #a855f7;">${otp}</strong></p>
+          <p style="color: #999;">Valido per 10 minuti.</p>
         </div>
       `
     })
+
+    console.log('Resend result:', emailResult)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

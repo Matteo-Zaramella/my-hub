@@ -61,17 +61,17 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
           {/* Icon */}
           <div className="flex justify-center">
             <div className="w-24 h-24 bg-purple-500/20 rounded-full flex items-center justify-center border-4 border-purple-500">
-              <span className="text-6xl">🎮</span>
+              <span className="text-6xl">🔐</span>
             </div>
           </div>
 
           {/* Title */}
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Accedi al Game
+              Accesso
             </h1>
             <p className="text-white/70">
-              Inserisci il codice sul tuo cartoncino
+              Inserisci il tuo codice
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="Codice (es. ABC123)"
                 className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-xl font-mono tracking-wider"
-                maxLength={6}
+                maxLength={8}
                 disabled={loading}
                 autoComplete="off"
                 suppressHydrationWarning
@@ -109,7 +109,7 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
           {/* Info */}
           <div className="pt-4 border-t border-white/10">
             <p className="text-sm text-white/50">
-              💡 Il codice è stampato sul cartoncino che hai ricevuto
+              💡 Il codice ti è stato inviato via email
             </p>
           </div>
 

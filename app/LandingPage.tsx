@@ -22,6 +22,9 @@ export default function LandingPage() {
   const [participantCode, setParticipantCode] = useState<string | null>(null)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
   const [showLoginForm, setShowLoginForm] = useState(false)
+  const [loginCode, setLoginCode] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
   const [userRegistered, setUserRegistered] = useState(false) // Registrazione personale dell'utente
   const [showAuthChoice, setShowAuthChoice] = useState(false) // Scelta tra registrati/accedi
   const [ceremonyActive, setCeremonyActive] = useState(false) // Controllo se la cerimonia è attiva
@@ -573,12 +576,14 @@ export default function LandingPage() {
       {/* Registration Form */}
       {showRegistrationForm && (
         <RegistrationForm
-          onSuccess={(code) => {
-            setShowRegistrationForm(false)
-            setUserRegistered(true)
+          onSuccess={(code, participant) => {
+            // Salva i dati completi del partecipante per la game area
+            localStorage.setItem('game_participant', JSON.stringify(participant))
+            localStorage.setItem('participantCode', code)
             localStorage.setItem('registrationCompleted', code)
-            // Redirect to game area login
-            router.push('/game/area')
+            setUserRegistered(true)
+            // Redirect diretto senza flash (replace per evitare back)
+            router.replace('/game/area')
           }}
           onBack={() => {
             setShowRegistrationForm(false)
@@ -587,47 +592,82 @@ export default function LandingPage() {
         />
       )}
 
-      {/* Login Form */}
+      {/* Login Form - Solo codice 8 caratteri */}
       {showLoginForm && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
           <div className="w-full max-w-4xl">
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault()
-                const code = (e.target as any).code.value
-                if (code && code.length === 8) {
-                  localStorage.setItem('participantCode', code)
-                  router.push('/game/area')
+                setLoginError('')
+
+                if (loginCode.length !== 8) return
+
+                setLoginLoading(true)
+                try {
+                  // Verifica codice direttamente nel database
+                  const { data: participant, error } = await supabase
+                    .from('game_participants')
+                    .select('*')
+                    .eq('participant_code', loginCode.toUpperCase())
+                    .single()
+
+                  if (error || !participant) {
+                    setLoginError('Codice non valido')
+                    setLoginLoading(false)
+                    return
+                  }
+
+                  // Salva dati partecipante e reindirizza
+                  localStorage.setItem('game_participant', JSON.stringify(participant))
+                  localStorage.setItem('participantCode', loginCode.toUpperCase())
+                  router.replace('/game/area')
+                } catch {
+                  setLoginError('Errore di connessione')
+                } finally {
+                  setLoginLoading(false)
                 }
               }}
-              className="flex gap-6 items-center"
+              className="flex flex-col gap-6"
             >
-              {/* Freccia indietro per tornare alla scelta */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLoginForm(false)
-                  setShowAuthChoice(true)
-                }}
-                className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
-              >
-                <div className="text-white text-4xl">←</div>
-              </button>
+              <div className="flex gap-6 items-center">
+                {/* Freccia indietro */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLoginForm(false)
+                    setShowAuthChoice(true)
+                    setLoginCode('')
+                    setLoginError('')
+                  }}
+                  className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+                >
+                  <div className="text-white text-4xl">←</div>
+                </button>
 
-              <input
-                type="text"
-                name="code"
-                placeholder="Codice 8 caratteri"
-                maxLength={8}
-                className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
-                autoFocus
-              />
-              <button
-                type="submit"
-                className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center"
-              >
-                <div className="text-white text-4xl">→</div>
-              </button>
+                <input
+                  type="text"
+                  value={loginCode}
+                  onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
+                  placeholder="Codice 8 caratteri"
+                  maxLength={8}
+                  className="flex-1 px-8 py-6 bg-black border-4 border-white rounded-2xl text-white text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
+                  autoFocus
+                />
+
+                <button
+                  type="submit"
+                  disabled={loginLoading || loginCode.length !== 8}
+                  className="w-20 h-20 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors disabled:opacity-30"
+                >
+                  <div className="text-white text-4xl">{loginLoading ? '...' : '→'}</div>
+                </button>
+              </div>
+
+              {/* Error message */}
+              {loginError && (
+                <div className="text-red-500 text-center text-lg">{loginError}</div>
+              )}
             </form>
           </div>
         </div>

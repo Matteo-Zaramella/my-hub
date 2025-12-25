@@ -1,227 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
-import ValidateAnswerTab from './ValidateAnswerTab'
-import { createClient } from '@/lib/supabase/client'
 
-// Componente per mostrare indizi sfide mensili con accordion
-function MonthlyChallengesCluesSection() {
-  const supabase = createClient()
-  const [challenges, setChallenges] = useState<any[]>([])
-  const [clues, setClues] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [openChallengeId, setOpenChallengeId] = useState<number | null>(null)
-
-  useEffect(() => {
-    loadChallengesAndClues()
-  }, [])
-
-  async function loadChallengesAndClues() {
-    setLoading(true)
-
-    // Carica le 11 sfide mensili (Febbraio 2026 - Dicembre 2026)
-    const { data: challengesData, error: challengesError } = await supabase
-      .from('game_challenges')
-      .select('*')
-      .gte('start_date', '2026-02-01')
-      .lte('start_date', '2026-12-31')
-      .order('start_date', { ascending: true })
-
-    if (challengesError) {
-      console.error('Error loading challenges:', challengesError)
-      setLoading(false)
-      return
-    }
-
-    // Carica tutti gli indizi
-    const { data: cluesData, error: cluesError } = await supabase
-      .from('game_clues')
-      .select('*')
-      .order('revealed_date', { ascending: true })
-
-    if (cluesError) {
-      console.error('Error loading clues:', cluesError)
-      setLoading(false)
-      return
-    }
-
-    setChallenges(challengesData || [])
-    setClues(cluesData || [])
-    setLoading(false)
-  }
-
-  function getChallengeClues(challengeId: number) {
-    return clues.filter((clue) => clue.challenge_id === challengeId)
-  }
-
-  function toggleChallenge(challengeId: number) {
-    setOpenChallengeId(openChallengeId === challengeId ? null : challengeId)
-  }
-
-  function formatDate(dateString: string) {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-  }
-
-  function isClueRevealed(revealDate: string) {
-    return new Date(revealDate) <= new Date()
-  }
-
-  // Calcola il prossimo lunedì dopo una data
-  function getNextMonday(date: Date): Date {
-    const result = new Date(date)
-    const day = result.getDay()
-    const daysUntilMonday = day === 0 ? 1 : (8 - day) % 7
-    result.setDate(result.getDate() + daysUntilMonday)
-    result.setHours(0, 0, 0, 0)
-    return result
-  }
-
-  // Verifica se l'immagine dell'indizio può essere mostrata (lunedì dopo revealed_date)
-  function canShowClueImage(revealDate: string) {
-    const reveal = new Date(revealDate)
-    const nextMonday = getNextMonday(reveal)
-    return new Date() >= nextMonday
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          🔍 Indizi Sfide Mensili
-        </h2>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin text-4xl mb-4">⏳</div>
-            <p className="text-white/60">Caricamento...</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {challenges.map((challenge, index) => {
-              const challengeClues = getChallengeClues(challenge.id)
-              const isOpen = openChallengeId === challenge.id
-              const revealedClues = challengeClues.filter(c => isClueRevealed(c.revealed_date))
-
-              return (
-                <div
-                  key={challenge.id}
-                  className="bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all hover:border-purple-500/30"
-                >
-                  {/* Header - Clickable */}
-                  <button
-                    onClick={() => toggleChallenge(challenge.id)}
-                    className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-lg">
-                        {index + 1}
-                      </div>
-                      <div className="text-left">
-                        <div className="font-bold text-white text-lg">
-                          Sfida {formatDate(challenge.start_date)}
-                        </div>
-                        <div className="text-sm text-white/60">
-                          {revealedClues.length}/{challengeClues.length} indizi rivelati
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-2xl transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                      ▼
-                    </div>
-                  </button>
-
-                  {/* Content - Accordion */}
-                  {isOpen && (
-                    <div className="border-t border-white/10 p-5 bg-white/5">
-                      {challengeClues.length === 0 ? (
-                        <p className="text-white/60 text-center py-4">
-                          Nessun indizio disponibile per questa sfida
-                        </p>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {challengeClues.map((clue, clueIndex) => {
-                            const imageRevealed = canShowClueImage(clue.revealed_date)
-                            const nextMonday = getNextMonday(new Date(clue.revealed_date))
-
-                            return (
-                              <div
-                                key={clue.id}
-                                className="relative aspect-square rounded-xl overflow-hidden border-2 border-white/20 group hover:border-purple-500/50 transition-all"
-                              >
-                                {imageRevealed ? (
-                                  // Immagine rivelata
-                                  clue.image_url ? (
-                                    <div className="relative w-full h-full">
-                                      <img
-                                        src={clue.image_url}
-                                        alt={`Indizio ${clueIndex + 1}`}
-                                        className="w-full h-full object-cover"
-                                      />
-                                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                                        <p className="text-white text-sm font-semibold">
-                                          Indizio #{clueIndex + 1}
-                                        </p>
-                                        <p className="text-white/70 text-xs">
-                                          {formatDate(clue.revealed_date)}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    // Placeholder se l'immagine non è stata caricata
-                                    <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex flex-col items-center justify-center p-4 text-center">
-                                      <span className="text-4xl mb-2">📷</span>
-                                      <p className="text-white/80 font-semibold">Indizio #{clueIndex + 1}</p>
-                                      <p className="text-white/50 text-xs mt-2">Immagine non ancora caricata</p>
-                                    </div>
-                                  )
-                                ) : (
-                                  // Card lucchettata
-                                  <div className="w-full h-full bg-gradient-to-br from-gray-800/50 to-gray-900/50 flex flex-col items-center justify-center p-4 text-center">
-                                    <span className="text-6xl mb-3 opacity-50">🔒</span>
-                                    <p className="text-white/80 font-semibold mb-1">Indizio #{clueIndex + 1}</p>
-                                    <p className="text-white/50 text-xs">
-                                      Disponibile dal {nextMonday.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Info */}
-        <div className="mt-6 bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 space-y-2">
-          <p className="text-sm text-white/70">
-            💡 <span className="font-bold">Come funziona:</span> Gli indizi vengono pubblicati ogni settimana, ma le immagini
-            si rivelano solo il <span className="font-bold">lunedì successivo</span> per dare tempo a tutti di partecipare!
-          </p>
-          <p className="text-sm text-purple-300">
-            🔒 <span className="font-bold">Rivelazione:</span> Durante il giorno dell'indizio/sfida rimane tutto lucchettato.
-            Le immagini si sbloccano il lunedì successivo.
-          </p>
-          <p className="text-sm text-green-300">
-            🏆 <span className="font-bold">11 Sfide:</span> Da Febbraio 2026 a Dicembre 2026, una sfida al mese con 3-4 indizi ciascuna
-          </p>
-        </div>
-      </div>
-    </div>
-  )
-}
+// NOTE: MonthlyChallengesCluesSection e ValidateAnswerTab rimossi temporaneamente
+// Si sbloccheranno dopo la cerimonia del 25/01/2026
 
 // Componente sezione privata con countdown
 function PrivateSection() {
@@ -233,7 +18,8 @@ function PrivateSection() {
   })
 
   useEffect(() => {
-    const targetDate = new Date('2026-07-26T00:00:00')
+    // Countdown alla cerimonia 25/01/2026 00:00
+    const targetDate = new Date('2026-01-25T00:00:00')
 
     const updateCountdown = () => {
       const now = new Date()
@@ -266,10 +52,10 @@ function PrivateSection() {
       <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
         <span className="text-6xl block mb-4">⏳</span>
         <p className="text-xl text-white/90 mb-6">
-          Contenuto disponibile tra:
+          Contenuto bloccato
         </p>
 
-        <div className="grid grid-cols-4 gap-4 max-w-lg mx-auto mb-6">
+        <div className="grid grid-cols-4 gap-4 max-w-lg mx-auto">
           <div className="bg-white/10 rounded-lg p-4">
             <div className="text-3xl md:text-4xl font-bold text-white mb-1">
               {timeLeft.days}
@@ -295,10 +81,6 @@ function PrivateSection() {
             <div className="text-xs md:text-sm text-white/60 uppercase">Secondi</div>
           </div>
         </div>
-
-        <p className="text-purple-200 text-sm">
-          📅 26 Luglio 2026 - 00:00
-        </p>
       </div>
     </div>
   )
@@ -318,8 +100,18 @@ interface Participant {
 }
 
 export default function GameAreaWithChat() {
+  const router = useRouter()
   const [participant, setParticipant] = useState<Participant | null>(null)
-  const [activeTab, setActiveTab] = useState<'chat' | 'clues' | 'validate' | 'private' | 'wishlist'>('chat')
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'wishlist' | 'private'>('info')
+
+  // Countdown alla cerimonia (25/01/2026 00:00)
+  const [ceremonyTimeLeft, setCeremonyTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  })
 
   // Carica partecipante da localStorage se esiste
   useEffect(() => {
@@ -331,11 +123,50 @@ export default function GameAreaWithChat() {
         console.error('Error loading participant:', e)
       }
     }
+    setIsLoading(false)
+  }, [])
+
+  // Countdown effect
+  useEffect(() => {
+    const targetDate = new Date('2026-01-25T00:00:00')
+
+    const updateCountdown = () => {
+      const now = new Date()
+      const difference = targetDate.getTime() - now.getTime()
+
+      if (difference > 0) {
+        setCeremonyTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60)
+        })
+      } else {
+        setCeremonyTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+      }
+    }
+
+    updateCountdown()
+    const interval = setInterval(updateCountdown, 1000)
+
+    return () => clearInterval(interval)
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('game_participant')
-    setParticipant(null)
+    localStorage.removeItem('participantCode')
+    localStorage.removeItem('registrationCompleted')
+    // Torna alla pagina principale con scelta REGISTRATI/ACCEDI
+    router.replace('/')
+  }
+
+  // Mostra loading mentre verifica localStorage
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 flex items-center justify-center">
+        <div className="text-white text-xl">Caricamento...</div>
+      </div>
+    )
   }
 
   // Se non è loggato, mostra il login
@@ -345,25 +176,34 @@ export default function GameAreaWithChat() {
 
   // Game Area completa
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 text-white pb-16">
       {/* Header */}
       <header className="bg-black/30 backdrop-blur-md border-b border-white/10">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center gap-4">
-            {/* Logo e Titolo */}
-            <div className="flex items-center gap-4">
-              <img
-                src="/logo.png"
-                alt="Logo"
-                className="w-12 h-12 md:w-16 md:h-16 rounded-lg"
-              />
-              <div>
-                <h1 className="text-xl md:text-3xl font-bold">A Tutto Reality: La Rivoluzione</h1>
-                <p className="text-purple-200 text-sm md:text-base">
-                  Ciao, {participant.participant_name}!
-                </p>
+          <div className="flex justify-between items-center relative">
+            {/* Nome utente - Sinistra */}
+            <div className="flex-shrink-0">
+              <p className="text-purple-200 text-sm md:text-base">
+                Ciao, {participant.participant_name}!
+              </p>
+            </div>
+
+            {/* Countdown - Centro assoluto */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="flex items-center bg-black/30 px-4 py-2 rounded-lg border border-white/10">
+                <div className="flex gap-1 font-mono text-white text-sm md:text-base">
+                  <span>{String(ceremonyTimeLeft.days).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.hours).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.minutes).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.seconds).padStart(2, '0')}</span>
+                </div>
               </div>
             </div>
+
+            {/* Esci - Destra */}
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm md:text-base flex-shrink-0"
@@ -376,8 +216,20 @@ export default function GameAreaWithChat() {
 
       {/* Tab Navigation */}
       <div className="bg-black/20 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2 md:gap-4 overflow-x-auto">
+        <div className="w-full flex justify-center">
+          <div className="flex gap-2 md:gap-8">
+            {/* Info - informazioni festa */}
+            <button
+              onClick={() => setActiveTab('info')}
+              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+                activeTab === 'info'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              📍 Info
+            </button>
+            {/* Chat - sempre accessibile */}
             <button
               onClick={() => setActiveTab('chat')}
               className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
@@ -388,36 +240,7 @@ export default function GameAreaWithChat() {
             >
               💬 Chat
             </button>
-            <button
-              onClick={() => setActiveTab('clues')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
-                activeTab === 'clues'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              🔍 Indizi
-            </button>
-            <button
-              onClick={() => setActiveTab('validate')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
-                activeTab === 'validate'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              🔐 Valida Risposta
-            </button>
-            <button
-              onClick={() => setActiveTab('private')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
-                activeTab === 'private'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              🔒 Privato
-            </button>
+            {/* Wishlist - sempre accessibile */}
             <button
               onClick={() => setActiveTab('wishlist')}
               className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
@@ -428,12 +251,77 @@ export default function GameAreaWithChat() {
             >
               🎁 Wishlist
             </button>
+            {/* Privato - mostra countdown */}
+            <button
+              onClick={() => setActiveTab('private')}
+              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+                activeTab === 'private'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              🔒 Privato
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6">
+        {/* Info Tab */}
+        {activeTab === 'info' && (
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">📍 Informazioni Festa</h2>
+
+            {/* Luogo */}
+            <div className="space-y-6">
+              <div className="bg-white/5 rounded-xl p-6">
+                <h3 className="text-xl font-semibold mb-4 text-purple-300">Luogo</h3>
+                <div className="space-y-3">
+                  <p className="text-white text-lg font-medium">
+                    L'Oste di Vino | Enoteca • Ristorante • Bistrot
+                  </p>
+                  <p className="text-white/70">
+                    Via Pelosa, 76 - Selvazzano Dentro (PD)
+                  </p>
+                  <a
+                    href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
+                  >
+                    🗺️ Apri in Google Maps
+                  </a>
+                </div>
+              </div>
+
+              {/* Parcheggio */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+                <h3 className="text-xl font-semibold mb-4 text-yellow-300">⚠️ Parcheggio</h3>
+                <p className="text-white/80 mb-4">
+                  Il locale dispone di soli <strong className="text-white">3 posti auto</strong>.
+                  Si consiglia di parcheggiare nel parcheggio pubblico nelle vicinanze (cerchiato in rosso nella mappa).
+                </p>
+                <div className="rounded-lg overflow-hidden border border-white/20">
+                  <img
+                    src="/venue-map.png"
+                    alt="Mappa del locale con parcheggio consigliato"
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+
+              {/* Sondaggio placeholder */}
+              <div className="bg-white/5 rounded-xl p-6">
+                <h3 className="text-xl font-semibold mb-4 text-purple-300">📊 Sondaggio</h3>
+                <p className="text-white/60">
+                  In arrivo...
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Chat Tab */}
         {activeTab === 'chat' && (
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden">
@@ -443,19 +331,6 @@ export default function GameAreaWithChat() {
           </div>
         )}
 
-        {/* Clues Tab */}
-        {activeTab === 'clues' && (
-          <MonthlyChallengesCluesSection />
-        )}
-
-        {/* Validate Answer Tab */}
-        {activeTab === 'validate' && (
-          <ValidateAnswerTab participantId={participant.id} />
-        )}
-
-        {/* Private Tab */}
-        {activeTab === 'private' && <PrivateSection />}
-
         {/* Wishlist Tab */}
         {activeTab === 'wishlist' && (
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
@@ -463,30 +338,22 @@ export default function GameAreaWithChat() {
               🎁 Wishlist
             </h2>
             <p className="text-white/80 text-lg">
-              Sezione wishlist in arrivo...
+              Sezione in arrivo...
             </p>
           </div>
         )}
+
+        {/* Private Tab - Locked with countdown */}
+        {activeTab === 'private' && <PrivateSection />}
       </main>
 
-      {/* Footer Info */}
-      <footer className="border-t border-white/10 mt-8">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/50">
-            <div>
-              <p>
-                Codice: <span className="font-mono font-bold text-white">{participant.participant_code}</span>
-              </p>
-              {participant.partner_name && (
-                <p className="mt-1">
-                  Partner: <span className="text-white">{participant.partner_name}</span>
-                </p>
-              )}
-            </div>
-            <div className="text-center md:text-right">
-              <p>A Tutto Reality: La Rivoluzione 2026-2027</p>
-              <p className="mt-1">24/01/2026 - 24/01/2027</p>
-            </div>
+      {/* Footer fisso con codice utente */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 z-40">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
+          <div className="text-sm text-white/50">
+            <p>
+              Codice: <span className="font-mono font-bold text-white">{participant.participant_code}</span>
+            </p>
           </div>
         </div>
       </footer>

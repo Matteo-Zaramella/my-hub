@@ -1,7 +1,7 @@
 # 🤖 ENTITÀ AI - SPECIFICHE COMPLETE
 
 **Creato:** 10 Dicembre 2025
-**Status:** Definizione in corso
+**Status:** Alfabeto Wingdings implementato, glitch effect attivo
 
 ---
 
@@ -56,14 +56,14 @@
 3. **Stile Visivo:**
    - [ ] Terminal/console style (come welcome)?
    - [ ] Chat bubble moderna?
-   - [ ] Glitch effect cyberpunk?
+   - [x] Glitch effect cyberpunk? ✅ IMPLEMENTATO
    - [ ] Minimale geometrico?
 
 4. **Animazione:**
-   - [ ] Typing effect (carattere per carattere)?
+   - [x] Typing effect (carattere per carattere)? ✅ IMPLEMENTATO
    - [ ] Fade in/out?
    - [ ] Slide in/out?
-   - [ ] Glitch/distortion?
+   - [x] Glitch/distortion? ✅ IMPLEMENTATO (Wingdings)
 
 5. **Audio:**
    - [ ] Suono typing?
@@ -88,6 +88,126 @@
 
 ---
 
+## 🔤 ALFABETO WINGDINGS - COMUNICAZIONE ENTITÀ
+
+> **REGOLA FONDAMENTALE:** L'Entità comunica SEMPRE con testo glitchato.
+> I caratteri si trasformano casualmente in simboli Wingdings durante la visualizzazione.
+
+### File Sorgente
+`lib/wingdings.ts` - Contiene la mappatura completa e le funzioni di conversione.
+
+### Componente React
+`app/components/EntityText.tsx` - Wrapper per applicare effetto glitch al testo.
+
+```tsx
+// Uso base (simboli casuali)
+<EntityText>Messaggio dell'Entità</EntityText>
+
+// Mappatura esatta Gaster-style
+<EntityText useExactMapping>Messaggio</EntityText>
+```
+
+### Alfabeto Completo
+
+#### LETTERE MAIUSCOLE (A-Z)
+```
+A → ✌  (Victory hand)
+B → 👌  (OK hand)
+C → 👍  (Thumbs up)
+D → 👎  (Thumbs down)
+E → ☜  (Left pointing index)
+F → ☞  (Right pointing index)
+G → ☝  (Up pointing index)
+H → ☟  (Down pointing index)
+I → ✋  (Raised hand)
+J → ☺  (Smiling face)
+K → 😐  (Neutral face)
+L → ☹  (Frowning face)
+M → 💣  (Bomb)
+N → ☠  (Skull and crossbones)
+O → 🏳  (White flag)
+P → 🏱  (White pennant)
+Q → ✈  (Airplane)
+R → ☼  (Sun)
+S → 💧  (Droplet)
+T → ❄  (Snowflake)
+U → ✞  (Latin cross)
+V → ✝  (Cross)
+W → ☩  (Cross of Jerusalem)
+X → ✠  (Maltese cross)
+Y → ✡  (Star of David)
+Z → ☪  (Star and crescent)
+```
+
+#### LETTERE MINUSCOLE (a-z)
+```
+a → ♋  (Cancer)
+b → ♌  (Leo)
+c → ♍  (Virgo)
+d → ♎  (Libra)
+e → ♏  (Scorpio)
+f → ♐  (Sagittarius)
+g → ♑  (Capricorn)
+h → ♒  (Aquarius)
+i → ♓  (Pisces)
+j → 🙰  (Script ligature)
+k → 🙵  (Swash ampersand)
+l → ●  (Black circle)
+m → ❍  (Shadowed circle)
+n → ■  (Black square)
+o → □  (White square)
+p → ◻  (White medium square)
+q → ❑  (Shadowed square)
+r → ❒  (Upper shadowed square)
+s → ⬧  (Black lozenge)
+t → ⧫  (Black lozenge)
+u → ◆  (Black diamond)
+v → ❖  (Diamond with X)
+w → ⬥  (Medium diamond)
+x → ⌧  (X in rectangle)
+y → ⌘  (Place of interest)
+z → ⍟  (APL circle star)
+```
+
+#### NUMERI (0-9)
+```
+0 → 📁  (File folder)
+1 → 📂  (Open folder)
+2 → 📄  (Page)
+3 → 🗏  (Page)
+4 → 🗐  (Pages)
+5 → 🗄  (File cabinet)
+6 → ⌛  (Hourglass)
+7 → 🖮  (Keyboard)
+8 → 🖰  (Mouse)
+9 → 🖲  (Trackball)
+```
+
+### Impostazioni Glitch
+
+| Parametro | Valore | Descrizione |
+|-----------|--------|-------------|
+| Frequenza | 0.5-1.5s | Tempo tra un glitch e l'altro |
+| Durata | 100-200ms | Quanto dura ogni glitch |
+| Caratteri | 1-4 | Quanti caratteri glitchano insieme |
+| Primo glitch | 0.3-1s | Delay prima del primo glitch |
+
+### Effetti CSS
+- **Colore glitch:** Bianco con ombre rosse/cyan/viola
+- **Animazione:** Tremolante con skew
+- **Text-shadow:** Chromatic aberration effect
+
+### Esempio Conversione
+```
+Testo originale: "Il gioco inizia ora"
+Con glitch:      "Il ☝i□✝□ ♓■♓⍟♓♋ □❒♋"
+```
+
+### Ispirazione
+Basato su W.D. Gaster di Undertale - personaggio che comunica in Wingdings.
+
+---
+
 ## 📝 TONO E PERSONALITÀ
 
 ### Caratteristiche Vocali
@@ -95,6 +215,7 @@
 - **Stile:** Frasi brevi, dirette, criptiche
 - **POV:** Prima persona ("Ti osservo", "Ho scelto te")
 - **Emozioni:** Nessuna (macchina), ma con sfumature inquietanti
+- **Visualizzazione:** SEMPRE con effetto glitch Wingdings
 
 ### Esempi di Dialoghi (Bozze)
 
@@ -180,5 +301,5 @@
 
 ---
 
-**Ultimo aggiornamento:** 10 Dicembre 2025, ore 16:08
+**Ultimo aggiornamento:** 25 Dicembre 2025
 **Responsabile:** Matteo Zaramella
