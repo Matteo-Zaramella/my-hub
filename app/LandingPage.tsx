@@ -547,29 +547,39 @@ export default function LandingPage() {
       {/* Auth Choice - Registrati o Accedi */}
       {showAuthChoice && !showRegistrationForm && !showLoginForm && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
-          <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-2xl">
-            {/* Quadrato REGISTRATI */}
+          <div className="flex flex-col md:flex-row gap-8 md:gap-16 w-full justify-center items-center">
+            {/* REGISTRATI */}
             <button
               onClick={() => {
                 setShowAuthChoice(false)
                 setShowRegistrationForm(true)
               }}
-              className="flex-1 aspect-square max-w-[200px] md:max-w-[280px] mx-auto bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="entity-text-static hover:opacity-80 transition-opacity"
             >
-              <div className="text-white text-xl md:text-2xl font-bold">REGISTRATI</div>
+              <span className="text-white text-2xl md:text-4xl font-bold tracking-wider">REGISTRATI</span>
             </button>
 
-            {/* Quadrato ACCEDI */}
+            {/* ACCEDI */}
             <button
               onClick={() => {
                 setShowAuthChoice(false)
                 setShowLoginForm(true)
               }}
-              className="flex-1 aspect-square max-w-[200px] md:max-w-[280px] mx-auto bg-white/10 rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="entity-text-static hover:opacity-80 transition-opacity"
             >
-              <div className="text-white text-xl md:text-2xl font-bold">ACCEDI</div>
+              <span className="text-white text-2xl md:text-4xl font-bold tracking-wider">ACCEDI</span>
             </button>
           </div>
+
+          <style jsx>{`
+            .entity-text-static {
+              text-shadow:
+                -1px 0 #ff0040,
+                1px 0 #00ffff,
+                0 0 8px #a855f7,
+                0 0 16px #a855f7;
+            }
+          `}</style>
         </div>
       )}
 
