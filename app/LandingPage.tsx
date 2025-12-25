@@ -546,17 +546,17 @@ export default function LandingPage() {
 
       {/* Auth Choice - Registrati o Accedi */}
       {showAuthChoice && !showRegistrationForm && !showLoginForm && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-8">
-          <div className="flex gap-8">
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full max-w-2xl">
             {/* Quadrato REGISTRATI */}
             <button
               onClick={() => {
                 setShowAuthChoice(false)
                 setShowRegistrationForm(true)
               }}
-              className="w-80 h-80 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+              className="flex-1 aspect-square max-w-[280px] md:max-w-[320px] mx-auto bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
             >
-              <div className="text-white text-3xl font-bold">REGISTRATI</div>
+              <div className="text-white text-2xl md:text-3xl font-bold">REGISTRATI</div>
             </button>
 
             {/* Quadrato ACCEDI */}
@@ -565,9 +565,9 @@ export default function LandingPage() {
                 setShowAuthChoice(false)
                 setShowLoginForm(true)
               }}
-              className="w-80 h-80 bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
+              className="flex-1 aspect-square max-w-[280px] md:max-w-[320px] mx-auto bg-black border-4 border-white rounded-2xl flex items-center justify-center hover:bg-white/5 transition-colors"
             >
-              <div className="text-white text-3xl font-bold">ACCEDI</div>
+              <div className="text-white text-2xl md:text-3xl font-bold">ACCEDI</div>
             </button>
           </div>
         </div>

@@ -179,19 +179,44 @@ export default function GameAreaWithChat() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 text-white pb-16">
       {/* Header */}
       <header className="bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center relative">
-            {/* Nome utente - Sinistra */}
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
+          {/* Mobile: stack vertically */}
+          <div className="flex flex-col gap-2 md:hidden">
+            <div className="flex justify-between items-center">
+              <p className="text-purple-200 text-sm truncate max-w-[150px]">
+                Ciao, {participant.participant_name.split(' ')[0]}!
+              </p>
+              <div className="flex items-center bg-black/30 px-3 py-1.5 rounded-lg border border-white/10">
+                <div className="flex gap-0.5 font-mono text-white text-xs">
+                  <span>{String(ceremonyTimeLeft.days).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.hours).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.minutes).padStart(2, '0')}</span>
+                  <span>:</span>
+                  <span>{String(ceremonyTimeLeft.seconds).padStart(2, '0')}</span>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm"
+              >
+                Esci
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop: horizontal with centered timer */}
+          <div className="hidden md:flex justify-between items-center relative">
             <div className="flex-shrink-0">
-              <p className="text-purple-200 text-sm md:text-base">
+              <p className="text-purple-200 text-base">
                 Ciao, {participant.participant_name}!
               </p>
             </div>
 
-            {/* Countdown - Centro assoluto */}
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <div className="flex items-center bg-black/30 px-4 py-2 rounded-lg border border-white/10">
-                <div className="flex gap-1 font-mono text-white text-sm md:text-base">
+                <div className="flex gap-1 font-mono text-white text-base">
                   <span>{String(ceremonyTimeLeft.days).padStart(2, '0')}</span>
                   <span>:</span>
                   <span>{String(ceremonyTimeLeft.hours).padStart(2, '0')}</span>
@@ -203,10 +228,9 @@ export default function GameAreaWithChat() {
               </div>
             </div>
 
-            {/* Esci - Destra */}
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm md:text-base flex-shrink-0"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-base flex-shrink-0"
             >
               Esci
             </button>
