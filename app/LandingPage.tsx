@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import RegistrationForm from './components/RegistrationForm'
 import TerminalWelcome from './components/TerminalWelcome'
+import UndertaleNameEntry from './components/UndertaleNameEntry'
 
 export default function LandingPage() {
   const router = useRouter()
@@ -37,6 +38,10 @@ export default function LandingPage() {
   const [showTerminalWelcome, setShowTerminalWelcome] = useState(true) // Inizia sempre mostrando il welcome
   const [welcomeCompleted, setWelcomeCompleted] = useState(false)
 
+  // Undertale name entry
+  const [showNameEntry, setShowNameEntry] = useState(false)
+  const [characterName, setCharacterName] = useState('')
+
   // Load ceremony clues from admin panel
   const [ceremonyClues, setCeremonyClues] = useState<{ word: string; order: number }[]>([])
 
@@ -48,10 +53,16 @@ export default function LandingPage() {
   // Check localStorage on client mount
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('hasSeenWelcome')
+    const savedCharName = localStorage.getItem('characterName')
     if (hasSeenWelcome) {
       setShowTerminalWelcome(false)
       setWelcomeCompleted(true)
-      setShowAuthChoice(true)
+      if (savedCharName) {
+        setCharacterName(savedCharName)
+        setShowAuthChoice(true)
+      } else {
+        setShowNameEntry(true)
+      }
     }
   }, [])
 
@@ -60,7 +71,15 @@ export default function LandingPage() {
     localStorage.setItem('hasSeenWelcome', 'true')
     setShowTerminalWelcome(false)
     setWelcomeCompleted(true)
-    setShowAuthChoice(true) // Mostra scelta registrati/accedi
+    setShowNameEntry(true) // Mostra selezione nome personaggio
+  }
+
+  // Handle name entry completion
+  const handleNameEntryComplete = (name: string) => {
+    localStorage.setItem('characterName', name)
+    setCharacterName(name)
+    setShowNameEntry(false)
+    setShowAuthChoice(true) // Dopo il nome, mostra registrazione
   }
 
   // Load participant code and clues from database
@@ -372,8 +391,17 @@ export default function LandingPage() {
       {/* Terminal Welcome Animation - First visit only */}
       {showTerminalWelcome && <TerminalWelcome onComplete={handleWelcomeComplete} daysRemaining={timeLeft.days} />}
 
+      {/* Undertale Name Entry - After welcome */}
+      {showNameEntry && (
+        <UndertaleNameEntry
+          onComplete={handleNameEntryComplete}
+          title="Scegli un nome."
+          maxLength={12}
+        />
+      )}
+
       {/* Wishlist Button - Top Left */}
-      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && wishlistEnabled && (
+      {!showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && wishlistEnabled && (
         <button
           onClick={() => router.push('/wishlist-public')}
           className="fixed top-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -383,7 +411,7 @@ export default function LandingPage() {
       )}
 
       {/* Login Button - Top Right */}
-      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
+      {!showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && (
         <button
           onClick={handleAdminAccess}
           className="fixed top-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -393,7 +421,7 @@ export default function LandingPage() {
       )}
 
       {/* Minigame Button - Bottom Left */}
-      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && minigameButtonEnabled && (
+      {!showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && minigameButtonEnabled && (
         <button
           onClick={() => router.push('/minigames')}
           className="fixed bottom-4 left-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -403,7 +431,7 @@ export default function LandingPage() {
       )}
 
       {/* Password Input Button - Bottom Right */}
-      {!showTerminalWelcome && welcomeCompleted && !showAuthChoice && passwordInputEnabled && (
+      {!showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && passwordInputEnabled && (
         <button
           onClick={handleGameAccess}
           className="fixed bottom-4 right-4 bg-white/5 backdrop-blur-sm rounded-lg p-6 hover:bg-white/10 transition-all duration-300 z-40"
@@ -414,7 +442,7 @@ export default function LandingPage() {
 
 
       {/* Circle Background Grid - Nascosta quando tutti gli indizi sono trovati O quando terminal è visibile O scelta auth */}
-      {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
+      {cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full h-full max-w-[100vh] max-h-screen grid grid-cols-10 grid-rows-10 gap-0 p-1 sm:p-2 md:p-3 lg:p-4 aspect-square">
           {Array.from({ length: totalCircles }, (_, index) => {
@@ -467,7 +495,7 @@ export default function LandingPage() {
       )}
 
       {/* Countdown Timer - Center (4x4 circles area) - Nascosto quando countdown finito O terminal visibile O scelta auth */}
-      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showAuthChoice && (
+      {!(timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) && cluesFound < 10 && !showTerminalWelcome && welcomeCompleted && !showNameEntry && !showAuthChoice && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
           <div className="grid grid-cols-2 gap-1 sm:gap-2 md:gap-3 lg:gap-4">
             {/* Days */}
