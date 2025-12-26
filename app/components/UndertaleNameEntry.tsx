@@ -60,7 +60,7 @@ export default function UndertaleNameEntry({
       setSelectedCol(c => Math.min(maxCol, c + 1))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      handleSelect()
+      handleConfirm()
     } else if (e.key === ' ') {
       // Spazio fisico aggiunge spazio
       e.preventDefault()
@@ -145,7 +145,7 @@ export default function UndertaleNameEntry({
   }
 
   // Simboli azioni
-  const ACTION_SYMBOLS = ['⌫', '␣', '↵']
+  const ACTION_SYMBOLS = ['←', '───', '↵']
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
