@@ -37,204 +37,77 @@ const CATEGORIE_LABELS: Record<string, string> = {
   altro: 'Altro'
 }
 
-// Componente Sondaggio Festa
-function PartySurvey({ participantCode }: { participantCode: string }) {
-  const [hasSubmitted, setHasSubmitted] = useState(false)
+// Componente Narghilé Question
+function NarghileQuestion({ participantCode }: { participantCode: string }) {
+  const [hasAnswered, setHasAnswered] = useState(false)
+  const [answer, setAnswer] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    wants_narghile: false,
-    drink_vino_bianco: false,
-    drink_vino_rosso: false,
-    drink_prosecco: false,
-    drink_spritz_campari: false,
-    drink_spritz_aperol: false,
-    drink_spritz_misto: false,
-    drink_coca_cola: false,
-    drink_fanta: false,
-    drink_acqua: false,
-  })
   const supabase = createClient()
 
   useEffect(() => {
-    checkExistingResponse()
+    checkExistingAnswer()
   }, [participantCode])
 
-  async function checkExistingResponse() {
+  async function checkExistingAnswer() {
     const { data, error } = await supabase
       .from('party_survey_responses')
-      .select('*')
+      .select('wants_narghile')
       .eq('participant_code', participantCode)
       .single()
 
     if (data && !error) {
-      setHasSubmitted(true)
-      setFormData({
-        wants_narghile: data.wants_narghile || false,
-        drink_vino_bianco: data.drink_vino_bianco || false,
-        drink_vino_rosso: data.drink_vino_rosso || false,
-        drink_prosecco: data.drink_prosecco || false,
-        drink_spritz_campari: data.drink_spritz_campari || false,
-        drink_spritz_aperol: data.drink_spritz_aperol || false,
-        drink_spritz_misto: data.drink_spritz_misto || false,
-        drink_coca_cola: data.drink_coca_cola || false,
-        drink_fanta: data.drink_fanta || false,
-        drink_acqua: data.drink_acqua || false,
-      })
+      setHasAnswered(true)
+      setAnswer(data.wants_narghile)
     }
     setIsLoading(false)
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setIsSubmitting(true)
-
+  async function handleAnswer(wantsNarghile: boolean) {
     const { error } = await supabase
       .from('party_survey_responses')
       .insert({
         participant_code: participantCode,
-        ...formData
+        wants_narghile: wantsNarghile
       })
 
     if (!error) {
-      setHasSubmitted(true)
+      setHasAnswered(true)
+      setAnswer(wantsNarghile)
     }
-    setIsSubmitting(false)
-  }
-
-  const handleChange = (field: keyof typeof formData) => {
-    setFormData(prev => ({ ...prev, [field]: !prev[field] }))
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-      </div>
-    )
+    return null
   }
 
-  if (hasSubmitted) {
+  if (hasAnswered) {
     return (
-      <div className="text-center py-6">
-        <div className="text-4xl mb-3">✓</div>
-        <p className="text-green-400 font-medium">Sondaggio inviato!</p>
-        <p className="text-white/50 text-sm mt-2">Grazie per aver risposto</p>
+      <div className="text-center py-8">
+        <p className="text-white/50 text-sm">
+          Hai risposto: {answer ? 'Sì 💨' : 'No'}
+        </p>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Narghilé */}
-      <div>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={formData.wants_narghile}
-            onChange={() => handleChange('wants_narghile')}
-            className="w-5 h-5 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-          />
-          <span className="text-white">Voglio il narghilé 💨</span>
-        </label>
+    <div className="text-center py-8">
+      <p className="text-2xl text-white mb-6">Narghilé? 💨</p>
+      <div className="flex justify-center gap-6">
+        <button
+          onClick={() => handleAnswer(true)}
+          className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition text-lg"
+        >
+          Sì
+        </button>
+        <button
+          onClick={() => handleAnswer(false)}
+          className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition text-lg"
+        >
+          No
+        </button>
       </div>
-
-      {/* Bevande */}
-      <div>
-        <p className="text-white/70 mb-3">Preferenze bevande (seleziona tutte quelle che vuoi):</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_vino_bianco}
-              onChange={() => handleChange('drink_vino_bianco')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🍷 Vino bianco</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_vino_rosso}
-              onChange={() => handleChange('drink_vino_rosso')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🍷 Vino rosso</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_prosecco}
-              onChange={() => handleChange('drink_prosecco')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🥂 Prosecco</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_spritz_campari}
-              onChange={() => handleChange('drink_spritz_campari')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🍹 Spritz Campari</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_spritz_aperol}
-              onChange={() => handleChange('drink_spritz_aperol')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🍹 Spritz Aperol</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_spritz_misto}
-              onChange={() => handleChange('drink_spritz_misto')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🍹 Spritz misto</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_coca_cola}
-              onChange={() => handleChange('drink_coca_cola')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🥤 Coca Cola</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_fanta}
-              onChange={() => handleChange('drink_fanta')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">🥤 Fanta</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.drink_acqua}
-              onChange={() => handleChange('drink_acqua')}
-              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
-            />
-            <span className="text-white/90 text-sm">💧 Acqua</span>
-          </label>
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition disabled:opacity-50"
-      >
-        {isSubmitting ? 'Invio...' : 'Invia sondaggio'}
-      </button>
-    </form>
+    </div>
   )
 }
 
@@ -702,11 +575,8 @@ export default function GameAreaWithChat() {
                 </div>
               </div>
 
-              {/* Sondaggio */}
-              <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4 text-purple-300">📊 Sondaggio</h3>
-                <PartySurvey participantCode={participant.participant_code} />
-              </div>
+              {/* Domanda Narghilé */}
+              <NarghileQuestion participantCode={participant.participant_code} />
             </div>
           </div>
         )}

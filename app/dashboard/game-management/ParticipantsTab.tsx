@@ -22,9 +22,15 @@ interface Participant {
   created_at: string
 }
 
+interface NarghileResponse {
+  participant_code: string
+  wants_narghile: boolean
+}
+
 export default function ParticipantsTab() {
   const supabase = createClient()
   const [participants, setParticipants] = useState<Participant[]>([])
+  const [narghileResponses, setNarghileResponses] = useState<Map<string, boolean>>(new Map())
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<Partial<Participant>>({})
@@ -43,6 +49,7 @@ export default function ParticipantsTab() {
 
   useEffect(() => {
     loadParticipants()
+    loadNarghileResponses()
   }, [])
 
   async function loadParticipants() {
@@ -58,6 +65,22 @@ export default function ParticipantsTab() {
       setParticipants(data || [])
     }
     setLoading(false)
+  }
+
+  async function loadNarghileResponses() {
+    const { data, error } = await supabase
+      .from('party_survey_responses')
+      .select('participant_code, wants_narghile')
+
+    if (error) {
+      console.error('Error loading narghile responses:', error)
+    } else if (data) {
+      const responseMap = new Map<string, boolean>()
+      data.forEach((r: NarghileResponse) => {
+        responseMap.set(r.participant_code, r.wants_narghile)
+      })
+      setNarghileResponses(responseMap)
+    }
   }
 
   // Generate unique participant code
@@ -217,6 +240,7 @@ export default function ParticipantsTab() {
                   <th className="px-4 py-3 text-left text-white/80 font-medium">Email</th>
                   <th className="px-4 py-3 text-left text-white/80 font-medium">Nickname</th>
                   <th className="px-4 py-3 text-left text-white/80 font-medium">Punti</th>
+                  <th className="px-4 py-3 text-center text-white/80 font-medium">Narghilé</th>
                   <th className="px-4 py-3 text-left text-white/80 font-medium">Stato</th>
                   <th className="px-4 py-3 text-right text-white/80 font-medium">Azioni</th>
                 </tr>
@@ -260,6 +284,17 @@ export default function ParticipantsTab() {
                             className="w-20 bg-white/10 border border-white/20 rounded px-2 py-1 text-white text-sm"
                           />
                         </td>
+                        <td className="px-4 py-3 text-center">
+                          {narghileResponses.has(p.participant_code) ? (
+                            narghileResponses.get(p.participant_code) ? (
+                              <span className="text-green-400 text-lg" title="Vuole il narghilé">✓</span>
+                            ) : (
+                              <span className="text-red-400 text-lg" title="Non vuole il narghilé">✗</span>
+                            )
+                          ) : (
+                            <span className="text-white/30" title="Non ha risposto">—</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded text-xs ${p.registration_completed ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                             {p.registration_completed ? 'Registrato' : 'Incompleto'}
@@ -288,6 +323,17 @@ export default function ParticipantsTab() {
                         <td className="px-4 py-3 text-white/70">{p.email || '-'}</td>
                         <td className="px-4 py-3 text-white/70">{p.nickname || '-'}</td>
                         <td className="px-4 py-3 text-white font-medium">{p.current_points}</td>
+                        <td className="px-4 py-3 text-center">
+                          {narghileResponses.has(p.participant_code) ? (
+                            narghileResponses.get(p.participant_code) ? (
+                              <span className="text-green-400 text-lg" title="Vuole il narghilé">✓</span>
+                            ) : (
+                              <span className="text-red-400 text-lg" title="Non vuole il narghilé">✗</span>
+                            )
+                          ) : (
+                            <span className="text-white/30" title="Non ha risposto">—</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded text-xs ${p.registration_completed ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                             {p.registration_completed ? 'Registrato' : 'Incompleto'}

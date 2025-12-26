@@ -79,19 +79,6 @@ export default async function DashboardPage() {
             </div>
           </Link>
 
-          {/* Wishlist Module */}
-          <Link href="/dashboard/wishlist">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer border border-white/10 hover:border-white/20 w-64 h-64 flex items-center justify-center group">
-              <div className="text-9xl group-hover:scale-110 transition-transform duration-300">🎁</div>
-            </div>
-          </Link>
-
-          {/* Todo Module */}
-          <Link href="/dashboard/todo">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer border border-white/10 hover:border-white/20 w-64 h-64 flex items-center justify-center group">
-              <div className="text-9xl group-hover:scale-110 transition-transform duration-300">✅</div>
-            </div>
-          </Link>
         </div>
       </main>
     </div>
