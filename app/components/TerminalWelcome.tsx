@@ -8,14 +8,12 @@ interface TerminalWelcomeProps {
   daysRemaining: number
 }
 
-// Messaggio di benvenuto - 6 righe (tono misterioso/entità - neutro)
+// Messaggio di benvenuto - 4 righe (tono misterioso/accogliente)
 const LINES = [
-  'Accesso garantito.',
-  'Registrazione richiesta.',
-  'Compila il modulo.',
-  'Riceverai un codice: non perderlo.',
-  'Tutto ciò che cerchi è all\'interno.',
-  'Il gioco inizia ora.'
+  'Salve.',
+  'Sembra tutto vuoto qui, vero?',
+  'Rilassati, non preoccuparti.',
+  'Scegli chi vuoi diventare.'
 ]
 
 // Ritmi e velocità (in millisecondi)
