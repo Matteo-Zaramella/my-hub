@@ -165,30 +165,25 @@ export default function UndertaleNameEntry({
     else if (action === 'done') handleConfirm()
   }
 
+  // Simboli azioni
+  const ACTION_SYMBOLS = ['⌫', '␣', '↵']
+
   return (
     <div className={`fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4 ${isGasterEffect ? 'gaster-effect' : ''}`}>
-      {/* Titolo */}
-      <div className="text-white text-xl md:text-2xl mb-8 font-mono">
-        {title}
-      </div>
-
       {/* Nome inserito */}
-      <div className="mb-8 w-full max-w-md">
-        <div className="bg-white/5 border-2 border-white/30 rounded px-6 py-4 min-h-[60px] flex items-center justify-center">
+      <div className="mb-12 w-full max-w-md">
+        <div className="px-6 py-4 min-h-[60px] flex items-center justify-center">
           <span className={`text-3xl md:text-4xl font-mono tracking-wider ${isGasterEffect ? 'text-red-500 animate-pulse' : 'text-white'}`}>
             {name || <span className="text-white/30">_</span>}
             <span className="animate-pulse">|</span>
           </span>
         </div>
-        <div className="text-center text-white/40 text-sm mt-2">
-          {name.length}/{maxLength}
-        </div>
       </div>
 
       {/* Tastiera */}
-      <div className="space-y-2">
+      <div className="space-y-4">
         {KEYBOARD_ROWS.map((row, rowIdx) => (
-          <div key={rowIdx} className="flex justify-center gap-1 md:gap-2">
+          <div key={rowIdx} className="flex justify-center gap-3 md:gap-4">
             {row.map((letter, colIdx) => {
               const isSelected = selectedRow === rowIdx && selectedCol === colIdx
               return (
@@ -197,12 +192,11 @@ export default function UndertaleNameEntry({
                   onClick={() => handleLetterClick(letter, rowIdx, colIdx)}
                   className={`
                     w-8 h-10 md:w-10 md:h-12
-                    font-mono text-lg md:text-xl font-bold
-                    border-2 rounded
+                    font-mono text-lg md:text-xl
                     transition-all duration-100
                     ${isSelected
-                      ? 'bg-white text-black border-white scale-110'
-                      : 'bg-transparent text-white/80 border-white/30 hover:border-white/60 hover:text-white'
+                      ? 'text-white scale-125'
+                      : 'text-white/50 hover:text-white'
                     }
                   `}
                 >
@@ -213,38 +207,31 @@ export default function UndertaleNameEntry({
           </div>
         ))}
 
-        {/* Riga azioni: CANC - SPAZIO - FATTO */}
-        <div className="flex justify-center gap-2 md:gap-4 mt-4">
-          {['CANC', 'SPAZIO', 'FATTO'].map((action, colIdx) => {
+        {/* Riga azioni: ⌫ - ␣ - ↵ */}
+        <div className="flex justify-center gap-8 md:gap-12 mt-6">
+          {ACTION_SYMBOLS.map((symbol, colIdx) => {
             const isSelected = selectedRow === KEYBOARD_ROWS.length && selectedCol === colIdx
             const actionType = colIdx === 0 ? 'back' : colIdx === 1 ? 'space' : 'done'
             return (
               <button
-                key={action}
+                key={symbol}
                 onClick={() => handleActionClick(actionType, colIdx)}
                 className={`
-                  px-4 py-2 md:px-6 md:py-3
-                  font-mono text-sm md:text-base font-bold
-                  border-2 rounded
+                  text-2xl md:text-3xl
                   transition-all duration-100
                   ${isSelected
-                    ? 'bg-white text-black border-white scale-105'
-                    : action === 'FATTO' && name.trim().length > 0
-                      ? 'bg-transparent text-yellow-400 border-yellow-400/50 hover:border-yellow-400'
-                      : 'bg-transparent text-white/60 border-white/30 hover:border-white/60 hover:text-white'
+                    ? 'text-white scale-125'
+                    : colIdx === 2 && name.trim().length > 0
+                      ? 'text-yellow-400 hover:text-yellow-300'
+                      : 'text-white/50 hover:text-white'
                   }
                 `}
               >
-                {action}
+                {symbol}
               </button>
             )
           })}
         </div>
-      </div>
-
-      {/* Istruzioni */}
-      <div className="mt-8 text-white/40 text-xs md:text-sm text-center font-mono">
-        Usa le frecce per navigare, INVIO per selezionare
       </div>
 
       <style jsx>{`

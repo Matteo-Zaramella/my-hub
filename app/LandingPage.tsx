@@ -395,7 +395,6 @@ export default function LandingPage() {
       {showNameEntry && (
         <UndertaleNameEntry
           onComplete={handleNameEntryComplete}
-          title="Scegli un nome."
           maxLength={12}
         />
       )}
