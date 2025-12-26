@@ -81,28 +81,22 @@ function NarghileQuestion({ participantCode }: { participantCode: string }) {
   }
 
   if (hasAnswered) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-white/50 text-sm">
-          Hai risposto: {answer ? 'Sì 💨' : 'No'}
-        </p>
-      </div>
-    )
+    return null
   }
 
   return (
-    <div className="text-center py-8">
-      <p className="text-2xl text-white mb-6">Narghilé? 💨</p>
-      <div className="flex justify-center gap-6">
+    <div className="text-center py-6">
+      <p className="text-white/70 mb-4">Narghilé?</p>
+      <div className="flex justify-center gap-8">
         <button
           onClick={() => handleAnswer(true)}
-          className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition text-lg"
+          className="text-white/60 hover:text-white transition"
         >
           Sì
         </button>
         <button
           onClick={() => handleAnswer(false)}
-          className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition text-lg"
+          className="text-white/60 hover:text-white transition"
         >
           No
         </button>
