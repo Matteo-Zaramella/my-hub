@@ -63,6 +63,7 @@ function NarghileQuestion({ participantCode }: { participantCode: string }) {
   }
 
   async function handleAnswer(wantsNarghile: boolean) {
+    console.log('Saving narghile answer:', participantCode, wantsNarghile)
     const { error } = await supabase
       .from('party_survey_responses')
       .insert({
@@ -70,7 +71,10 @@ function NarghileQuestion({ participantCode }: { participantCode: string }) {
         wants_narghile: wantsNarghile
       })
 
-    if (!error) {
+    if (error) {
+      console.error('Error saving narghile:', error)
+    } else {
+      console.log('Saved successfully')
       setHasAnswered(true)
       setAnswer(wantsNarghile)
     }
