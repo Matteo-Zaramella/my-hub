@@ -51,7 +51,7 @@ export default function LandingPage() {
     if (hasSeenWelcome) {
       setShowTerminalWelcome(false)
       setWelcomeCompleted(true)
-      setShowAuthChoice(true) // Mostra direttamente la scelta se ha già visto il welcome
+      setShowAuthChoice(true)
     }
   }, [])
 
@@ -545,7 +545,7 @@ export default function LandingPage() {
       )}
 
       {/* Auth Choice - Registrati o Accedi */}
-      {showAuthChoice && !showRegistrationForm && !showLoginForm && (
+      {!showTerminalWelcome && showAuthChoice && !showRegistrationForm && !showLoginForm && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
           <div className="flex flex-col md:flex-row gap-8 md:gap-16 w-full justify-center items-center">
             {/* REGISTRATI */}

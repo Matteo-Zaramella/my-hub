@@ -2,11 +2,373 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import NextImage from 'next/image'
+import { createClient } from '@/lib/supabase/client'
 import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
 
 // NOTE: MonthlyChallengesCluesSection e ValidateAnswerTab rimossi temporaneamente
 // Si sbloccheranno dopo la cerimonia del 25/01/2026
+
+// Tipi per la wishlist
+interface WishlistItem {
+  id: number
+  nome: string
+  descrizione: string | null
+  link: string | null
+  prezzo: number | null
+  immagine_url: string | null
+  pubblico: boolean
+  categoria: string
+  taglie: {
+    pantaloni?: string
+    maglie?: string
+    tshirt?: string
+  } | null
+}
+
+const CATEGORIE_LABELS: Record<string, string> = {
+  elettrodomestici: 'Elettrodomestici',
+  elettronica: 'Elettronica',
+  bici: 'Bici',
+  integratori: 'Integratori',
+  sport: 'Sport',
+  vestiti: 'Vestiti',
+  altro: 'Altro'
+}
+
+// Componente Sondaggio Festa
+function PartySurvey({ participantCode }: { participantCode: string }) {
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    wants_narghile: false,
+    drink_vino_bianco: false,
+    drink_vino_rosso: false,
+    drink_prosecco: false,
+    drink_spritz_campari: false,
+    drink_spritz_aperol: false,
+    drink_spritz_misto: false,
+    drink_coca_cola: false,
+    drink_fanta: false,
+    drink_acqua: false,
+  })
+  const supabase = createClient()
+
+  useEffect(() => {
+    checkExistingResponse()
+  }, [participantCode])
+
+  async function checkExistingResponse() {
+    const { data, error } = await supabase
+      .from('party_survey_responses')
+      .select('*')
+      .eq('participant_code', participantCode)
+      .single()
+
+    if (data && !error) {
+      setHasSubmitted(true)
+      setFormData({
+        wants_narghile: data.wants_narghile || false,
+        drink_vino_bianco: data.drink_vino_bianco || false,
+        drink_vino_rosso: data.drink_vino_rosso || false,
+        drink_prosecco: data.drink_prosecco || false,
+        drink_spritz_campari: data.drink_spritz_campari || false,
+        drink_spritz_aperol: data.drink_spritz_aperol || false,
+        drink_spritz_misto: data.drink_spritz_misto || false,
+        drink_coca_cola: data.drink_coca_cola || false,
+        drink_fanta: data.drink_fanta || false,
+        drink_acqua: data.drink_acqua || false,
+      })
+    }
+    setIsLoading(false)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    const { error } = await supabase
+      .from('party_survey_responses')
+      .insert({
+        participant_code: participantCode,
+        ...formData
+      })
+
+    if (!error) {
+      setHasSubmitted(true)
+    }
+    setIsSubmitting(false)
+  }
+
+  const handleChange = (field: keyof typeof formData) => {
+    setFormData(prev => ({ ...prev, [field]: !prev[field] }))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  if (hasSubmitted) {
+    return (
+      <div className="text-center py-6">
+        <div className="text-4xl mb-3">✓</div>
+        <p className="text-green-400 font-medium">Sondaggio inviato!</p>
+        <p className="text-white/50 text-sm mt-2">Grazie per aver risposto</p>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Narghilé */}
+      <div>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={formData.wants_narghile}
+            onChange={() => handleChange('wants_narghile')}
+            className="w-5 h-5 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+          />
+          <span className="text-white">Voglio il narghilé 💨</span>
+        </label>
+      </div>
+
+      {/* Bevande */}
+      <div>
+        <p className="text-white/70 mb-3">Preferenze bevande (seleziona tutte quelle che vuoi):</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_vino_bianco}
+              onChange={() => handleChange('drink_vino_bianco')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🍷 Vino bianco</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_vino_rosso}
+              onChange={() => handleChange('drink_vino_rosso')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🍷 Vino rosso</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_prosecco}
+              onChange={() => handleChange('drink_prosecco')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🥂 Prosecco</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_spritz_campari}
+              onChange={() => handleChange('drink_spritz_campari')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🍹 Spritz Campari</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_spritz_aperol}
+              onChange={() => handleChange('drink_spritz_aperol')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🍹 Spritz Aperol</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_spritz_misto}
+              onChange={() => handleChange('drink_spritz_misto')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🍹 Spritz misto</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_coca_cola}
+              onChange={() => handleChange('drink_coca_cola')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🥤 Coca Cola</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_fanta}
+              onChange={() => handleChange('drink_fanta')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">🥤 Fanta</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.drink_acqua}
+              onChange={() => handleChange('drink_acqua')}
+              className="w-4 h-4 rounded border-white/30 bg-white/10 text-purple-500 focus:ring-purple-500"
+            />
+            <span className="text-white/90 text-sm">💧 Acqua</span>
+          </label>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+      >
+        {isSubmitting ? 'Invio...' : 'Invia sondaggio'}
+      </button>
+    </form>
+  )
+}
+
+// Componente Wishlist Section
+function WishlistSection() {
+  const [items, setItems] = useState<WishlistItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    loadPublicItems()
+  }, [])
+
+  async function loadPublicItems() {
+    try {
+      const { data, error } = await supabase
+        .from('wishlist_items')
+        .select('id, nome, descrizione, link, prezzo, immagine_url, pubblico, categoria, taglie')
+        .eq('pubblico', true)
+        .order('categoria', { ascending: true })
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error loading wishlist:', error)
+        setItems([])
+      } else {
+        setItems(data || [])
+      }
+      setLoading(false)
+    } catch (err) {
+      console.error('Exception loading wishlist:', err)
+      setItems([])
+      setLoading(false)
+    }
+  }
+
+  // Raggruppa per categoria
+  const itemsByCategory = items.reduce((acc, item) => {
+    const cat = item.categoria || 'altro'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(item)
+    return acc
+  }, {} as Record<string, WishlistItem[]>)
+
+  if (loading) {
+    return (
+      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+        </div>
+      </div>
+    )
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
+        <p className="text-white/60 text-center py-8">Nessun prodotto nella wishlist</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
+
+      <div className="space-y-8">
+        {Object.entries(itemsByCategory).map(([categoria, categoryItems]) => (
+          <section key={categoria}>
+            <h3 className="text-lg md:text-xl font-semibold mb-4 text-purple-300 border-b border-white/10 pb-2">
+              {CATEGORIE_LABELS[categoria] || categoria}
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {categoryItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors"
+                >
+                  {/* Immagine */}
+                  {item.immagine_url ? (
+                    <div className="aspect-square relative bg-black/30">
+                      <NextImage
+                        src={item.immagine_url}
+                        alt={item.nome}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-square bg-white/5 flex items-center justify-center">
+                      <span className="text-4xl opacity-30">🎁</span>
+                    </div>
+                  )}
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h4 className="font-medium text-white mb-2 line-clamp-2">
+                      {item.nome}
+                    </h4>
+
+                    {/* Taglie per vestiti */}
+                    {item.categoria === 'vestiti' && item.taglie && (
+                      <div className="text-xs text-white/50 mb-3 space-y-0.5">
+                        {item.taglie.pantaloni && <p>Pantaloni: {item.taglie.pantaloni}</p>}
+                        {item.taglie.maglie && <p>Maglie: {item.taglie.maglie}</p>}
+                        {item.taglie.tshirt && <p>T-shirt: {item.taglie.tshirt}</p>}
+                      </div>
+                    )}
+
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-lg hover:bg-purple-500/30 transition-colors text-sm text-purple-200"
+                      >
+                        Vedi prodotto →
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // Componente sezione privata con countdown
 function PrivateSection() {
@@ -297,10 +659,10 @@ export default function GameAreaWithChat() {
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8">
             <h2 className="text-2xl md:text-3xl font-bold mb-6">📍 Informazioni Festa</h2>
 
-            {/* Luogo */}
+            {/* Luogo e Orario */}
             <div className="space-y-6">
               <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4 text-purple-300">Luogo</h3>
+                <h3 className="text-xl font-semibold mb-4 text-purple-300">Luogo e Orario</h3>
                 <div className="space-y-3">
                   <p className="text-white text-lg font-medium">
                     L'Oste di Vino | Enoteca • Ristorante • Bistrot
@@ -308,11 +670,16 @@ export default function GameAreaWithChat() {
                   <p className="text-white/70">
                     Via Pelosa, 76 - Selvazzano Dentro (PD)
                   </p>
+                  <div className="flex items-center gap-2 text-white/90 mt-4">
+                    <span className="text-xl">🕘</span>
+                    <span className="font-medium">Dalle 21:30 / 22:00 alle 02:00</span>
+                    <span className="text-white/50 text-sm">(chiusura locale)</span>
+                  </div>
                   <a
                     href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition"
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition mt-2"
                   >
                     🗺️ Apri in Google Maps
                   </a>
@@ -335,12 +702,10 @@ export default function GameAreaWithChat() {
                 </div>
               </div>
 
-              {/* Sondaggio placeholder */}
+              {/* Sondaggio */}
               <div className="bg-white/5 rounded-xl p-6">
                 <h3 className="text-xl font-semibold mb-4 text-purple-300">📊 Sondaggio</h3>
-                <p className="text-white/60">
-                  In arrivo...
-                </p>
+                <PartySurvey participantCode={participant.participant_code} />
               </div>
             </div>
           </div>
@@ -356,16 +721,7 @@ export default function GameAreaWithChat() {
         )}
 
         {/* Wishlist Tab */}
-        {activeTab === 'wishlist' && (
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
-            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-              🎁 Wishlist
-            </h2>
-            <p className="text-white/80 text-lg">
-              Sezione in arrivo...
-            </p>
-          </div>
-        )}
+        {activeTab === 'wishlist' && <WishlistSection />}
 
         {/* Private Tab - Locked with countdown */}
         {activeTab === 'private' && <PrivateSection />}
