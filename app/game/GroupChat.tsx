@@ -494,11 +494,6 @@ export default function GroupChat({ participant }: GroupChatProps) {
 
       {/* Input Form */}
       <div className="border-t border-white/10 p-4">
-        {!canSendMessage && cooldownSeconds > 0 && (
-          <div className="mb-2 text-center text-sm text-yellow-400">
-            ⏱️ Attendi {cooldownSeconds}s prima di inviare un altro messaggio
-          </div>
-        )}
         <form onSubmit={sendMessage} className="flex gap-2">
           <input
             type="text"
