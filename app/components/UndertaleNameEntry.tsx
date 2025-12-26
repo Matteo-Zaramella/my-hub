@@ -29,20 +29,17 @@ export default function UndertaleNameEntry({
   onComplete,
   onBack,
   title = 'Scegli un nome.',
-  maxLength = 12
+  maxLength = 20
 }: UndertaleNameEntryProps) {
   const [name, setName] = useState('')
   const [selectedRow, setSelectedRow] = useState(0)
   const [selectedCol, setSelectedCol] = useState(0)
-  const [isGasterEffect, setIsGasterEffect] = useState(false)
 
   // Calcola la riga corrente (include riga speciale per SPAZIO/CANC/FATTO)
   const totalRows = KEYBOARD_ROWS.length + 1 // +1 per riga azioni
 
   // Gestione tasti fisici
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (isGasterEffect) return
-
     const key = e.key.toUpperCase()
 
     // Navigazione con frecce
@@ -61,9 +58,13 @@ export default function UndertaleNameEntry({
         ? KEYBOARD_ROWS[selectedRow].length - 1
         : 2 // 3 pulsanti nell'ultima riga
       setSelectedCol(c => Math.min(maxCol, c + 1))
-    } else if (e.key === 'Enter' || e.key === ' ') {
+    } else if (e.key === 'Enter') {
       e.preventDefault()
       handleSelect()
+    } else if (e.key === ' ') {
+      // Spazio fisico aggiunge spazio
+      e.preventDefault()
+      handleSpace()
     } else if (e.key === 'Backspace') {
       e.preventDefault()
       handleBackspace()
@@ -71,7 +72,7 @@ export default function UndertaleNameEntry({
       // Digitazione diretta da tastiera fisica
       addLetter(key)
     }
-  }, [selectedRow, selectedCol, name, isGasterEffect, maxLength])
+  }, [selectedRow, selectedCol, name, maxLength])
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
@@ -81,9 +82,7 @@ export default function UndertaleNameEntry({
   // Aggiungi lettera
   const addLetter = (letter: string) => {
     if (name.length < maxLength) {
-      const newName = name + letter
-      setName(newName)
-      checkSpecialName(newName)
+      setName(name + letter)
     }
   }
 
@@ -95,9 +94,7 @@ export default function UndertaleNameEntry({
   // Spazio
   const handleSpace = () => {
     if (name.length < maxLength && name.length > 0 && !name.endsWith(' ')) {
-      const newName = name + ' '
-      setName(newName)
-      checkSpecialName(newName)
+      setName(name + ' ')
     }
   }
 
@@ -105,32 +102,14 @@ export default function UndertaleNameEntry({
   const handleConfirm = () => {
     const trimmedName = name.trim()
     if (trimmedName.length > 0) {
-      // Controllo finale per nomi speciali
+      // Controllo per nomi speciali - cancella silenziosamente
       const upperName = trimmedName.toUpperCase()
       if (SPECIAL_NAMES[upperName] === 'gaster') {
-        triggerGasterEffect()
+        setName('')
         return
       }
       onComplete(trimmedName)
     }
-  }
-
-  // Controlla nomi speciali durante la digitazione
-  const checkSpecialName = (currentName: string) => {
-    const upperName = currentName.trim().toUpperCase()
-    if (SPECIAL_NAMES[upperName] === 'gaster') {
-      triggerGasterEffect()
-    }
-  }
-
-  // Effetto Gaster - cancella tutto
-  const triggerGasterEffect = () => {
-    setIsGasterEffect(true)
-    // Effetto glitch rapido poi cancella
-    setTimeout(() => {
-      setName('')
-      setIsGasterEffect(false)
-    }, 500)
   }
 
   // Gestione selezione con click/enter
@@ -169,11 +148,11 @@ export default function UndertaleNameEntry({
   const ACTION_SYMBOLS = ['⌫', '␣', '↵']
 
   return (
-    <div className={`fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4 ${isGasterEffect ? 'gaster-effect' : ''}`}>
+    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
       {/* Nome inserito */}
       <div className="mb-12 w-full max-w-md">
         <div className="px-6 py-4 min-h-[60px] flex items-center justify-center">
-          <span className={`text-3xl md:text-4xl font-mono tracking-wider ${isGasterEffect ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+          <span className="text-3xl md:text-4xl font-mono tracking-wider text-white">
             {name || <span className="text-white/30">_</span>}
             <span className="animate-pulse">|</span>
           </span>
@@ -234,18 +213,6 @@ export default function UndertaleNameEntry({
         </div>
       </div>
 
-      <style jsx>{`
-        .gaster-effect {
-          animation: gaster-glitch 0.1s infinite;
-        }
-
-        @keyframes gaster-glitch {
-          0%, 100% { filter: none; }
-          25% { filter: hue-rotate(90deg) saturate(200%); }
-          50% { filter: invert(1); }
-          75% { filter: hue-rotate(-90deg) saturate(200%); }
-        }
-      `}</style>
     </div>
   )
 }
