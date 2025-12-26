@@ -251,15 +251,15 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             onChange={(e) => handleChange(e.target.value)}
             placeholder={STEP_LABELS.otp}
             maxLength={6}
-            className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-lg md:text-2xl focus:outline-none placeholder:text-white/30 text-center tracking-widest"
+            className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-transparent text-white text-lg md:text-2xl focus:outline-none placeholder:text-white/30 text-center tracking-widest"
             autoFocus
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-14 h-14 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center disabled:opacity-50 hover:bg-white/20 transition"
+            className="text-white/50 hover:text-white transition disabled:opacity-50"
           >
-            <div className="text-white text-2xl md:text-4xl">→</div>
+            <span className="text-2xl md:text-4xl">→</span>
           </button>
         </>
       )
@@ -273,9 +273,9 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
           <button
             type="button"
             onClick={handleBack}
-            className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center self-start md:self-auto hover:bg-white/20 transition"
+            className="text-white/50 hover:text-white transition self-start md:self-auto"
           >
-            <div className="text-white text-2xl md:text-4xl">←</div>
+            <span className="text-2xl md:text-4xl">←</span>
           </button>
 
           {/* Password */}
@@ -284,7 +284,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             value={formData.password}
             onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
             placeholder="Password"
-            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
+            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-transparent text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
             autoFocus
           />
 
@@ -294,14 +294,14 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
             value={formData.confirmPassword}
             onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
             placeholder="Conferma password"
-            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
+            className="w-full md:flex-1 px-4 py-3 md:px-8 md:py-6 bg-transparent text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
           />
 
-          {/* Pulsante bianco pieno */}
+          {/* Pulsante INVIA - solo testo */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full md:w-auto px-8 py-3 md:px-12 md:py-6 bg-white rounded-xl md:rounded-2xl text-black text-lg md:text-xl font-bold disabled:opacity-50 hover:bg-white/90 transition"
+            className="text-white/50 hover:text-white transition disabled:opacity-50 text-lg md:text-xl font-bold"
           >
             INVIA
           </button>
@@ -319,9 +319,9 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
           <button
             type="button"
             onClick={handleBack}
-            className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition"
+            className="text-white/50 hover:text-white transition"
           >
-            <div className="text-white text-2xl md:text-4xl">←</div>
+            <span className="text-2xl md:text-4xl">←</span>
           </button>
         )}
 
@@ -330,7 +330,7 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
           value={currentValue}
           onChange={(e) => handleChange(e.target.value)}
           placeholder={STEP_LABELS[currentStep]}
-          className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
+          className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-transparent text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30"
           autoFocus
         />
 
@@ -338,9 +338,9 @@ export default function RegistrationForm({ onSuccess, onBack }: RegistrationForm
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center disabled:opacity-50 hover:bg-white/20 transition"
+          className="text-white/50 hover:text-white transition disabled:opacity-50"
         >
-          <div className="text-white text-2xl md:text-4xl">→</div>
+          <span className="text-2xl md:text-4xl">→</span>
         </button>
       </>
     )

@@ -650,9 +650,9 @@ export default function LandingPage() {
                     setLoginCode('')
                     setLoginError('')
                   }}
-                  className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors"
+                  className="text-white/50 hover:text-white transition-colors"
                 >
-                  <div className="text-white text-2xl md:text-4xl">←</div>
+                  <span className="text-2xl md:text-4xl">←</span>
                 </button>
 
                 <input
@@ -661,16 +661,16 @@ export default function LandingPage() {
                   onChange={(e) => setLoginCode(e.target.value.toUpperCase())}
                   placeholder="Codice 8 caratteri"
                   maxLength={8}
-                  className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-white/10 rounded-xl md:rounded-2xl text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
+                  className="flex-1 px-4 py-3 md:px-8 md:py-6 bg-transparent text-white text-base md:text-2xl focus:outline-none placeholder:text-white/30 uppercase text-center tracking-widest"
                   autoFocus
                 />
 
                 <button
                   type="submit"
                   disabled={loginLoading || loginCode.length !== 8}
-                  className="w-12 h-12 md:w-20 md:h-20 bg-white/10 rounded-xl md:rounded-2xl flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                  className="text-white/50 hover:text-white transition-colors disabled:opacity-30"
                 >
-                  <div className="text-white text-2xl md:text-4xl">{loginLoading ? '...' : '→'}</div>
+                  <span className="text-2xl md:text-4xl">{loginLoading ? '...' : '→'}</span>
                 </button>
               </div>
 
