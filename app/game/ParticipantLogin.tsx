@@ -55,72 +55,59 @@ export default function ParticipantLogin({ onLoginSuccess }: ParticipantLoginPro
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 md:p-12 text-center space-y-6">
-          {/* Icon */}
-          <div className="flex justify-center">
-            <div className="w-24 h-24 bg-purple-500/20 rounded-full flex items-center justify-center border-4 border-purple-500">
-              <span className="text-6xl">🔐</span>
-            </div>
-          </div>
-
-          {/* Title */}
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Accesso
-            </h1>
-            <p className="text-white/70">
-              Inserisci il tuo codice
-            </p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="Codice (es. ABC123)"
-                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-center text-xl font-mono tracking-wider"
-                maxLength={8}
-                disabled={loading}
-                autoComplete="off"
-                suppressHydrationWarning
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
-                <p className="text-red-300 text-sm">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading || !code.trim()}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {loading ? 'Accesso in corso...' : 'Accedi'}
-            </button>
-          </form>
-
-          {/* Info */}
-          <div className="pt-4 border-t border-white/10">
-            <p className="text-sm text-white/50">
-              💡 Il codice ti è stato inviato via email
-            </p>
-          </div>
-
-          {/* Back Button */}
-          <button
-            onClick={() => window.history.back()}
-            className="text-white/60 hover:text-white text-sm underline"
-          >
-            ← Torna indietro
-          </button>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="max-w-sm w-full space-y-8 text-center">
+        {/* Title */}
+        <div>
+          <h1 className="text-xl font-light text-white mb-2">
+            Accesso
+          </h1>
+          <p className="text-white/40 text-sm">
+            Inserisci il tuo codice
+          </p>
         </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="CODICE"
+              className="w-full bg-transparent border border-white/20 px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-white/40 text-center text-lg font-mono tracking-wider"
+              maxLength={8}
+              disabled={loading}
+              autoComplete="off"
+              suppressHydrationWarning
+            />
+          </div>
+
+          {error && (
+            <p className="text-white/60 text-sm">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !code.trim()}
+            className="w-full border border-white/20 text-white px-6 py-3 hover:border-white/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            {loading ? '...' : 'Accedi'}
+          </button>
+        </form>
+
+        {/* Info */}
+        <p className="text-xs text-white/30">
+          Il codice ti è stato inviato via email
+        </p>
+
+        {/* Back Button */}
+        <button
+          onClick={() => window.history.back()}
+          className="text-white/30 hover:text-white/60 text-sm transition"
+        >
+          Torna indietro
+        </button>
       </div>
     </div>
   )

@@ -152,68 +152,64 @@ function WishlistSection() {
 
   if (loading) {
     return (
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
-        <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-        </div>
+      <div className="text-center py-12">
+        <p className="text-white/40">Caricamento...</p>
       </div>
     )
   }
 
   if (items.length === 0) {
     return (
-      <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
-        <p className="text-white/60 text-center py-8">Nessun prodotto nella wishlist</p>
+      <div className="text-center py-12">
+        <p className="text-white/40">Nessun prodotto nella wishlist</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6">🎁 Wishlist</h2>
+    <div className="space-y-8">
+      <h2 className="text-xl font-light text-center">Wishlist</h2>
 
       <div className="space-y-8">
         {Object.entries(itemsByCategory).map(([categoria, categoryItems]) => (
           <section key={categoria}>
-            <h3 className="text-lg md:text-xl font-semibold mb-4 text-purple-300 border-b border-white/10 pb-2">
+            <h3 className="text-sm text-white/60 mb-4 border-b border-white/10 pb-2">
               {CATEGORIE_LABELS[categoria] || categoria}
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {categoryItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors"
+                  className="border border-white/20 overflow-hidden hover:border-white/40 transition-colors"
                 >
                   {/* Immagine */}
                   {item.immagine_url ? (
-                    <div className="aspect-square relative bg-black/30">
+                    <div className="aspect-square relative bg-black">
                       <NextImage
                         src={item.immagine_url}
                         alt={item.nome}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-contain"
+                        sizes="(max-width: 640px) 100vw, 50vw"
+                        className="object-contain opacity-80"
                         unoptimized
                       />
                     </div>
                   ) : (
                     <div className="aspect-square bg-white/5 flex items-center justify-center">
-                      <span className="text-4xl opacity-30">🎁</span>
+                      <span className="text-2xl opacity-20">?</span>
                     </div>
                   )}
 
                   {/* Info */}
-                  <div className="p-4">
-                    <h4 className="font-medium text-white mb-2 line-clamp-2">
+                  <div className="p-4 border-t border-white/10">
+                    <h4 className="text-white/80 text-sm mb-2 line-clamp-2">
                       {item.nome}
                     </h4>
 
                     {/* Taglie per vestiti */}
                     {item.categoria === 'vestiti' && item.taglie && (
-                      <div className="text-xs text-white/50 mb-3 space-y-0.5">
+                      <div className="text-xs text-white/40 mb-3 space-y-0.5">
                         {item.taglie.pantaloni && <p>Pantaloni: {item.taglie.pantaloni}</p>}
                         {item.taglie.maglie && <p>Maglie: {item.taglie.maglie}</p>}
                         {item.taglie.tshirt && <p>T-shirt: {item.taglie.tshirt}</p>}
@@ -225,9 +221,9 @@ function WishlistSection() {
                         href={item.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-lg hover:bg-purple-500/30 transition-colors text-sm text-purple-200"
+                        className="text-white/40 hover:text-white text-xs underline transition"
                       >
-                        Vedi prodotto →
+                        Vedi prodotto
                       </a>
                     )}
                   </div>
@@ -277,41 +273,36 @@ function PrivateSection() {
   }, [])
 
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6">
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        🔒 Privato
-      </h2>
+    <div className="space-y-8">
+      <h2 className="text-xl font-light text-center">Privato</h2>
 
-      <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
-        <span className="text-6xl block mb-4">⏳</span>
-        <p className="text-xl text-white/90 mb-6">
-          Contenuto bloccato
-        </p>
+      <div className="text-center py-8">
+        <p className="text-white/40 mb-8">Contenuto bloccato</p>
 
-        <div className="grid grid-cols-4 gap-4 max-w-lg mx-auto">
-          <div className="bg-white/10 rounded-lg p-4">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-              {timeLeft.days}
+        <div className="flex justify-center gap-8 font-mono">
+          <div>
+            <div className="text-2xl md:text-3xl text-white">
+              {String(timeLeft.days).padStart(2, '0')}
             </div>
-            <div className="text-xs md:text-sm text-white/60 uppercase">Giorni</div>
+            <div className="text-xs text-white/40 mt-1">giorni</div>
           </div>
-          <div className="bg-white/10 rounded-lg p-4">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-              {timeLeft.hours}
+          <div>
+            <div className="text-2xl md:text-3xl text-white">
+              {String(timeLeft.hours).padStart(2, '0')}
             </div>
-            <div className="text-xs md:text-sm text-white/60 uppercase">Ore</div>
+            <div className="text-xs text-white/40 mt-1">ore</div>
           </div>
-          <div className="bg-white/10 rounded-lg p-4">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-              {timeLeft.minutes}
+          <div>
+            <div className="text-2xl md:text-3xl text-white">
+              {String(timeLeft.minutes).padStart(2, '0')}
             </div>
-            <div className="text-xs md:text-sm text-white/60 uppercase">Minuti</div>
+            <div className="text-xs text-white/40 mt-1">min</div>
           </div>
-          <div className="bg-white/10 rounded-lg p-4">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-              {timeLeft.seconds}
+          <div>
+            <div className="text-2xl md:text-3xl text-white">
+              {String(timeLeft.seconds).padStart(2, '0')}
             </div>
-            <div className="text-xs md:text-sm text-white/60 uppercase">Secondi</div>
+            <div className="text-xs text-white/40 mt-1">sec</div>
           </div>
         </div>
       </div>
@@ -396,8 +387,8 @@ export default function GameAreaWithChat() {
   // Mostra loading mentre verifica localStorage
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 flex items-center justify-center">
-        <div className="text-white text-xl">Caricamento...</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white/60">Caricamento...</div>
       </div>
     )
   }
@@ -409,30 +400,22 @@ export default function GameAreaWithChat() {
 
   // Game Area completa
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-900 text-white pb-16">
+    <div className="min-h-screen bg-black text-white pb-12">
       {/* Header */}
-      <header className="bg-black/30 backdrop-blur-md border-b border-white/10">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
+      <header className="border-b border-white/20">
+        <div className="w-full px-4 py-3">
           {/* Mobile: stack vertically */}
           <div className="flex flex-col gap-2 md:hidden">
             <div className="flex justify-between items-center">
-              <p className="text-purple-200 text-sm truncate max-w-[150px]">
+              <p className="text-white/60 text-sm truncate max-w-[150px]">
                 Ciao, {participant.participant_name.split(' ')[0]}!
               </p>
-              <div className="flex items-center bg-black/30 px-3 py-1.5 rounded-lg border border-white/10">
-                <div className="flex gap-0.5 font-mono text-white text-xs">
-                  <span>{String(ceremonyTimeLeft.days).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.hours).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.minutes).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.seconds).padStart(2, '0')}</span>
-                </div>
+              <div className="font-mono text-white text-xs">
+                {String(ceremonyTimeLeft.days).padStart(2, '0')} : {String(ceremonyTimeLeft.hours).padStart(2, '0')} : {String(ceremonyTimeLeft.minutes).padStart(2, '0')} : {String(ceremonyTimeLeft.seconds).padStart(2, '0')}
               </div>
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition text-sm"
+                className="text-white/40 hover:text-white transition text-sm"
               >
                 Esci
               </button>
@@ -442,28 +425,20 @@ export default function GameAreaWithChat() {
           {/* Desktop: horizontal with centered timer */}
           <div className="hidden md:flex justify-between items-center relative">
             <div className="flex-shrink-0">
-              <p className="text-purple-200 text-base">
+              <p className="text-white/60">
                 Ciao, {participant.participant_name}!
               </p>
             </div>
 
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="flex items-center bg-black/30 px-4 py-2 rounded-lg border border-white/10">
-                <div className="flex gap-1 font-mono text-white text-base">
-                  <span>{String(ceremonyTimeLeft.days).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.hours).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.minutes).padStart(2, '0')}</span>
-                  <span>:</span>
-                  <span>{String(ceremonyTimeLeft.seconds).padStart(2, '0')}</span>
-                </div>
+              <div className="font-mono text-white">
+                {String(ceremonyTimeLeft.days).padStart(2, '0')} : {String(ceremonyTimeLeft.hours).padStart(2, '0')} : {String(ceremonyTimeLeft.minutes).padStart(2, '0')} : {String(ceremonyTimeLeft.seconds).padStart(2, '0')}
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition text-base flex-shrink-0"
+              className="text-white/40 hover:text-white transition flex-shrink-0"
             >
               Esci
             </button>
@@ -472,117 +447,104 @@ export default function GameAreaWithChat() {
       </header>
 
       {/* Tab Navigation */}
-      <div className="bg-black/20 border-b border-white/10">
+      <div className="border-b border-white/20">
         <div className="w-full flex justify-center">
-          <div className="flex gap-2 md:gap-8">
-            {/* Info - informazioni festa */}
+          <div className="flex gap-6 md:gap-12">
             <button
               onClick={() => setActiveTab('info')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+              className={`py-3 transition whitespace-nowrap ${
                 activeTab === 'info'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-white border-b border-white'
+                  : 'text-white/40 hover:text-white/70'
               }`}
             >
-              📍 Info
+              Info
             </button>
-            {/* Chat - sempre accessibile */}
             <button
               onClick={() => setActiveTab('chat')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+              className={`py-3 transition whitespace-nowrap ${
                 activeTab === 'chat'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-white border-b border-white'
+                  : 'text-white/40 hover:text-white/70'
               }`}
             >
-              💬 Chat
+              Chat
             </button>
-            {/* Wishlist - sempre accessibile */}
             <button
               onClick={() => setActiveTab('wishlist')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+              className={`py-3 transition whitespace-nowrap ${
                 activeTab === 'wishlist'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-white border-b border-white'
+                  : 'text-white/40 hover:text-white/70'
               }`}
             >
-              🎁 Wishlist
+              Wishlist
             </button>
-            {/* Privato - mostra countdown */}
             <button
               onClick={() => setActiveTab('private')}
-              className={`px-4 md:px-6 py-3 font-semibold transition whitespace-nowrap ${
+              className={`py-3 transition whitespace-nowrap ${
                 activeTab === 'private'
-                  ? 'text-white border-b-2 border-purple-500'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-white border-b border-white'
+                  : 'text-white/40 hover:text-white/70'
               }`}
             >
-              🔒 Privato
+              Privato
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="w-full px-4 sm:px-6 lg:px-8 py-6">
+      <main className="w-full px-4 md:px-8 lg:px-16 py-8">
         {/* Info Tab */}
         {activeTab === 'info' && (
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6">📍 Informazioni Festa</h2>
+          <div className="space-y-8">
+            <h2 className="text-xl font-light text-center mb-8">Informazioni Festa</h2>
 
             {/* Luogo e Orario */}
-            <div className="space-y-6">
-              <div className="bg-white/5 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4 text-purple-300">Luogo e Orario</h3>
-                <div className="space-y-3">
-                  <p className="text-white text-lg font-medium">
-                    L'Oste di Vino | Enoteca • Ristorante • Bistrot
-                  </p>
-                  <p className="text-white/70">
-                    Via Pelosa, 76 - Selvazzano Dentro (PD)
-                  </p>
-                  <div className="flex items-center gap-2 text-white/90 mt-4">
-                    <span className="text-xl">🕘</span>
-                    <span className="font-medium">Dalle 21:30 / 22:00 alle 02:00</span>
-                    <span className="text-white/50 text-sm">(chiusura locale)</span>
-                  </div>
-                  <a
-                    href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition mt-2"
-                  >
-                    🗺️ Apri in Google Maps
-                  </a>
-                </div>
-              </div>
-
-              {/* Parcheggio */}
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-4 text-yellow-300">⚠️ Parcheggio</h3>
-                <p className="text-white/80 mb-4">
-                  Il locale dispone di soli <strong className="text-white">3 posti auto</strong>.
-                  Si consiglia di parcheggiare nel parcheggio pubblico nelle vicinanze (cerchiato in rosso nella mappa).
-                </p>
-                <div className="rounded-lg overflow-hidden border border-white/20">
-                  <img
-                    src="/venue-map.png"
-                    alt="Mappa del locale con parcheggio consigliato"
-                    className="w-full h-auto"
-                  />
-                </div>
-              </div>
-
-              {/* Domanda Narghilé */}
-              <NarghileQuestion participantCode={participant.participant_code} />
+            <div className="space-y-4">
+              <p className="text-white font-medium">
+                L'Oste di Vino | Enoteca • Ristorante • Bistrot
+              </p>
+              <p className="text-white/60">
+                Via Pelosa, 76 - Selvazzano Dentro (PD)
+              </p>
+              <p className="text-white/60">
+                Dalle 21:30 / 22:00 alle 02:00
+              </p>
+              <a
+                href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-white/40 hover:text-white transition underline"
+              >
+                Apri in Google Maps
+              </a>
             </div>
+
+            <div className="border-t border-white/10 pt-8">
+              <p className="text-white/60 mb-4">
+                Il locale dispone di soli 3 posti auto.
+                Parcheggiare nel parcheggio pubblico nelle vicinanze.
+              </p>
+              <div className="border border-white/20">
+                <img
+                  src="/venue-map.png"
+                  alt="Mappa del locale con parcheggio consigliato"
+                  className="w-full h-auto opacity-80"
+                />
+              </div>
+            </div>
+
+            {/* Domanda Narghilé */}
+            <NarghileQuestion participantCode={participant.participant_code} />
           </div>
         )}
 
         {/* Chat Tab */}
         {activeTab === 'chat' && (
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden">
-            <div className="h-[calc(100vh-200px)] md:h-[700px] lg:h-[750px] flex flex-col">
+          <div className="border border-white/20 overflow-hidden">
+            <div className="h-[calc(100vh-180px)] flex flex-col">
               <GroupChat participant={participant} />
             </div>
           </div>
@@ -596,13 +558,11 @@ export default function GameAreaWithChat() {
       </main>
 
       {/* Footer fisso con codice utente */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/10 z-40">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
-          <div className="text-sm text-white/50">
-            <p>
-              Codice: <span className="font-mono font-bold text-white">{participant.participant_code}</span>
-            </p>
-          </div>
+      <footer className="fixed bottom-0 left-0 right-0 bg-black border-t border-white/20 z-40">
+        <div className="w-full px-4 py-2">
+          <p className="text-xs text-white/40">
+            Codice: <span className="font-mono text-white/60">{participant.participant_code}</span>
+          </p>
         </div>
       </footer>
     </div>
