@@ -360,61 +360,44 @@ export default function GroupChat({ participant }: GroupChatProps) {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-black/20">
       {/* Header with online users */}
-      <div className="bg-white/5 backdrop-blur-sm border-b border-white/10 p-4">
+      <div className="bg-black/30 border-b border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             💬 Chat di Gruppo
           </h2>
-          <div className="flex items-center gap-4 text-sm text-white/70">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="flex items-center gap-4 text-xs text-white/60">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
               <span>{onlineCount} online</span>
             </div>
-            <div className="text-white/50">
-              {messages.length} messaggi
-            </div>
+            <span className="text-white/40">{messages.filter(m => !m.is_system_message).length} msg</span>
           </div>
         </div>
       </div>
 
       {/* Pinned System Message */}
       {latestSystemMessage && (
-        <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 border-b border-blue-500/30 p-4">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 mt-1">
-              <div className="w-8 h-8 rounded-full bg-blue-500/30 border border-blue-400/50 flex items-center justify-center">
-                📢
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-semibold text-blue-300 uppercase tracking-wide">
-                  Messaggio di Sistema
-                </span>
-                <span className="text-xs text-white/40">
-                  {formatTime(latestSystemMessage.created_at)}
-                </span>
-              </div>
-              <p className="text-white/90 text-sm leading-relaxed break-words">
-                {latestSystemMessage.message}
-              </p>
-            </div>
+        <div className="bg-purple-500/10 border-b border-purple-500/20 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">📢</span>
+            <p className="text-white/80 text-sm flex-1">{latestSystemMessage.message}</p>
+            <span className="text-xs text-white/40">{formatTime(latestSystemMessage.created_at)}</span>
           </div>
         </div>
       )}
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {messages.filter(m => !m.is_system_message).length === 0 ? (
-          <div className="text-center text-white/50 py-8">
-            <p className="text-lg">Nessun messaggio ancora.</p>
-            <p className="text-sm mt-2">Sii il primo a scrivere!</p>
+          <div className="text-center text-white/40 py-12">
+            <p className="text-base">Nessun messaggio ancora</p>
+            <p className="text-sm mt-1">Sii il primo a scrivere!</p>
           </div>
         ) : (
           messages
-            .filter(m => !m.is_system_message) // Show only user messages
+            .filter(m => !m.is_system_message)
             .map((msg) => {
             const isOwnMessage = msg.participant_id === participant.id
 
@@ -423,68 +406,68 @@ export default function GroupChat({ participant }: GroupChatProps) {
                 key={msg.id}
                 className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
               >
-                {(
-                  <div className="flex flex-col gap-1">
-                    <div
-                      className={`max-w-xs md:max-w-md ${isOwnMessage ? 'bg-purple-600/80' : 'bg-white/10'} backdrop-blur-sm rounded-2xl px-4 py-3 border ${isOwnMessage ? 'border-purple-500/30' : 'border-white/20'}`}
-                    >
-                      {!isOwnMessage && (
-                        <div className="text-xs font-semibold text-white/70 mb-1">
-                          {msg.participant_name}
-                        </div>
-                      )}
-                      <div className="text-white break-words">{msg.message}</div>
-                      <div className="flex items-center justify-between mt-1">
-                        <div
-                          className={`text-xs ${isOwnMessage ? 'text-purple-200' : 'text-white/50'}`}
-                        >
-                          {formatTime(msg.created_at)}
-                        </div>
-                        <button
-                          onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
-                          className="text-xs text-white/40 hover:text-white/80 transition"
-                        >
-                          😀
-                        </button>
+                <div className="flex flex-col gap-1 max-w-[80%] md:max-w-[70%]">
+                  <div
+                    className={`rounded-xl px-3 py-2 ${
+                      isOwnMessage
+                        ? 'bg-purple-500/30 border border-purple-500/20'
+                        : 'bg-white/5 border border-white/10'
+                    }`}
+                  >
+                    {!isOwnMessage && (
+                      <div className="text-xs font-medium text-purple-300 mb-1">
+                        {msg.participant_name}
                       </div>
+                    )}
+                    <div className="text-white/90 text-sm break-words">{msg.message}</div>
+                    <div className="flex items-center justify-between mt-1 gap-2">
+                      <span className="text-[10px] text-white/40">
+                        {formatTime(msg.created_at)}
+                      </span>
+                      <button
+                        onClick={() => setShowEmojiPicker(showEmojiPicker === msg.id ? null : msg.id)}
+                        className="text-xs text-white/30 hover:text-white/60 transition"
+                      >
+                        +
+                      </button>
                     </div>
-
-                    {/* Reactions */}
-                    {getMessageReactions(msg.id).length > 0 && (
-                      <div className={`flex flex-wrap gap-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                        {getMessageReactions(msg.id).map((reaction) => (
-                          <button
-                            key={reaction.emoji}
-                            onClick={() => addReaction(msg.id, reaction.emoji)}
-                            className={`px-2 py-1 rounded-full text-xs flex items-center gap-1 transition ${
-                              reaction.hasReacted
-                                ? 'bg-purple-500/30 border border-purple-400/50'
-                                : 'bg-white/10 border border-white/20 hover:bg-white/20'
-                            }`}
-                          >
-                            <span>{reaction.emoji}</span>
-                            <span className="text-white/70">{reaction.count}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Emoji Picker */}
-                    {showEmojiPicker === msg.id && (
-                      <div className={`flex flex-wrap gap-1 p-2 bg-white/10 border border-white/20 rounded-lg ${isOwnMessage ? 'self-end' : 'self-start'}`}>
-                        {AVAILABLE_EMOJIS.map((emoji) => (
-                          <button
-                            key={emoji}
-                            onClick={() => addReaction(msg.id, emoji)}
-                            className="text-xl hover:scale-125 transition-transform"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                )}
+
+                  {/* Reactions */}
+                  {getMessageReactions(msg.id).length > 0 && (
+                    <div className={`flex flex-wrap gap-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                      {getMessageReactions(msg.id).map((reaction) => (
+                        <button
+                          key={reaction.emoji}
+                          onClick={() => addReaction(msg.id, reaction.emoji)}
+                          className={`px-1.5 py-0.5 rounded-full text-xs flex items-center gap-0.5 transition ${
+                            reaction.hasReacted
+                              ? 'bg-purple-500/20 border border-purple-400/30'
+                              : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                          }`}
+                        >
+                          <span>{reaction.emoji}</span>
+                          <span className="text-white/50 text-[10px]">{reaction.count}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Emoji Picker */}
+                  {showEmojiPicker === msg.id && (
+                    <div className={`flex flex-wrap gap-1 p-2 bg-black/40 border border-white/10 rounded-lg ${isOwnMessage ? 'self-end' : 'self-start'}`}>
+                      {AVAILABLE_EMOJIS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => addReaction(msg.id, emoji)}
+                          className="text-lg hover:scale-110 transition-transform p-1"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )
           })
@@ -493,27 +476,27 @@ export default function GroupChat({ participant }: GroupChatProps) {
       </div>
 
       {/* Input Form */}
-      <div className="border-t border-white/10 p-4">
+      <div className="border-t border-white/10 px-4 py-3 bg-black/30">
         <form onSubmit={sendMessage} className="flex gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder={canSendMessage ? "Scrivi un messaggio..." : `Attendi ${cooldownSeconds}s...`}
-            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:border-purple-500/50 disabled:opacity-50"
             disabled={sending || !canSendMessage}
             maxLength={500}
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || sending || !canSendMessage}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="bg-purple-500/30 border border-purple-500/30 text-white px-4 py-2.5 rounded-lg hover:bg-purple-500/40 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           >
-            {sending ? '...' : !canSendMessage ? `⏱️ ${cooldownSeconds}` : '📤'}
+            {sending ? '...' : !canSendMessage ? cooldownSeconds : '→'}
           </button>
         </form>
-        <div className="mt-2 text-xs text-white/40 text-center">
-          {newMessage.length}/500 caratteri
+        <div className="mt-1.5 text-[10px] text-white/30 text-center">
+          {newMessage.length}/500
         </div>
       </div>
     </div>
