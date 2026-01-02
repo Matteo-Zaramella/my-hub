@@ -66,28 +66,28 @@ function RSVPQuestion({ participantCode }: { participantCode: string }) {
   async function handleRSVP(status: 'yes' | 'no' | 'maybe') {
     setIsSaving(true)
 
-    // Prova prima un update, poi insert se non esiste
-    const { error: updateError } = await supabase
+    // Usa upsert per creare o aggiornare
+    const { error } = await supabase
       .from('party_survey_responses')
-      .update({ rsvp_status: status })
-      .eq('participant_code', participantCode)
+      .upsert({
+        participant_code: participantCode,
+        rsvp_status: status
+      }, { onConflict: 'participant_code' })
 
-    if (updateError) {
-      // Se update fallisce, prova insert
-      const { error: insertError } = await supabase
-        .from('party_survey_responses')
-        .insert({
-          participant_code: participantCode,
-          rsvp_status: status
-        })
-
-      if (insertError) {
-        console.error('Error saving RSVP:', insertError)
-      } else {
-        setRsvpStatus(status)
-      }
+    if (error) {
+      console.error('Error saving RSVP:', error)
     } else {
       setRsvpStatus(status)
+      // Reset narghile answer to show question again if switching to yes/maybe
+      if (status === 'yes' || status === 'maybe') {
+        // Ricarica per vedere se ha già risposto
+        const { data } = await supabase
+          .from('party_survey_responses')
+          .select('wants_narghile')
+          .eq('participant_code', participantCode)
+          .single()
+        setNarghileAnswer(data?.wants_narghile ?? null)
+      }
     }
 
     setIsSaving(false)
