@@ -388,11 +388,17 @@ export default function GroupChat({ participant }: GroupChatProps) {
         </div>
       </div>
 
-      {/* Pinned System Message */}
+      {/* Pinned System Message - Marquee */}
       {latestSystemMessage && (
-        <div className="border-b border-white/20 bg-white/5 px-4 py-3">
-          <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Messaggio di Sistema</p>
-          <p className="text-white/80 text-sm whitespace-pre-line">{latestSystemMessage.message}</p>
+        <div className="border-b border-white/20 bg-white/5 py-2 overflow-hidden">
+          <div className="animate-marquee whitespace-nowrap">
+            <span className="text-white/60 text-sm mx-4">
+              {latestSystemMessage.message.split('\n').join(' • ')}
+            </span>
+            <span className="text-white/60 text-sm mx-4">
+              {latestSystemMessage.message.split('\n').join(' • ')}
+            </span>
+          </div>
         </div>
       )}
 
