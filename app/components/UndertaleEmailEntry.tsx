@@ -35,6 +35,18 @@ export default function UndertaleEmailEntry({
 
     const key = e.key
 
+    // Gestione Ctrl+V per incollare
+    if ((e.ctrlKey || e.metaKey) && key.toLowerCase() === 'v') {
+      e.preventDefault()
+      navigator.clipboard.readText().then(text => {
+        const cleanEmail = text.trim().toLowerCase().slice(0, 50)
+        if (cleanEmail) {
+          setEmail(cleanEmail)
+        }
+      }).catch(() => {})
+      return
+    }
+
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       setSelectedRow(r => Math.max(0, r - 1))

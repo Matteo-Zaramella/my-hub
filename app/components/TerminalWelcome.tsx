@@ -8,13 +8,20 @@ interface TerminalWelcomeProps {
   daysRemaining: number
 }
 
-// Messaggio di benvenuto - 4 righe (tono misterioso/accogliente)
+// Messaggio di benvenuto
 const LINES = [
   'Salve.',
-  'Sembra tutto vuoto qui, vero?',
-  'Rilassati, non preoccuparti.',
-  'Scegli chi vuoi diventare.'
+  'Sono Samantha, l\'entità creata da Matteo per questo evento.',
+  'Ti prego di proseguire seguendo le indicazioni.',
+  'Dovrai prima selezionare il nome del tuo personaggio e poi verificare l\'accesso tramite il tuo indirizzo email.',
+  'Riceverai il codice OTP di conferma per l\'email ed un personale codice identificativo segreto.',
+  'Non perdere il codice e non condividerlo.',
+  'Il luogo, la data e l\'orario della festa saranno disponibili all\'interno del sito una volta effettuata la registrazione.',
+  'Buon divertimento!'
 ]
+
+// Solo l'ultima riga ha effetto glitch
+const GLITCH_LINE_INDEX = LINES.length - 1
 
 // Ritmi e velocità (in millisecondi)
 const TYPING_SPEED = 60
@@ -77,7 +84,7 @@ export default function TerminalWelcome({ onComplete }: TerminalWelcomeProps) {
 
       const currentLine = LINES[currentLineRef.current]
       const isDeleting = isDeletingRef.current
-      const isLast = currentLineRef.current === LINES.length - 1
+      const isLast = currentLineRef.current === GLITCH_LINE_INDEX
 
       // Aggiorna flag ultima riga
       if (isLast && !isLastLine) {
@@ -93,7 +100,7 @@ export default function TerminalWelcome({ onComplete }: TerminalWelcomeProps) {
         } else {
           // Riga completata
           if (isLast) {
-            // Ultima riga: piccola pausa poi glitch
+            // Ultima riga (buon divertimento): piccola pausa poi glitch
             timeoutRef.current = setTimeout(() => {
               currentLineRef.current++
               animate()

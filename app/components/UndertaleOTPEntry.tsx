@@ -147,11 +147,11 @@ export default function UndertaleOTPEntry({
             {row.map((digit, colIdx) => {
               const isSelected = selectedRow === rowIdx && selectedCol === colIdx
               if (!digit) {
-                return <div key={colIdx} className="w-12 h-12 md:w-14 md:h-14" />
+                return <div key={`${rowIdx}-${colIdx}`} className="w-12 h-12 md:w-14 md:h-14" />
               }
               return (
                 <button
-                  key={digit}
+                  key={`${rowIdx}-${colIdx}`}
                   onClick={() => handleDigitClick(digit, rowIdx, colIdx)}
                   disabled={isLoading || otp.length >= 6}
                   className={`

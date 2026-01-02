@@ -56,15 +56,11 @@ export default function UndertaleNameEntry({
       e.preventDefault()
       const maxCol = selectedRow < KEYBOARD_ROWS.length
         ? KEYBOARD_ROWS[selectedRow].length - 1
-        : 2 // 3 pulsanti nell'ultima riga
+        : 1 // 2 pulsanti nell'ultima riga (← e ↵)
       setSelectedCol(c => Math.min(maxCol, c + 1))
     } else if (e.key === 'Enter') {
       e.preventDefault()
       handleConfirm()
-    } else if (e.key === ' ') {
-      // Spazio fisico aggiunge spazio
-      e.preventDefault()
-      handleSpace()
     } else if (e.key === 'Backspace') {
       e.preventDefault()
       handleBackspace()
@@ -89,13 +85,6 @@ export default function UndertaleNameEntry({
   // Backspace
   const handleBackspace = () => {
     setName(n => n.slice(0, -1))
-  }
-
-  // Spazio
-  const handleSpace = () => {
-    if (name.length < maxLength && name.length > 0 && !name.endsWith(' ')) {
-      setName(name + ' ')
-    }
   }
 
   // Conferma nome
@@ -123,8 +112,7 @@ export default function UndertaleNameEntry({
     } else {
       // Riga azioni
       if (selectedCol === 0) handleBackspace()
-      else if (selectedCol === 1) handleSpace()
-      else if (selectedCol === 2) handleConfirm()
+      else if (selectedCol === 1) handleConfirm()
     }
   }
 
@@ -136,16 +124,15 @@ export default function UndertaleNameEntry({
   }
 
   // Click su azione
-  const handleActionClick = (action: 'back' | 'space' | 'done', colIdx: number) => {
+  const handleActionClick = (action: 'back' | 'done', colIdx: number) => {
     setSelectedRow(KEYBOARD_ROWS.length)
     setSelectedCol(colIdx)
     if (action === 'back') handleBackspace()
-    else if (action === 'space') handleSpace()
     else if (action === 'done') handleConfirm()
   }
 
-  // Simboli azioni
-  const ACTION_SYMBOLS = ['←', '───', '↵']
+  // Simboli azioni: backspace e conferma
+  const ACTION_SYMBOLS = ['←', '↵']
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
@@ -186,11 +173,11 @@ export default function UndertaleNameEntry({
           </div>
         ))}
 
-        {/* Riga azioni: ⌫ - ␣ - ↵ */}
-        <div className="flex justify-center gap-8 md:gap-12 mt-6">
+        {/* Riga azioni: ← e ↵ */}
+        <div className="flex justify-center gap-12 mt-6">
           {ACTION_SYMBOLS.map((symbol, colIdx) => {
             const isSelected = selectedRow === KEYBOARD_ROWS.length && selectedCol === colIdx
-            const actionType = colIdx === 0 ? 'back' : colIdx === 1 ? 'space' : 'done'
+            const actionType = colIdx === 0 ? 'back' : 'done'
             return (
               <button
                 key={symbol}
@@ -200,7 +187,7 @@ export default function UndertaleNameEntry({
                   transition-all duration-100
                   ${isSelected
                     ? 'text-white scale-125'
-                    : colIdx === 2 && name.trim().length > 0
+                    : colIdx === 1 && name.trim().length > 0
                       ? 'text-yellow-400 hover:text-yellow-300'
                       : 'text-white/50 hover:text-white'
                   }
