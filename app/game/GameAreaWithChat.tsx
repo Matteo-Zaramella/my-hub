@@ -510,16 +510,26 @@ export default function GameAreaWithChat() {
                 Via Pelosa, 76 - Selvazzano Dentro (PD)
               </p>
               <p className="text-white/60">
-                Dalle 21:30 / 22:00 alle 02:00
+                24 Gennaio 2026 - Dalle 21:30 / 22:00 alle 02:00
               </p>
-              <a
-                href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-white/40 hover:text-white transition underline"
-              >
-                Apri in Google Maps
-              </a>
+              <div className="flex gap-6 mt-2">
+                <a
+                  href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/40 hover:text-white transition underline"
+                >
+                  Google Maps
+                </a>
+                <a
+                  href="https://chat.whatsapp.com/J0G6N7owQWcBtuuhcTpCo6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/40 hover:text-white transition underline"
+                >
+                  Gruppo WhatsApp
+                </a>
+              </div>
             </div>
 
             <div className="border-t border-white/10 pt-8">
