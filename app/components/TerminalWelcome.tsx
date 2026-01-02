@@ -10,7 +10,8 @@ interface TerminalWelcomeProps {
 
 // Messaggio di benvenuto
 const LINES = [
-  'Samantha.',
+  'Benvenuto.',
+  'Sono Samantha.',
   'Sono stata creata per gestire questo evento.',
   'Per proseguire è necessaria la registrazione.',
   'Seleziona un nome e verifica la tua identità tramite email.',
