@@ -74,6 +74,69 @@ const containsBlasphemy = (name: string): boolean => {
   return BLASPHEMY_PATTERNS.some(pattern => pattern.test(normalized))
 }
 
+// Nomi bloccati - cronaca nera, criminali, casi discussi
+const BLOCKED_NAMES = new Set([
+  // Caso Yara Gambirasio (2010)
+  'YARA', 'GAMBIRASIO', 'BOSSETTI', 'MASSIMO BOSSETTI',
+
+  // Caso Giulia Cecchettin (2023)
+  'TURETTA', 'FILIPPO TURETTA', 'CECCHETTIN', 'GIULIA CECCHETTIN',
+
+  // Caso Sarah Scazzi - Avetrana (2010)
+  'SARAH SCAZZI', 'SCAZZI', 'SABRINA MISSERI', 'MISSERI', 'COSIMA SERRANO',
+
+  // Caso Melania Rea (2011)
+  'MELANIA REA', 'PAROLISI', 'SALVATORE PAROLISI',
+
+  // Caso Roberta Ragusa (2012)
+  'ROBERTA RAGUSA', 'RAGUSA', 'ANTONIO LOGLI', 'LOGLI',
+
+  // Caso Cogne - Samuele Lorenzi (2002)
+  'FRANZONI', 'ANNAMARIA FRANZONI', 'SAMUELE LORENZI',
+
+  // Caso Stefano Cucchi (2009)
+  'CUCCHI', 'STEFANO CUCCHI',
+
+  // Caso Denise Pipitone (2004)
+  'DENISE PIPITONE', 'PIPITONE',
+
+  // Caso Elena Ceste (2014)
+  'ELENA CESTE', 'CESTE', 'BUONINCONTI',
+
+  // Caso Elisa Claps (1993)
+  'ELISA CLAPS', 'CLAPS', 'DANILO RESTIVO', 'RESTIVO',
+
+  // Caso Meredith Kercher (2007)
+  'MEREDITH', 'KERCHER', 'AMANDA KNOX', 'KNOX', 'SOLLECITO',
+
+  // Caso Novi Ligure (2001)
+  'ERIKA DE NARDO', 'OMAR',
+
+  // Mostro di Firenze
+  'MOSTRO DI FIRENZE', 'PACCIANI',
+
+  // Altri casi recenti
+  'BIGGIOGERO',
+
+  // Strage di Erba (2006)
+  'OLINDO', 'ROSA BAZZI', 'OLINDO ROMANO',
+
+  // Caso Vannini (2015)
+  'VANNINI', 'MARCO VANNINI', 'CIONTOLI',
+
+  // Caso Willy (2020)
+  'WILLY', 'MONTEIRO', 'WILLY MONTEIRO', 'BIANCHI', 'GABRIELE BIANCHI', 'MARCO BIANCHI',
+
+  // Caso Saman Abbas (2021)
+  'SAMAN', 'SAMAN ABBAS', 'ABBAS',
+])
+
+// Funzione per controllare se il nome è bloccato
+const isBlockedName = (name: string): boolean => {
+  const normalized = name.trim().toUpperCase()
+  return BLOCKED_NAMES.has(normalized)
+}
+
 // Commenti di Samantha basati sul nome inserito
 const NAME_COMMENTS: Record<string, string> = {
   // Creatore
@@ -117,6 +180,10 @@ export default function UndertaleNameEntry({
     // Prima controlla le bestemmie
     if (containsBlasphemy(trimmedName)) {
       return 'Inaccettabile.'
+    }
+    // Controlla nomi bloccati
+    if (isBlockedName(trimmedName)) {
+      return 'Non consentito.'
     }
     const upperName = trimmedName.toUpperCase()
     return NAME_COMMENTS[upperName] || null
@@ -177,6 +244,10 @@ export default function UndertaleNameEntry({
     if (trimmedName.length > 0) {
       // Controllo per bestemmie - blocca silenziosamente
       if (containsBlasphemy(trimmedName)) {
+        return
+      }
+      // Controllo per nomi bloccati - blocca silenziosamente
+      if (isBlockedName(trimmedName)) {
         return
       }
       // Controllo per nomi speciali - cancella silenziosamente
