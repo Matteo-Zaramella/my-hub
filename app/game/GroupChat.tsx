@@ -390,8 +390,9 @@ export default function GroupChat({ participant }: GroupChatProps) {
 
       {/* Pinned System Message */}
       {latestSystemMessage && (
-        <div className="border-b border-white/10 px-4 py-2">
-          <p className="text-white/50 text-xs">{latestSystemMessage.message}</p>
+        <div className="border-b border-white/20 bg-white/5 px-4 py-3">
+          <p className="text-white/40 text-[10px] uppercase tracking-wider mb-1">Messaggio di Sistema</p>
+          <p className="text-white/80 text-sm whitespace-pre-line">{latestSystemMessage.message}</p>
         </div>
       )}
 
