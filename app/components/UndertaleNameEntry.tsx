@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
 interface UndertaleNameEntryProps {
   onComplete: (name: string) => void
@@ -9,13 +9,73 @@ interface UndertaleNameEntryProps {
   maxLength?: number
 }
 
-// Nomi speciali che triggerano effetti
+// Nomi speciali che triggerano effetti (cancella il nome)
 const SPECIAL_NAMES: Record<string, 'gaster' | 'other'> = {
   'GASTER': 'gaster',
   'DR GASTER': 'gaster',
   'WD GASTER': 'gaster',
   'W.D. GASTER': 'gaster',
   'W D GASTER': 'gaster',
+}
+
+// Commenti di Samantha basati sul nome inserito
+const NAME_COMMENTS: Record<string, string> = {
+  // Nomi del creatore
+  'MATTEO': 'Il creatore.',
+  'ZARA': 'Il creatore.',
+  'ZARAMELLA': 'Il creatore.',
+
+  // Nomi dei partecipanti (aggiungi qui)
+  'ALBERTO': 'Un nome classico.',
+  'MARCO': 'Semplice ed efficace.',
+  'LUCA': 'Interessante.',
+  'ANDREA': 'Versatile.',
+  'GIULIA': 'Elegante.',
+  'SARA': 'Dolce.',
+  'ANNA': 'Breve ma significativo.',
+  'ELENA': 'Luminoso.',
+
+  // Nomi divertenti/easter eggs
+  'SAMANTHA': 'Quello è il mio nome.',
+  'SAM': 'Mi stai imitando?',
+  'GOKU': 'Il livello è superiore a 9000.',
+  'MARIO': 'Mamma mia!',
+  'LUIGI': 'Sempre nell\'ombra.',
+  'LINK': '...',
+  'ZELDA': 'La principessa?',
+  'FRISK': 'Determinazione.',
+  'CHARA': 'Interessante scelta.',
+  'SANS': 'Hai avuto una brutta giornata?',
+  'PAPYRUS': 'NYEH HEH HEH!',
+  'FLOWEY': 'In questo mondo è uccidere o essere uccisi.',
+  'ASRIEL': 'Il principe perduto.',
+  'TORIEL': 'Una figura materna.',
+  'ASGORE': 'Il re.',
+  'UNDYNE': 'NGAHHH!',
+  'ALPHYS': 'A-anime?',
+  'METTATON': 'OH YES!',
+  'NAPSTABLOOK': 'oh.....',
+  'TEMMIE': 'hOI!',
+  'JERRY': 'No.',
+  'BATMAN': 'Gotham ha bisogno di te.',
+  'ADMIN': 'Permesso negato.',
+  'ROOT': 'Permesso negato.',
+  'GOD': 'Blasfemia.',
+  'SATAN': 'Interessante.',
+  'DIAVOLO': 'Audace.',
+  'GESÙ': 'Benedizioni.',
+  'GESU': 'Benedizioni.',
+  'PIPPO': 'Yuk yuk!',
+  'PLUTO': 'Arf!',
+  'TEST': 'Questo non è un test.',
+  'PROVA': 'Stai davvero provando?',
+  'CIAO': 'Quello non è un nome.',
+  'NOME': 'Molto creativo.',
+  'AAA': 'Stai urlando?',
+  'AAAA': 'Forte.',
+  'AAAAA': 'Più forte.',
+  'ZZZZZ': 'Svegliati.',
+  'PIPPOBAUDO': 'Allegria!',
 }
 
 // Layout tastiera QWERTY
@@ -37,6 +97,12 @@ export default function UndertaleNameEntry({
 
   // Calcola la riga corrente (include riga speciale per SPAZIO/CANC/FATTO)
   const totalRows = KEYBOARD_ROWS.length + 1 // +1 per riga azioni
+
+  // Commento di Samantha basato sul nome corrente
+  const samanthaComment = useMemo(() => {
+    const upperName = name.trim().toUpperCase()
+    return NAME_COMMENTS[upperName] || null
+  }, [name])
 
   // Gestione tasti fisici
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -136,6 +202,17 @@ export default function UndertaleNameEntry({
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-4">
+      {/* Commento di Samantha */}
+      <div className="absolute top-8 left-0 right-0 flex justify-center">
+        <div className="min-h-[40px] px-6">
+          {samanthaComment && (
+            <p className="font-mono text-white/70 text-sm md:text-base animate-pulse">
+              {samanthaComment}
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* Nome inserito */}
       <div className="mb-12 w-full max-w-md">
         <div className="px-6 py-4 min-h-[60px] flex items-center justify-center">
