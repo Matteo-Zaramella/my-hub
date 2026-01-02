@@ -10,13 +10,13 @@ interface TerminalWelcomeProps {
 
 // Messaggio di benvenuto
 const LINES = [
-  'Salve.',
-  'Sono Samantha, l\'entità creata da Matteo per questo evento.',
-  'Ti prego di proseguire seguendo le indicazioni.',
-  'Dovrai prima selezionare il nome del tuo personaggio e poi verificare l\'accesso tramite il tuo indirizzo email.',
-  'Riceverai il codice OTP di conferma per l\'email ed un personale codice identificativo segreto.',
-  'Non perdere il codice e non condividerlo.',
-  'Il luogo, la data e l\'orario della festa saranno disponibili all\'interno del sito una volta effettuata la registrazione.',
+  'Samantha.',
+  'Sono stata creata per gestire questo evento.',
+  'Per proseguire è necessaria la registrazione.',
+  'Seleziona un nome e verifica la tua identità tramite email.',
+  'Ti verrà assegnato un codice identificativo personale.',
+  'Non perderlo. Non condividerlo.',
+  'I dettagli dell\'evento saranno accessibili dopo la registrazione.',
   'Buon divertimento!'
 ]
 
