@@ -302,6 +302,20 @@ export default function GroupChat({ participant }: GroupChatProps) {
           last_message_at: new Date().toISOString(),
         })
 
+      // Auto-delete messages beyond 100
+      const { data: allMessages } = await supabase
+        .from('game_chat_messages_v2')
+        .select('id')
+        .order('created_at', { ascending: false })
+
+      if (allMessages && allMessages.length > 100) {
+        const idsToDelete = allMessages.slice(100).map(m => m.id)
+        await supabase
+          .from('game_chat_messages_v2')
+          .delete()
+          .in('id', idsToDelete)
+      }
+
       setNewMessage('')
 
       // Start cooldown
