@@ -86,6 +86,9 @@ const NAME_COMMENTS: Record<string, string> = {
 
   // Easter egg Undertale
   'GASTER': '',
+
+  // Easter egg
+  'PALLE': 'PALLE.',
 }
 
 // Layout tastiera QWERTY
