@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
     // Invia email conferma con codice
     await resend.emails.send({
-      from: 'Sistema <noreply@matteozaramella.com>',
+      from: 'Samantha <noreply@matteozaramella.com>',
       to: email,
       subject: 'Registrazione completata',
       html: `

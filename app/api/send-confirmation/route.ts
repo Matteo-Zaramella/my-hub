@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Invia email di conferma
     const { data, error } = await resend.emails.send({
-      from: 'My Hub <onboarding@resend.dev>', // Cambia con il tuo dominio quando configurato
+      from: 'Samantha <noreply@matteozaramella.com>',
       to: email,
       subject: '✅ Iscrizione Confermata - A Tutto Reality: La Rivoluzione',
       html: `

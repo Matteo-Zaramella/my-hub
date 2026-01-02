@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     console.log('OTP code:', otp)
 
     const emailResult = await resend.emails.send({
-      from: 'Sistema <noreply@matteozaramella.com>',
+      from: 'Samantha <noreply@matteozaramella.com>',
       to: email,
       subject: 'Codice di verifica',
       html: `

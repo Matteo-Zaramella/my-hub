@@ -37,46 +37,70 @@ const CATEGORIE_LABELS: Record<string, string> = {
   altro: 'Altro'
 }
 
-// Componente Narghilé Question
-function NarghileQuestion({ participantCode }: { participantCode: string }) {
-  const [hasAnswered, setHasAnswered] = useState(false)
-  const [answer, setAnswer] = useState<boolean | null>(null)
+// Componente RSVP Presenza + Narghilé
+function RSVPQuestion({ participantCode }: { participantCode: string }) {
+  const [rsvpStatus, setRsvpStatus] = useState<string | null>(null)
+  const [narghileAnswer, setNarghileAnswer] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
-    checkExistingAnswer()
+    checkExistingAnswers()
   }, [participantCode])
 
-  async function checkExistingAnswer() {
+  async function checkExistingAnswers() {
     const { data, error } = await supabase
       .from('party_survey_responses')
-      .select('wants_narghile')
+      .select('rsvp_status, wants_narghile')
       .eq('participant_code', participantCode)
       .single()
 
     if (data && !error) {
-      setHasAnswered(true)
-      setAnswer(data.wants_narghile)
+      setRsvpStatus(data.rsvp_status)
+      setNarghileAnswer(data.wants_narghile)
     }
     setIsLoading(false)
   }
 
-  async function handleAnswer(wantsNarghile: boolean) {
-    console.log('Saving narghile answer:', participantCode, wantsNarghile)
+  async function handleRSVP(status: 'yes' | 'no' | 'maybe') {
+    setIsSaving(true)
+
+    // Prova prima un update, poi insert se non esiste
+    const { error: updateError } = await supabase
+      .from('party_survey_responses')
+      .update({ rsvp_status: status })
+      .eq('participant_code', participantCode)
+
+    if (updateError) {
+      // Se update fallisce, prova insert
+      const { error: insertError } = await supabase
+        .from('party_survey_responses')
+        .insert({
+          participant_code: participantCode,
+          rsvp_status: status
+        })
+
+      if (insertError) {
+        console.error('Error saving RSVP:', insertError)
+      } else {
+        setRsvpStatus(status)
+      }
+    } else {
+      setRsvpStatus(status)
+    }
+
+    setIsSaving(false)
+  }
+
+  async function handleNarghile(wantsNarghile: boolean) {
     const { error } = await supabase
       .from('party_survey_responses')
-      .insert({
-        participant_code: participantCode,
-        wants_narghile: wantsNarghile
-      })
+      .update({ wants_narghile: wantsNarghile })
+      .eq('participant_code', participantCode)
 
-    if (error) {
-      console.error('Error saving narghile:', error)
-    } else {
-      console.log('Saved successfully')
-      setHasAnswered(true)
-      setAnswer(wantsNarghile)
+    if (!error) {
+      setNarghileAnswer(wantsNarghile)
     }
   }
 
@@ -84,27 +108,59 @@ function NarghileQuestion({ participantCode }: { participantCode: string }) {
     return null
   }
 
-  if (hasAnswered) {
-    return null
-  }
+  const options = [
+    { value: 'yes', label: 'Ci sarò' },
+    { value: 'maybe', label: 'Forse' },
+    { value: 'no', label: 'Non ci sarò' }
+  ] as const
+
+  const showNarghile = (rsvpStatus === 'yes' || rsvpStatus === 'maybe') && narghileAnswer === null
 
   return (
-    <div className="text-center py-6">
-      <p className="text-white/70 mb-4">Narghilé?</p>
-      <div className="flex justify-center gap-8">
-        <button
-          onClick={() => handleAnswer(true)}
-          className="text-white/60 hover:text-white transition"
-        >
-          Sì
-        </button>
-        <button
-          onClick={() => handleAnswer(false)}
-          className="text-white/60 hover:text-white transition"
-        >
-          No
-        </button>
+    <div className="pb-4">
+      <p className="text-white/70 mb-4 text-center">Conferma la tua presenza</p>
+      <div className="flex justify-center gap-4">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => handleRSVP(option.value)}
+            disabled={isSaving}
+            className={`px-4 py-2 border transition ${
+              rsvpStatus === option.value
+                ? 'border-white text-white'
+                : 'border-white/20 text-white/60 hover:border-white/40 hover:text-white/80'
+            } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
+      {rsvpStatus && (
+        <p className="text-white/40 text-xs text-center mt-3">
+          Puoi modificare la tua risposta in qualsiasi momento.
+        </p>
+      )}
+
+      {/* Domanda Narghilé - solo se presenza = sì o forse */}
+      {showNarghile && (
+        <div className="mt-6 pt-6 border-t border-white/10 text-center">
+          <p className="text-white/70 mb-4">Narghilé?</p>
+          <div className="flex justify-center gap-8">
+            <button
+              onClick={() => handleNarghile(true)}
+              className="text-white/60 hover:text-white transition"
+            >
+              Sì
+            </button>
+            <button
+              onClick={() => handleNarghile(false)}
+              className="text-white/60 hover:text-white transition"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -501,6 +557,9 @@ export default function GameAreaWithChat() {
           <div className="space-y-8">
             <h2 className="text-xl font-light text-center mb-8">Informazioni Festa</h2>
 
+            {/* RSVP Presenza */}
+            <RSVPQuestion participantCode={participant.participant_code} />
+
             {/* Luogo e Orario */}
             <div className="space-y-4">
               <p className="text-white font-medium">
@@ -552,8 +611,6 @@ export default function GameAreaWithChat() {
               </div>
             </div>
 
-            {/* Domanda Narghilé */}
-            <NarghileQuestion participantCode={participant.participant_code} />
           </div>
         )}
 
