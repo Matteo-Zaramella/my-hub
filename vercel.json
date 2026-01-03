@@ -1,3 +1,8 @@
 {
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/rsvp-reminder",
+      "schedule": "0 9 11 1 *"
+    }
+  ]
 }
