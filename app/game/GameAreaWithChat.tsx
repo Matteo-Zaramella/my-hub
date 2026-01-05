@@ -6,6 +6,7 @@ import NextImage from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import ParticipantLogin from './ParticipantLogin'
 import GroupChat from './GroupChat'
+import { getRandomBlockedPhrase, getClueComment } from '@/lib/samantha-phrases'
 
 // NOTE: MonthlyChallengesCluesSection e ValidateAnswerTab rimossi temporaneamente
 // Si sbloccheranno dopo la cerimonia del 25/01/2026
@@ -304,12 +305,49 @@ function CeremonySection({ participantCode, onCeremonyComplete }: { participantC
   const [finalPassword, setFinalPassword] = useState('')
   const [ceremonyCompleted, setCeremonyCompleted] = useState(false)
 
-  // Stati per messaggio Samantha
+  // Stati per messaggio Samantha (finale)
   const [samanthaText, setSamanthaText] = useState('')
   const [showSamanthaCursor, setShowSamanthaCursor] = useState(true)
   const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings'>('none')
 
+  // Stati per commenti Samantha durante il gioco
+  const [samanthaComment, setSamanthaComment] = useState('')
+  const [samanthaCommentVisible, setSamanthaCommentVisible] = useState(false)
+  const [samanthaCommentText, setSamanthaCommentText] = useState('')
+  const [isTypingComment, setIsTypingComment] = useState(false)
+
   const supabase = createClient()
+
+  // Funzione per mostrare commento di Samantha con typing effect
+  const showSamanthaComment = (comment: string) => {
+    setSamanthaComment(comment)
+    setSamanthaCommentText('')
+    setSamanthaCommentVisible(true)
+    setIsTypingComment(true)
+  }
+
+  // Effetto typing per i commenti
+  useEffect(() => {
+    if (!isTypingComment || !samanthaComment) return
+
+    let charIndex = 0
+
+    const typeInterval = setInterval(() => {
+      if (charIndex < samanthaComment.length) {
+        setSamanthaCommentText(samanthaComment.slice(0, charIndex + 1))
+        charIndex++
+      } else {
+        clearInterval(typeInterval)
+        setIsTypingComment(false)
+        // Nascondi dopo 3 secondi
+        setTimeout(() => {
+          setSamanthaCommentVisible(false)
+        }, 3000)
+      }
+    }, 50)
+
+    return () => clearInterval(typeInterval)
+  }, [isTypingComment, samanthaComment])
 
   // Carica gli indizi e lo stato globale
   useEffect(() => {
@@ -382,6 +420,8 @@ function CeremonySection({ participantCode, onCeremonyComplete }: { participantC
     const matchedClue = allClues.find(c => c.word.toUpperCase() === word)
 
     if (!matchedClue) {
+      // Parola sbagliata - commento di Samantha
+      showSamanthaComment(getClueComment('wrong'))
       setInputWord('')
       setIsSubmitting(false)
       return
@@ -405,8 +445,19 @@ function CeremonySection({ participantCode, onCeremonyComplete }: { participantC
     if (error && error.code !== '23505') { // Ignora errore duplicato
       setMessage({ type: 'error', text: 'Errore nel salvataggio' })
     } else {
-      setMessage({ type: 'success', text: `Corretto! (${foundClues.length + 1}/10)` })
+      const newCount = foundClues.length + 1
       setFoundClues(prev => [...prev, matchedClue.word])
+
+      // Commento di Samantha in base al progresso
+      if (newCount === 1) {
+        showSamanthaComment(getClueComment('firstClue'))
+      } else if (newCount === 5) {
+        showSamanthaComment(getClueComment('halfway'))
+      } else if (newCount >= 8 && newCount < 10) {
+        showSamanthaComment(getClueComment('almostThere'))
+      } else {
+        showSamanthaComment(getClueComment('correct'))
+      }
     }
 
     setInputWord('')
@@ -610,7 +661,15 @@ function CeremonySection({ participantCode, onCeremonyComplete }: { participantC
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-12">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
+      {/* Commento di Samantha */}
+      <div className={`h-12 flex items-center justify-center transition-opacity duration-300 ${samanthaCommentVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="font-mono text-white/80 text-lg md:text-xl">
+          {samanthaCommentText}
+          {isTypingComment && <span className="animate-pulse">_</span>}
+        </div>
+      </div>
+
       {/* Input parola - grande e centrato con freccia a destra */}
       <form onSubmit={showFinalPassword ? handleFinalPassword : handleSubmitWord} className="w-full px-4 flex justify-center">
         <div className="flex items-center">
@@ -619,7 +678,7 @@ function CeremonySection({ participantCode, onCeremonyComplete }: { participantC
             value={showFinalPassword ? finalPassword : inputWord}
             onChange={(e) => showFinalPassword ? setFinalPassword(e.target.value) : setInputWord(e.target.value)}
             placeholder={showFinalPassword ? "PAROLA FINALE" : ""}
-            className="w-[500px] max-w-[70vw] bg-transparent border-2 border-white/40 px-8 py-5 text-white text-center text-2xl placeholder-white/20 focus:outline-none focus:border-white transition-colors"
+            className="w-[500px] max-w-[70vw] bg-transparent border-2 border-white/40 px-8 py-5 text-white text-center text-2xl placeholder-white/20 focus:outline-none focus:border-white transition-colors uppercase"
             autoComplete="off"
             disabled={isSubmitting || ceremonyCompleted}
           />
@@ -740,15 +799,20 @@ export default function GameAreaWithChat() {
   const router = useRouter()
   const [participant, setParticipant] = useState<Participant | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'wishlist' | 'private' | 'cerimonia'>('cerimonia')
+  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'wishlist' | 'private' | 'cerimonia' | 'mystery'>('info')
   const [ceremonyHidden, setCeremonyHidden] = useState(false)
+
+  // Stati per tab "?" bloccata
+  const [mysteryPhrase, setMysteryPhrase] = useState('')
+  const [mysteryTyping, setMysteryTyping] = useState(false)
+  const [mysteryText, setMysteryText] = useState('')
+  const [showMysteryCursor, setShowMysteryCursor] = useState(true)
 
   // Controlla se la cerimonia è già stata completata
   useEffect(() => {
     const completed = localStorage.getItem('ceremony_completed')
     if (completed === 'true') {
       setCeremonyHidden(true)
-      setActiveTab('info')
     }
   }, [])
 
@@ -757,6 +821,42 @@ export default function GameAreaWithChat() {
     setCeremonyHidden(true)
     setActiveTab('info')
   }
+
+  // Gestisce il click sulla tab "?" - mostra messaggio Samantha
+  const handleMysteryTabClick = () => {
+    setActiveTab('mystery')
+    const phrase = getRandomBlockedPhrase()
+    setMysteryPhrase(phrase)
+    setMysteryText('')
+    setMysteryTyping(true)
+  }
+
+  // Effetto typing per la tab mystery
+  useEffect(() => {
+    if (!mysteryTyping || activeTab !== 'mystery') return
+
+    let charIndex = 0
+    const phrase = mysteryPhrase
+
+    const cursorInterval = setInterval(() => {
+      setShowMysteryCursor(prev => !prev)
+    }, 500)
+
+    const typeInterval = setInterval(() => {
+      if (charIndex < phrase.length) {
+        setMysteryText(phrase.slice(0, charIndex + 1))
+        charIndex++
+      } else {
+        clearInterval(typeInterval)
+        setMysteryTyping(false)
+      }
+    }, 60)
+
+    return () => {
+      clearInterval(cursorInterval)
+      clearInterval(typeInterval)
+    }
+  }, [mysteryTyping, mysteryPhrase, activeTab])
 
   // Countdown alla cerimonia (25/01/2026 00:00)
   const [ceremonyTimeLeft, setCeremonyTimeLeft] = useState({
@@ -879,16 +979,17 @@ export default function GameAreaWithChat() {
       <div className="border-b border-white/20">
         <div className="w-full flex justify-center">
           <div className="flex gap-6 md:gap-12">
+            {/* Tab "?" - sempre visibile, bloccata con messaggi di Samantha */}
             {!ceremonyHidden && (
               <button
-                onClick={() => setActiveTab('cerimonia')}
+                onClick={handleMysteryTabClick}
                 className={`py-3 transition whitespace-nowrap ${
-                  activeTab === 'cerimonia'
+                  activeTab === 'mystery'
                     ? 'text-white border-b border-white'
                     : 'text-white/40 hover:text-white/70'
                 }`}
               >
-                Gioco
+                ?
               </button>
             )}
             <button
@@ -937,9 +1038,18 @@ export default function GameAreaWithChat() {
 
       {/* Main Content */}
       <main className="w-full px-4 md:px-8 lg:px-16 py-8">
-        {/* Cerimonia Tab */}
-        {activeTab === 'cerimonia' && !ceremonyHidden && (
-          <CeremonySection participantCode={participant.participant_code} onCeremonyComplete={handleCeremonyComplete} />
+        {/* Mystery Tab - Schermata bloccata con Samantha */}
+        {activeTab === 'mystery' && (
+          <div className="flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="text-center px-8 max-w-4xl">
+              <div className="font-mono text-white text-xl md:text-2xl lg:text-3xl">
+                {mysteryText}
+                <span className={`${showMysteryCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
+                  _
+                </span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Info Tab */}
