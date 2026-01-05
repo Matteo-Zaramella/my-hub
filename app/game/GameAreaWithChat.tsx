@@ -831,30 +831,49 @@ export default function GameAreaWithChat() {
     setMysteryTyping(true)
   }
 
-  // Effetto typing per la tab mystery
+  // Effetto typing per la tab mystery (scrive e poi cancella)
   useEffect(() => {
     if (!mysteryTyping || activeTab !== 'mystery') return
 
     let charIndex = 0
+    let isDeleting = false
     const phrase = mysteryPhrase
 
     const cursorInterval = setInterval(() => {
       setShowMysteryCursor(prev => !prev)
     }, 500)
 
-    const typeInterval = setInterval(() => {
-      if (charIndex < phrase.length) {
-        setMysteryText(phrase.slice(0, charIndex + 1))
-        charIndex++
+    const animate = () => {
+      if (!isDeleting) {
+        // Fase scrittura
+        if (charIndex < phrase.length) {
+          setMysteryText(phrase.slice(0, charIndex + 1))
+          charIndex++
+          setTimeout(animate, 60)
+        } else {
+          // Pausa prima di cancellare
+          setTimeout(() => {
+            isDeleting = true
+            animate()
+          }, 2000)
+        }
       } else {
-        clearInterval(typeInterval)
-        setMysteryTyping(false)
+        // Fase cancellazione
+        if (charIndex > 0) {
+          charIndex--
+          setMysteryText(phrase.slice(0, charIndex))
+          setTimeout(animate, 40)
+        } else {
+          // Finito
+          setMysteryTyping(false)
+        }
       }
-    }, 60)
+    }
+
+    animate()
 
     return () => {
       clearInterval(cursorInterval)
-      clearInterval(typeInterval)
     }
   }, [mysteryTyping, mysteryPhrase, activeTab])
 

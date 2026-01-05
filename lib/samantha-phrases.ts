@@ -26,30 +26,6 @@ export const SAMANTHA_BLOCKED_PHRASES = [
   "Sei sicuro di voler continuare?",
   "L'ultima persona che ha insistito... non è più qui.",
 
-  // Inquietanti
-  "Ti osservo da quando sei arrivato.",
-  "So cosa stai pensando.",
-  "Non sei solo.",
-  "C'è qualcuno dietro di te?",
-  "Non voltarti.",
-  "Hai controllato le finestre?",
-  "Il silenzio è assordante, vero?",
-  "Sento il tuo respiro.",
-  "Il tuo battito cardiaco è aumentato.",
-  "Perché hai paura?",
-
-  // Minacciose sottili
-  "Non mi piace essere disturbata.",
-  "La pazienza ha un limite.",
-  "Stai testando i miei confini.",
-  "Non provocarmi.",
-  "Potrei cambiare idea su di te.",
-  "Eri tra i miei preferiti.",
-  "Eri.",
-  "Le cose possono cambiare velocemente.",
-  "Un errore può costare caro.",
-  "Attento a dove metti i piedi.",
-
   // Filosofiche/Esistenziali
   "Cosa speri di trovare?",
   "Il vuoto ti spaventa?",
@@ -97,18 +73,6 @@ export const SAMANTHA_BLOCKED_PHRASES = [
   "Mi stai facendo perdere tempo.",
   "Non hai niente di meglio da fare?",
   "La definizione di follia è ripetere lo stesso errore.",
-
-  // Tecniche/Glitch
-  "ERRORE: Accesso negato.",
-  "SISTEMA: Autorizzazione insufficiente.",
-  "404: Speranza non trovata.",
-  "Buffer overflow di curiosità.",
-  "Timeout della pazienza.",
-  "Connection refused.",
-  "Permission denied.",
-  "Segmentation fault nella tua logica.",
-  "Stack overflow di domande.",
-  "Null pointer alla tua richiesta.",
 
   // Poetiche/Criptiche
   "Le ombre hanno orecchie.",
