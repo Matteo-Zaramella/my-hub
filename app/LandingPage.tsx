@@ -56,6 +56,7 @@ export default function LandingPage() {
   // Password modal
   const [showGamePassword, setShowGamePassword] = useState(false)
   const [gamePassword, setGamePassword] = useState('')
+  const [showBonusMessage, setShowBonusMessage] = useState(false)
 
   const GAME_PASSWORD = 'EVOLUZIONE'
 
@@ -159,10 +160,7 @@ export default function LandingPage() {
       const words = data.map(row => row.clue_word)
       setFoundClueWords(words)
       setCluesFound(words.length)
-
-      if (words.length >= 10) {
-        router.push('/game?password=' + encodeURIComponent(GAME_PASSWORD))
-      }
+      // Non reindirizzare automaticamente - mostra la barra password
     }
   }
 
@@ -388,8 +386,10 @@ export default function LandingPage() {
 
     if (!input) return
 
-    if (input === GAME_PASSWORD) {
-      router.push('/game?password=' + encodeURIComponent(input))
+    if (input === GAME_PASSWORD && cluesFound >= 10) {
+      // Mostra messaggio punti bonus invece di reindirizzare subito
+      setShowBonusMessage(true)
+      setGamePassword('')
       return
     }
 
@@ -585,21 +585,57 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Final Password Bar */}
-      {cluesFound >= 10 && (
+      {/* Final Password Bar or Bonus Message */}
+      {cluesFound >= 10 && !showBonusMessage && (
         <div className="absolute inset-0 bg-black flex items-center justify-center z-50">
           <div className="w-full max-w-md mx-4">
+            <p className="text-white/50 text-center mb-4 text-sm">Hai trovato tutti gli indizi! Inserisci la parola chiave finale.</p>
             <form onSubmit={handleGamePasswordSubmit} className="flex gap-3">
               <input
                 type="text"
                 value={gamePassword}
                 onChange={(e) => setGamePassword(e.target.value)}
-                className="flex-1 px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white focus:outline-none text-center text-xl"
-                placeholder="PAROLA CHIAVE FINALE"
+                className="flex-1 px-6 py-4 bg-transparent border-2 border-white rounded-lg text-white focus:outline-none text-center text-xl uppercase"
+                placeholder="PAROLA CHIAVE"
                 autoFocus
               />
               <button type="submit" className="w-16 h-16 bg-white rounded-lg hover:bg-white/90 transition" />
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bonus Points Message */}
+      {showBonusMessage && (
+        <div className="absolute inset-0 bg-black flex items-center justify-center z-50">
+          <div className="w-full max-w-lg mx-4 text-center space-y-8">
+            {/* Check Icon */}
+            <div className="flex justify-center">
+              <div className="w-24 h-24 border-2 border-white rounded-full flex items-center justify-center">
+                <span className="text-5xl text-white">✓</span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-4xl md:text-5xl font-bold text-white">
+              EVOLUZIONE
+            </h1>
+
+            {/* Points */}
+            <div className="space-y-2">
+              <p className="text-white/70 text-lg">Tutti i partecipanti guadagnano</p>
+              <div className="border-2 border-white rounded-lg py-6 px-8 inline-block">
+                <span className="text-5xl md:text-6xl font-bold text-white">+50 PUNTI</span>
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            <button
+              onClick={() => router.push('/game/area')}
+              className="mt-8 px-12 py-4 border-2 border-white text-white text-xl font-medium rounded-lg hover:bg-white hover:text-black transition-all duration-300"
+            >
+              CONTINUA
+            </button>
           </div>
         </div>
       )}

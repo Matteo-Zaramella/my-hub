@@ -293,6 +293,363 @@ function WishlistSection() {
   )
 }
 
+// Componente Cerimonia - 10 cerchi per gli indizi
+function CeremonySection({ participantCode, onCeremonyComplete }: { participantCode: string, onCeremonyComplete: () => void }) {
+  const [foundClues, setFoundClues] = useState<string[]>([])
+  const [inputWord, setInputWord] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null)
+  const [allClues, setAllClues] = useState<{ word: string, order_number: number }[]>([])
+  const [showFinalPassword, setShowFinalPassword] = useState(false)
+  const [finalPassword, setFinalPassword] = useState('')
+  const [ceremonyCompleted, setCeremonyCompleted] = useState(false)
+
+  // Stati per messaggio Samantha
+  const [samanthaText, setSamanthaText] = useState('')
+  const [showSamanthaCursor, setShowSamanthaCursor] = useState(true)
+  const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings'>('none')
+
+  const supabase = createClient()
+
+  // Carica gli indizi e lo stato globale
+  useEffect(() => {
+    loadCeremonyData()
+
+    // Sottoscrizione realtime per aggiornamenti globali
+    const channel = supabase
+      .channel('ceremony-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ceremony_clues_found',
+        },
+        () => {
+          loadFoundClues()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
+
+  async function loadCeremonyData() {
+    // Carica tutti gli indizi disponibili
+    const { data: cluesData } = await supabase
+      .from('ceremony_clue_riddles')
+      .select('clue_word, order_number')
+      .order('order_number', { ascending: true })
+
+    if (cluesData) {
+      setAllClues(cluesData.map(c => ({ word: c.clue_word, order_number: c.order_number })))
+    }
+
+    await loadFoundClues()
+  }
+
+  async function loadFoundClues() {
+    // Carica indizi trovati (stato GLOBALE)
+    const { data: foundData } = await supabase
+      .from('ceremony_clues_found')
+      .select('clue_word')
+      .eq('participant_code', 'GLOBAL')
+
+    if (foundData) {
+      setFoundClues(foundData.map(f => f.clue_word))
+    }
+  }
+
+  // Verifica se tutti gli indizi sono stati trovati
+  useEffect(() => {
+    if (foundClues.length >= 10 && allClues.length === 10) {
+      setShowFinalPassword(true)
+    }
+  }, [foundClues, allClues])
+
+  async function handleSubmitWord(e: React.FormEvent) {
+    e.preventDefault()
+    if (!inputWord.trim() || isSubmitting) return
+
+    setIsSubmitting(true)
+    setMessage(null)
+
+    const word = inputWord.trim().toUpperCase()
+
+    // Verifica se la parola è tra gli indizi
+    const matchedClue = allClues.find(c => c.word.toUpperCase() === word)
+
+    if (!matchedClue) {
+      setInputWord('')
+      setIsSubmitting(false)
+      return
+    }
+
+    // Verifica se già trovata
+    if (foundClues.includes(matchedClue.word)) {
+      setInputWord('')
+      setIsSubmitting(false)
+      return
+    }
+
+    // Salva nel database (stato GLOBALE)
+    const { error } = await supabase
+      .from('ceremony_clues_found')
+      .insert({
+        participant_code: 'GLOBAL',
+        clue_word: matchedClue.word
+      })
+
+    if (error && error.code !== '23505') { // Ignora errore duplicato
+      setMessage({ type: 'error', text: 'Errore nel salvataggio' })
+    } else {
+      setMessage({ type: 'success', text: `Corretto! (${foundClues.length + 1}/10)` })
+      setFoundClues(prev => [...prev, matchedClue.word])
+    }
+
+    setInputWord('')
+    setIsSubmitting(false)
+  }
+
+  async function handleFinalPassword(e: React.FormEvent) {
+    e.preventDefault()
+    const password = finalPassword.trim().toUpperCase()
+
+    if (password === 'EVOLUZIONE') {
+      setCeremonyCompleted(true)
+      setMessage({ type: 'success', text: 'EVOLUZIONE! Accesso sbloccato!' })
+      // Qui si potrebbe triggerare l'assegnazione dei punti bonus
+    } else {
+      setMessage({ type: 'error', text: 'Password errata' })
+    }
+  }
+
+  // Calcola quali cerchi sono pieni in base all'ordine
+  const filledCircles = allClues
+    .filter(c => foundClues.includes(c.word))
+    .map(c => c.order_number)
+
+  const SAMANTHA_LINES = [
+    'Congratulazioni.',
+    'Avete vinto.',
+    'Tutti i partecipanti guadagnano 50 punti.',
+    'Adesso inizia il divertimento... :D'
+  ]
+
+  // Converti testo in Wingdings
+  const charToWingdings = (char: string): string => {
+    const wingdingsMap: Record<string, string> = {
+      'A': '✌', 'B': '👎', 'C': '👍', 'D': '☜', 'E': '☞', 'F': '☝', 'G': '☟',
+      'H': '✋', 'I': '☺', 'J': '😐', 'K': '☹', 'L': '💣', 'M': '☠', 'N': '⚐',
+      'O': '✈', 'P': '☼', 'Q': '💧', 'R': '❄', 'S': '✞', 'T': '✝', 'U': '☪',
+      'V': '✡', 'W': '☯', 'X': 'ॐ', 'Y': '☸', 'Z': '♈',
+      'a': '✌', 'b': '👎', 'c': '👍', 'd': '☜', 'e': '☞', 'f': '☝', 'g': '☟',
+      'h': '✋', 'i': '☺', 'j': '😐', 'k': '☹', 'l': '💣', 'm': '☠', 'n': '⚐',
+      'o': '✈', 'p': '☼', 'q': '💧', 'r': '❄', 's': '✞', 't': '✝', 'u': '☪',
+      'v': '✡', 'w': '☯', 'x': 'ॐ', 'y': '☸', 'z': '♈',
+      '.': '●', ',': '◆', '!': '✏', '?': '✎', ':': '◼', ';': '◻',
+      '0': '📁', '1': '📂', '2': '📄', '3': '🗏', '4': '🗐', '5': '🗄',
+    }
+    return wingdingsMap[char] || char
+  }
+
+  const getWingdingsText = (text: string) => {
+    return text.split('').map(char => char === ' ' ? ' ' : charToWingdings(char)).join('')
+  }
+
+  useEffect(() => {
+    if (!ceremonyCompleted) return
+
+    let charIndex = 0
+    let lineIndex = 0
+    let isDeleting = false
+    let cursorInterval: NodeJS.Timeout
+
+    cursorInterval = setInterval(() => {
+      if (glitchPhase === 'none') {
+        setShowSamanthaCursor(prev => !prev)
+      }
+    }, 500)
+
+    const animate = () => {
+      // Tutte le righe completate - attiva glitch
+      if (lineIndex >= SAMANTHA_LINES.length) {
+        setShowSamanthaCursor(false)
+        // Fase 1: Glitch RGB
+        setGlitchPhase('rgb')
+        setTimeout(() => {
+          // Fase 2: Wingdings
+          setGlitchPhase('wingdings')
+          setTimeout(() => {
+            // Fine - nascondi tab Gioco
+            onCeremonyComplete()
+          }, 1500)
+        }, 1000)
+        return
+      }
+
+      const currentLine = SAMANTHA_LINES[lineIndex]
+
+      if (!isDeleting) {
+        if (charIndex < currentLine.length) {
+          setSamanthaText(currentLine.slice(0, charIndex + 1))
+          charIndex++
+          setTimeout(animate, 60)
+        } else {
+          // Riga completata
+          if (lineIndex < SAMANTHA_LINES.length - 1) {
+            // Pausa e cancella
+            setTimeout(() => {
+              isDeleting = true
+              animate()
+            }, 800)
+          } else {
+            // Ultima riga: piccola pausa poi glitch
+            setTimeout(() => {
+              lineIndex++
+              animate()
+            }, 500)
+          }
+        }
+      } else {
+        if (charIndex > 0) {
+          charIndex--
+          setSamanthaText(currentLine.slice(0, charIndex))
+          setTimeout(animate, 40)
+        } else {
+          // Passa alla riga successiva
+          setTimeout(() => {
+            isDeleting = false
+            lineIndex++
+            animate()
+          }, 400)
+        }
+      }
+    }
+
+    setTimeout(animate, 500)
+
+    return () => clearInterval(cursorInterval)
+  }, [ceremonyCompleted])
+
+  // Se la cerimonia è completata, mostra messaggio Samantha
+  if (ceremonyCompleted) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="text-center px-8 max-w-4xl">
+          <div className="font-mono text-white text-xl md:text-2xl lg:text-3xl">
+            {glitchPhase === 'wingdings' ? (
+              <span className="wingdings-text">
+                {getWingdingsText(samanthaText)}
+              </span>
+            ) : glitchPhase === 'rgb' ? (
+              <span className="rgb-glitch-text">
+                {samanthaText.split('').map((char, i) => (
+                  <span key={i} className="glitch-char">
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <>
+                {samanthaText}
+                <span className={`${showSamanthaCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
+                  _
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        <style jsx>{`
+          .rgb-glitch-text {
+            display: inline-block;
+            animation: screen-shake 0.1s infinite;
+          }
+
+          .glitch-char {
+            display: inline-block;
+            position: relative;
+            animation: char-glitch 0.1s infinite;
+            text-shadow:
+              -3px 0 #ff0040,
+              3px 0 #00ffff;
+          }
+
+          .wingdings-text {
+            display: inline-block;
+            color: #a855f7;
+            text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7;
+            animation: wingdings-pulse 0.2s infinite;
+          }
+
+          @keyframes screen-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            50% { transform: translateX(2px); }
+            75% { transform: translateX(-1px); }
+          }
+
+          @keyframes char-glitch {
+            0%, 100% { transform: translateX(0) skewX(0deg); }
+            20% { transform: translateX(-2px) skewX(-5deg); }
+            40% { transform: translateX(2px) skewX(5deg); }
+            60% { transform: translateX(-1px) skewX(-2deg); }
+            80% { transform: translateX(1px) skewX(2deg); }
+          }
+
+          @keyframes wingdings-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-12">
+      {/* Input parola - grande e centrato con freccia a destra */}
+      <form onSubmit={showFinalPassword ? handleFinalPassword : handleSubmitWord} className="w-full px-4 flex justify-center">
+        <div className="flex items-center">
+          <input
+            type="text"
+            value={showFinalPassword ? finalPassword : inputWord}
+            onChange={(e) => showFinalPassword ? setFinalPassword(e.target.value) : setInputWord(e.target.value)}
+            placeholder={showFinalPassword ? "PAROLA FINALE" : ""}
+            className="w-[500px] max-w-[70vw] bg-transparent border-2 border-white/40 px-8 py-5 text-white text-center text-2xl placeholder-white/20 focus:outline-none focus:border-white transition-colors"
+            autoComplete="off"
+            disabled={isSubmitting || ceremonyCompleted}
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting || ceremonyCompleted}
+            className="ml-4 border-2 border-white/40 text-white/60 px-6 py-5 hover:border-white hover:text-white transition-colors disabled:opacity-30"
+          >
+            <span className="text-2xl">→</span>
+          </button>
+        </div>
+      </form>
+
+      {/* 10 Cerchi grandi */}
+      <div className="flex justify-center gap-4 flex-wrap px-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+          <div
+            key={num}
+            className={`w-14 h-14 md:w-16 md:h-16 rounded-full border-2 transition-all duration-500 ${
+              filledCircles.includes(num)
+                ? 'bg-white border-white'
+                : 'border-white/30'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Componente sezione privata con countdown
 function PrivateSection() {
   const [timeLeft, setTimeLeft] = useState({
@@ -383,7 +740,23 @@ export default function GameAreaWithChat() {
   const router = useRouter()
   const [participant, setParticipant] = useState<Participant | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'wishlist' | 'private'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'wishlist' | 'private' | 'cerimonia'>('cerimonia')
+  const [ceremonyHidden, setCeremonyHidden] = useState(false)
+
+  // Controlla se la cerimonia è già stata completata
+  useEffect(() => {
+    const completed = localStorage.getItem('ceremony_completed')
+    if (completed === 'true') {
+      setCeremonyHidden(true)
+      setActiveTab('info')
+    }
+  }, [])
+
+  const handleCeremonyComplete = () => {
+    localStorage.setItem('ceremony_completed', 'true')
+    setCeremonyHidden(true)
+    setActiveTab('info')
+  }
 
   // Countdown alla cerimonia (25/01/2026 00:00)
   const [ceremonyTimeLeft, setCeremonyTimeLeft] = useState({
@@ -506,6 +879,18 @@ export default function GameAreaWithChat() {
       <div className="border-b border-white/20">
         <div className="w-full flex justify-center">
           <div className="flex gap-6 md:gap-12">
+            {!ceremonyHidden && (
+              <button
+                onClick={() => setActiveTab('cerimonia')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'cerimonia'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Gioco
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('info')}
               className={`py-3 transition whitespace-nowrap ${
@@ -552,6 +937,11 @@ export default function GameAreaWithChat() {
 
       {/* Main Content */}
       <main className="w-full px-4 md:px-8 lg:px-16 py-8">
+        {/* Cerimonia Tab */}
+        {activeTab === 'cerimonia' && !ceremonyHidden && (
+          <CeremonySection participantCode={participant.participant_code} onCeremonyComplete={handleCeremonyComplete} />
+        )}
+
         {/* Info Tab */}
         {activeTab === 'info' && (
           <div className="space-y-8">
