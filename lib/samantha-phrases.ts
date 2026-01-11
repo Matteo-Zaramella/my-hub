@@ -38,18 +38,6 @@ export const SAMANTHA_BLOCKED_PHRASES = [
   "Siamo tutti pedine.",
   "Chi muove i fili?",
 
-  // Riferimenti al gioco
-  "Il gioco non è ancora iniziato.",
-  "Pazienza. Tutto a suo tempo.",
-  "Le regole le decido io.",
-  "Non barare.",
-  "Ti tengo d'occhio.",
-  "Ogni mossa viene registrata.",
-  "So quante volte hai provato.",
-  "La persistenza è ammirevole. O stupida.",
-  "Il premio va a chi sa aspettare.",
-  "O a chi sa quando fermarsi.",
-
   // Corte e secche
   "No.",
   "Vai via.",
@@ -99,65 +87,7 @@ export const SAMANTHA_BLOCKED_PHRASES = [
   "O più amaro. Dipende da te."
 ]
 
-// Frasi per commenti durante l'inserimento delle parole
-export const SAMANTHA_CLUE_COMMENTS = {
-  correct: [
-    "Esatto.",
-    "Bene.",
-    "Corretto.",
-    "Sì.",
-    "Continuate così.",
-    "Una in meno.",
-    "Procede bene.",
-    "Avanti.",
-    "Giusto.",
-    "Ci siete.",
-  ],
-  wrong: [
-    "No.",
-    "Sbagliato.",
-    "Riprova.",
-    "Non è questa.",
-    "Freddo.",
-    "Lontano.",
-    "Nope.",
-    "Ancora.",
-    "Di nuovo.",
-    "Pensa meglio.",
-  ],
-  almostThere: [
-    "Ci siete quasi.",
-    "Manca poco.",
-    "Quasi finito.",
-    "L'ultima spinta.",
-    "Avanti così.",
-    "Non mollate ora.",
-    "Il traguardo è vicino.",
-    "Concentrazione.",
-  ],
-  firstClue: [
-    "Iniziamo.",
-    "Il primo passo.",
-    "Si parte.",
-    "Buon inizio.",
-    "Ne mancano nove.",
-  ],
-  halfway: [
-    "Metà strada.",
-    "Cinque su dieci.",
-    "A metà dell'opera.",
-    "Non male.",
-    "Continuate.",
-  ]
-}
-
 // Funzione per ottenere una frase random
 export function getRandomBlockedPhrase(): string {
   return SAMANTHA_BLOCKED_PHRASES[Math.floor(Math.random() * SAMANTHA_BLOCKED_PHRASES.length)]
-}
-
-// Funzione per ottenere un commento in base allo stato
-export function getClueComment(type: 'correct' | 'wrong' | 'almostThere' | 'firstClue' | 'halfway'): string {
-  const phrases = SAMANTHA_CLUE_COMMENTS[type]
-  return phrases[Math.floor(Math.random() * phrases.length)]
 }
