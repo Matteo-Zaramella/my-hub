@@ -157,7 +157,7 @@ function WishlistSection() {
                     </div>
                   )}
 
-                  {item.link && (
+                  {item.link && item.prezzo && (
                     <a
                       href={item.link}
                       target="_blank"
