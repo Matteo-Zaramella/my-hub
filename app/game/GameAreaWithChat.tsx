@@ -8,6 +8,9 @@ import { getRandomBlockedPhrase, getClueComment } from '@/lib/samantha-phrases'
 // Data e ora inizio cerimonia
 const CEREMONY_START = new Date('2026-01-24T22:00:00')
 
+// Data e ora apertura iscrizioni (00:00 del 24 gennaio = mezzanotte tra 23 e 24)
+const REGISTRATION_OPEN = new Date('2026-01-24T00:00:00')
+
 // Messaggi vittoria Samantha
 const SAMANTHA_VICTORY_LINES = [
   'Congratulazioni.',
@@ -177,8 +180,440 @@ function WishlistSection() {
   )
 }
 
+// Componente Registrazione
+function RegisterSection() {
+  const [step, setStep] = useState<'form' | 'otp' | 'success'>('form')
+  const [nickname, setNickname] = useState('')
+  const [email, setEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [participantCode, setParticipantCode] = useState('')
+
+  async function handleSendOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nickname })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Errore durante l\'invio')
+        setLoading(false)
+        return
+      }
+
+      setStep('otp')
+    } catch {
+      setError('Errore di connessione')
+    }
+
+    setLoading(false)
+  }
+
+  async function handleVerifyOtp(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nickname, otp })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Codice non valido')
+        setLoading(false)
+        return
+      }
+
+      setParticipantCode(data.participant_code)
+      setStep('success')
+    } catch {
+      setError('Errore di connessione')
+    }
+
+    setLoading(false)
+  }
+
+  if (step === 'success') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-6">✓</div>
+          <h2 className="text-2xl font-light mb-4">Registrazione completata</h2>
+          <p className="text-white/60 mb-8">
+            Benvenuto, <span className="text-white">{nickname}</span>!
+          </p>
+
+          <div className="bg-white/5 border border-white/20 p-6 mb-6">
+            <p className="text-white/40 text-sm mb-2">Il tuo codice identificativo:</p>
+            <div className="text-3xl font-mono font-bold tracking-widest text-white">
+              {participantCode}
+            </div>
+          </div>
+
+          <p className="text-white/40 text-sm">
+            Conserva questo codice. Ti servirà per validare le sfide durante l'anno.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'otp') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <div className="w-full max-w-sm">
+          <h2 className="text-xl font-light text-center mb-2">Verifica email</h2>
+          <p className="text-white/40 text-center text-sm mb-8">
+            Inserisci il codice a 6 cifre inviato a {email}
+          </p>
+
+          <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <input
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="000000"
+              className="w-full bg-transparent border border-white/30 px-4 py-4 text-center text-2xl tracking-[0.5em] placeholder-white/20 focus:outline-none focus:border-white transition"
+              maxLength={6}
+              autoComplete="one-time-code"
+            />
+
+            {error && (
+              <p className="text-red-400 text-sm text-center">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || otp.length !== 6}
+              className="w-full border border-white/40 text-white py-3 hover:bg-white hover:text-black transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white"
+            >
+              {loading ? 'Verifica...' : 'Verifica codice'}
+            </button>
+          </form>
+
+          <button
+            onClick={() => setStep('form')}
+            className="w-full text-white/40 text-sm mt-4 hover:text-white transition"
+          >
+            ← Torna indietro
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+      <div className="w-full max-w-sm">
+        <h2 className="text-xl font-light text-center mb-2">Iscriviti al gioco</h2>
+        <p className="text-white/40 text-center text-sm mb-8">
+          Partecipa a A Tutto Reality: La Rivoluzione
+        </p>
+
+        <form onSubmit={handleSendOtp} className="space-y-4">
+          <div>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="Nickname"
+              className="w-full bg-transparent border border-white/30 px-4 py-3 placeholder-white/30 focus:outline-none focus:border-white transition"
+              autoComplete="username"
+            />
+            <p className="text-white/30 text-xs mt-1">3-20 caratteri, lettere, numeri e underscore</p>
+          </div>
+
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full bg-transparent border border-white/30 px-4 py-3 placeholder-white/30 focus:outline-none focus:border-white transition"
+            autoComplete="email"
+          />
+
+          {error && (
+            <p className="text-red-400 text-sm">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !nickname || !email}
+            className="w-full border border-white/40 text-white py-3 hover:bg-white hover:text-black transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white"
+          >
+            {loading ? 'Invio codice...' : 'Invia codice di verifica'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+// Componente Sfide/Indizi
+interface Challenge {
+  id: number
+  challenge_number: number
+  challenge_name: string
+  challenge_date: string
+  challenge_description: string | null
+  clues: {
+    id: number
+    clue_number: number
+    clue_text: string
+    clue_date: string
+    image_url: string | null
+  }[]
+}
+
+// Dati placeholder per le sfide (da rimuovere quando ci sono dati reali)
+const PLACEHOLDER_CHALLENGES: Challenge[] = [
+  {
+    id: 2,
+    challenge_number: 2,
+    challenge_name: 'Febbraio 2026',
+    challenge_date: '2026-02-22',
+    challenge_description: 'Prima sfida del gioco',
+    clues: [
+      {
+        id: 1,
+        clue_number: 1,
+        clue_text: 'Nel mese più breve che l\'anno riserva\ntre cigni si posano lungo la via\nla data nel tempo il segreto conserva\nnel giorno e nel mese la stessa magia',
+        clue_date: '2026-02-01',
+        image_url: null
+      },
+      {
+        id: 2,
+        clue_number: 2,
+        clue_text: 'Quando il giorno ha passato metà del cammino\nma il sole è ancora padrone del cielo\ntre passi dal mezzogiorno divino\nla sfida vi attende, cade ogni velo',
+        clue_date: '2026-02-08',
+        image_url: null
+      },
+      {
+        id: 3,
+        clue_number: 3,
+        clue_text: 'Nel grembo che Memmo strappò dalla palude\nsettantotto occhi di marmo vi guardano\nchi cerca la via che al centro si chiude\nnell\'anello d\'acqua le risposte si tardano',
+        clue_date: '2026-02-15',
+        image_url: null
+      }
+    ]
+  },
+  {
+    id: 3,
+    challenge_number: 3,
+    challenge_name: 'Marzo 2026',
+    challenge_date: '2026-03-29',
+    challenge_description: 'Seconda sfida del gioco',
+    clues: [
+      {
+        id: 4,
+        clue_number: 1,
+        clue_text: 'Il dio della guerra sta per lasciare il trono\nventinove guerrieri lo salutano al tramonto\nprima che i fiori rubino la scena e il suono\ncercate quel giorno, è quasi il confronto',
+        clue_date: '2026-03-08',
+        image_url: null
+      }
+    ]
+  },
+  {
+    id: 4,
+    challenge_number: 4,
+    challenge_name: 'Aprile 2026',
+    challenge_date: '2026-04-26',
+    challenge_description: null,
+    clues: []
+  }
+]
+
+function ChallengesSection() {
+  const [challenges, setChallenges] = useState<Challenge[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedChallenge, setExpandedChallenge] = useState<number | null>(null)
+
+  useEffect(() => {
+    loadChallenges()
+  }, [])
+
+  async function loadChallenges() {
+    try {
+      const res = await fetch('/api/clues')
+      const data = await res.json()
+      // Usa placeholder se non ci sono dati dal database
+      const dbChallenges = data.challenges || []
+      setChallenges(dbChallenges.length > 0 ? dbChallenges : PLACEHOLDER_CHALLENGES)
+    } catch (err) {
+      console.error('Error loading challenges:', err)
+      // In caso di errore, usa i placeholder
+      setChallenges(PLACEHOLDER_CHALLENGES)
+    }
+    setLoading(false)
+  }
+
+  const clueTypes = ['GIORNO', 'ORARIO', 'LUOGO']
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-white/40">Caricamento...</p>
+      </div>
+    )
+  }
+
+  if (challenges.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="text-center max-w-md">
+          <p className="text-white/40 text-lg mb-4">Nessuna sfida pubblicata</p>
+          <p className="text-white/20 text-sm">
+            Gli indizi per le sfide appariranno qui quando verranno rilasciati.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <h2 className="text-xl font-light text-center mb-8">Sfide e Indizi</h2>
+
+      {challenges.map((challenge) => (
+        <div key={challenge.id} className="border border-white/20">
+          <button
+            onClick={() => setExpandedChallenge(
+              expandedChallenge === challenge.id ? null : challenge.id
+            )}
+            className="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition"
+          >
+            <div className="text-left">
+              <span className="text-white/40 text-sm">Sfida {challenge.challenge_number}</span>
+              <h3 className="text-white font-medium">{challenge.challenge_name}</h3>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-white/30 text-sm">
+                {challenge.clues.length}/3 indizi
+              </span>
+              <span className={`transition-transform ${expandedChallenge === challenge.id ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+            </div>
+          </button>
+
+          {expandedChallenge === challenge.id && (
+            <div className="border-t border-white/10 px-6 py-4 space-y-4">
+              {challenge.clues.length === 0 ? (
+                <p className="text-white/30 text-sm">Nessun indizio ancora rilasciato</p>
+              ) : (
+                challenge.clues.map((clue) => (
+                  <div key={clue.id} className="bg-white/5 p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-white/40 text-xs">
+                        INDIZIO {clue.clue_number} • {clueTypes[clue.clue_number - 1] || ''}
+                      </span>
+                      <span className="text-white/20 text-xs">
+                        {new Date(clue.clue_date).toLocaleDateString('it-IT')}
+                      </span>
+                    </div>
+                    <p className="text-white whitespace-pre-line leading-relaxed">
+                      {clue.clue_text}
+                    </p>
+                  </div>
+                ))
+              )}
+
+              {challenge.clues.length === 3 && (
+                <div className="text-center pt-4 border-t border-white/10">
+                  <p className="text-white/40 text-sm">
+                    Sfida: <span className="text-white">{new Date(challenge.challenge_date).toLocaleDateString('it-IT')}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Componente Chat
+function ChatSection() {
+  const [messages, setMessages] = useState<{ id: number; nickname: string; text: string; time: string }[]>([
+    { id: 1, nickname: 'Samantha', text: 'Benvenuti nella chat del gioco.', time: '22:00' },
+    { id: 2, nickname: 'Samantha', text: 'Qui potrete comunicare durante le sfide.', time: '22:00' },
+  ])
+  const [newMessage, setNewMessage] = useState('')
+
+  function handleSend(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newMessage.trim()) return
+
+    const now = new Date()
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
+
+    setMessages(prev => [...prev, {
+      id: Date.now(),
+      nickname: 'Tu',
+      text: newMessage.trim(),
+      time
+    }])
+    setNewMessage('')
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto flex flex-col h-[70vh]">
+      <h2 className="text-xl font-light text-center mb-4">Chat</h2>
+
+      {/* Messaggi */}
+      <div className="flex-1 overflow-y-auto border border-white/20 p-4 space-y-3 mb-4">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`${msg.nickname === 'Samantha' ? 'text-purple-400' : ''}`}>
+            <div className="flex items-baseline gap-2">
+              <span className="font-medium text-sm">{msg.nickname}</span>
+              <span className="text-white/30 text-xs">{msg.time}</span>
+            </div>
+            <p className="text-white/80 text-sm">{msg.text}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <form onSubmit={handleSend} className="flex gap-2">
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Scrivi un messaggio..."
+          className="flex-1 bg-transparent border border-white/30 px-4 py-2 text-sm placeholder-white/30 focus:outline-none focus:border-white transition"
+        />
+        <button
+          type="submit"
+          className="border border-white/30 px-4 py-2 text-white/60 hover:text-white hover:border-white transition"
+        >
+          Invia
+        </button>
+      </form>
+
+      <p className="text-white/30 text-xs text-center mt-4">
+        La chat sarà attiva durante le sfide
+      </p>
+    </div>
+  )
+}
+
 export default function GameAreaWithChat() {
-  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat'>('info')
   const supabase = createClient()
 
   // Stati per tab "?" - frasi Samantha
@@ -186,6 +621,9 @@ export default function GameAreaWithChat() {
   const [mysteryTyping, setMysteryTyping] = useState(false)
   const [mysteryText, setMysteryText] = useState('')
   const [showMysteryCursor, setShowMysteryCursor] = useState(true)
+
+  // Stati per iscrizioni
+  const [registrationOpen, setRegistrationOpen] = useState(false)
 
   // Stati per cerimonia
   const [ceremonyActive, setCeremonyActive] = useState(false)
@@ -208,15 +646,17 @@ export default function GameAreaWithChat() {
   const [showVictoryCursor, setShowVictoryCursor] = useState(true)
   const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings'>('none')
 
-  // Verifica se cerimonia è attiva (dopo 22:00 del 24/01/2026)
+  // Verifica se iscrizioni sono aperte (dopo 00:00 del 24/01/2026)
+  // e se cerimonia è attiva (dopo 22:00 del 24/01/2026)
   useEffect(() => {
-    const checkCeremonyTime = () => {
+    const checkTimes = () => {
       const now = new Date()
+      setRegistrationOpen(now >= REGISTRATION_OPEN)
       setCeremonyActive(now >= CEREMONY_START)
     }
 
-    checkCeremonyTime()
-    const interval = setInterval(checkCeremonyTime, 1000)
+    checkTimes()
+    const interval = setInterval(checkTimes, 1000)
     return () => clearInterval(interval)
   }, [])
 
@@ -547,7 +987,7 @@ export default function GameAreaWithChat() {
                   : 'text-white/40 hover:text-white/70'
               }`}
             >
-              ?
+              {registrationOpen ? 'Cerimonia' : '?'}
             </button>
             <button
               onClick={() => setActiveTab('info')}
@@ -559,6 +999,18 @@ export default function GameAreaWithChat() {
             >
               Info
             </button>
+            {registrationOpen && (
+              <button
+                onClick={() => setActiveTab('challenges')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'challenges'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Sfide
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('wishlist')}
               className={`py-3 transition whitespace-nowrap ${
@@ -569,6 +1021,30 @@ export default function GameAreaWithChat() {
             >
               Wishlist
             </button>
+            {registrationOpen && (
+              <button
+                onClick={() => setActiveTab('register')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'register'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Iscriviti
+              </button>
+            )}
+            {registrationOpen && (
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'chat'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Chat
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -737,6 +1213,15 @@ export default function GameAreaWithChat() {
 
         {/* Wishlist Tab */}
         {activeTab === 'wishlist' && <WishlistSection />}
+
+        {/* Challenges Tab */}
+        {activeTab === 'challenges' && registrationOpen && <ChallengesSection />}
+
+        {/* Register Tab */}
+        {activeTab === 'register' && registrationOpen && <RegisterSection />}
+
+        {/* Chat Tab */}
+        {activeTab === 'chat' && registrationOpen && <ChatSection />}
       </main>
     </div>
   )
