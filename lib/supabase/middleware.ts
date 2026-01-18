@@ -44,7 +44,8 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/game') &&
     !request.nextUrl.pathname.startsWith('/wishlist-public') &&
     !request.nextUrl.pathname.startsWith('/api/') &&
-    !request.nextUrl.pathname.startsWith('/dashboard') // TEMPORARY: Allow dashboard access without auth
+    !request.nextUrl.pathname.startsWith('/dashboard') && // TEMPORARY: Allow dashboard access without auth
+    !request.nextUrl.pathname.startsWith('/private') // Area privata con auth custom
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()

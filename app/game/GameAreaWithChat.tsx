@@ -625,6 +625,9 @@ export default function GameAreaWithChat() {
   // Stati per iscrizioni
   const [registrationOpen, setRegistrationOpen] = useState(false)
 
+  // Stati per info partecipante
+  const [participantInfo, setParticipantInfo] = useState<{ nickname: string; code: string } | null>(null)
+
   // Stati per cerimonia
   const [ceremonyActive, setCeremonyActive] = useState(false)
   const [foundClues, setFoundClues] = useState<string[]>([])
@@ -646,6 +649,9 @@ export default function GameAreaWithChat() {
   const [showVictoryCursor, setShowVictoryCursor] = useState(true)
   const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings'>('none')
 
+  // Stato per ultimo messaggio di sistema (footer)
+  const [lastSystemMessage, setLastSystemMessage] = useState('In attesa...')
+
   // Verifica se iscrizioni sono aperte (dopo 00:00 del 24/01/2026)
   // e se cerimonia è attiva (dopo 22:00 del 24/01/2026)
   useEffect(() => {
@@ -658,6 +664,24 @@ export default function GameAreaWithChat() {
     checkTimes()
     const interval = setInterval(checkTimes, 1000)
     return () => clearInterval(interval)
+  }, [])
+
+  // Carica info partecipante dalla sessione
+  useEffect(() => {
+    async function loadParticipantInfo() {
+      try {
+        const res = await fetch('/api/game/check-session')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.valid && data.nickname) {
+            setParticipantInfo({ nickname: data.nickname, code: data.code })
+          }
+        }
+      } catch {
+        // Ignora errori
+      }
+    }
+    loadParticipantInfo()
   }, [])
 
   // Carica dati cerimonia quando attiva
@@ -726,6 +750,7 @@ export default function GameAreaWithChat() {
     setSamanthaCommentText('')
     setSamanthaCommentVisible(true)
     setIsTypingComment(true)
+    setLastSystemMessage(comment)
   }
 
   // Effetto typing per i commenti
@@ -975,10 +1000,23 @@ export default function GameAreaWithChat() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-12">
-      {/* Tab Navigation */}
-      <div className="border-b border-white/20">
-        <div className="w-full flex justify-center">
-          <div className="flex gap-8 md:gap-12">
+      {/* Tab Navigation - Fixed Header */}
+      <div className="sticky top-0 z-50 bg-black border-b border-white/20">
+        <div className="w-full flex items-center px-4">
+          {/* Info partecipante a sinistra */}
+          <div className="flex-shrink-0 w-32 md:w-48">
+            {participantInfo && (
+              <div className="text-xs text-white/40">
+                <span className="text-white/60">{participantInfo.nickname}</span>
+                <span className="mx-1">•</span>
+                <span>{participantInfo.code}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Tab centrali */}
+          <div className="flex-1 flex justify-center">
+            <div className="flex gap-8 md:gap-12">
             <button
               onClick={handleMysteryTabClick}
               className={`py-3 transition whitespace-nowrap ${
@@ -1045,12 +1083,16 @@ export default function GameAreaWithChat() {
                 Chat
               </button>
             )}
+            </div>
           </div>
+
+          {/* Spacer a destra per bilanciare */}
+          <div className="flex-shrink-0 w-32 md:w-48"></div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="w-full px-4 md:px-8 lg:px-16 py-8">
+      <main className="w-full px-4 md:px-8 lg:px-16 py-8 pb-20">
         {/* Mystery Tab */}
         {activeTab === 'mystery' && (
           <>
@@ -1223,6 +1265,15 @@ export default function GameAreaWithChat() {
         {/* Chat Tab */}
         {activeTab === 'chat' && registrationOpen && <ChatSection />}
       </main>
+
+      {/* Fixed Footer - Last System Message */}
+      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20">
+        <div className="px-4 py-3 text-center">
+          <p className="text-white/60 text-sm">
+            {lastSystemMessage}
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
