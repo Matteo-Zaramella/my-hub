@@ -118,6 +118,13 @@ export default function LandingPage() {
               {loading ? 'Verifica...' : 'Accedi'}
             </button>
           </form>
+
+          <Link
+            href="/wishlist"
+            className="block mt-8 text-white/40 hover:text-white/60 text-sm transition"
+          >
+            Wishlist →
+          </Link>
         </div>
       </main>
     </div>
