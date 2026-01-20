@@ -60,3 +60,4 @@ backups/
 # Password mapping (CONFIDENTIAL)
 PASSWORD_MAPPING_CONFIDENTIAL.md
 .supabase-config
+tmpclaude-*

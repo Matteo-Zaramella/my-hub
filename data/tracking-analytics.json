@@ -1,0 +1,1356 @@
+{
+  "generato_il": "2026-01-19T19:01:04.584Z",
+  "alimentazione": {
+    "giorni_totali": 7,
+    "pasti_completati": 48,
+    "pasti_totali": 48,
+    "percentuale_completamento": 100,
+    "variazioni_totali": 0,
+    "media_valutazione": 5,
+    "media_acqua": 2.5,
+    "giorni_allenamento": 4,
+    "giorni_riposo": 3
+  },
+  "palestra": {
+    "allenamenti_totali": 4,
+    "allenamenti_completati": 4,
+    "percentuale_completamento": 100,
+    "media_valutazione": 5,
+    "schede_A": 2,
+    "schede_B": 1,
+    "schede_C": 1,
+    "giorni_riposo": 3
+  },
+  "per_giorno": [
+    {
+      "data": "2026-01-19",
+      "alimentazione": {
+        "data": "2026-01-19",
+        "giorno_ciclo": 1,
+        "settimana": 1,
+        "giorno_settimana": "Domenica",
+        "tipo_giorno": "allenamento",
+        "scheda_allenamento": "A",
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "06:30",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "albumi": "150g (~5 albumi)"
+              },
+              {
+                "pane_integrale": "90g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "10:30",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "90g"
+              },
+              {
+                "petto_pollo": "200g"
+              },
+              {
+                "broccoli": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "pre_workout": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "cracker_integrali": "1 pacchetto"
+              },
+              {
+                "banana": "1 (130g)"
+              },
+              {
+                "mandorle": "15g"
+              }
+            ],
+            "variazioni": []
+          },
+          "post_workout": {
+            "completato": true,
+            "orario_effettivo": "19:30",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "merluzzo": "200g"
+              },
+              {
+                "patate": "200g"
+              },
+              {
+                "insalata_mista": "150g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2400,
+          "proteine_g": 180,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-19.md"
+      },
+      "palestra": {
+        "data": "2026-01-19",
+        "giorno_ciclo": 1,
+        "settimana": 1,
+        "giorno_settimana": "Domenica",
+        "scheda": "A",
+        "tipo": "allenamento",
+        "orario": {
+          "inizio": "18:00",
+          "fine": "19:30"
+        },
+        "esercizi": [
+          {
+            "nome": "Esercizio 1",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 2",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 3",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 4",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 5",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              15,
+              12,
+              12
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          }
+        ],
+        "valutazione": 5,
+        "completato": true,
+        "cardio_minuti": 0,
+        "sensazioni": {
+          "energia": "alta",
+          "pump": "buono",
+          "recupero": "ben recuperato"
+        },
+        "_filename": "2026-01-19.md"
+      }
+    },
+    {
+      "data": "2026-01-20",
+      "alimentazione": {
+        "data": "2026-01-20",
+        "giorno_ciclo": 2,
+        "settimana": 1,
+        "giorno_settimana": "Martedì",
+        "tipo_giorno": "allenamento",
+        "scheda_allenamento": "B",
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "06:30",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "albumi": "150g (~5 albumi)"
+              },
+              {
+                "pane_integrale": "90g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "10:30",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "90g"
+              },
+              {
+                "tonno_naturale": "160g"
+              },
+              {
+                "zucchine": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "pre_workout": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "cracker_integrali": "1 pacchetto"
+              },
+              {
+                "banana": "1 (130g)"
+              },
+              {
+                "mandorle": "15g"
+              }
+            ],
+            "variazioni": []
+          },
+          "post_workout": {
+            "completato": true,
+            "orario_effettivo": "19:30",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "petto_tacchino": "200g"
+              },
+              {
+                "verdure_grigliate": "200g"
+              },
+              {
+                "pane_integrale": "40g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2400,
+          "proteine_g": 180,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-20.md"
+      },
+      "palestra": {
+        "data": "2026-01-20",
+        "giorno_ciclo": 2,
+        "settimana": 1,
+        "giorno_settimana": "Martedì",
+        "scheda": "B",
+        "tipo": "allenamento",
+        "orario": {
+          "inizio": "18:00",
+          "fine": "19:30"
+        },
+        "esercizi": [
+          {
+            "nome": "Esercizio 1",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 2",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 3",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 4",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 5",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              15,
+              12,
+              12
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          }
+        ],
+        "valutazione": 5,
+        "completato": true,
+        "cardio_minuti": 0,
+        "sensazioni": {
+          "energia": "alta",
+          "pump": "buono",
+          "recupero": "ok"
+        },
+        "_filename": "2026-01-20.md"
+      }
+    },
+    {
+      "data": "2026-01-21",
+      "alimentazione": {
+        "data": "2026-01-21",
+        "giorno_ciclo": 3,
+        "settimana": 1,
+        "giorno_settimana": "Mercoledì",
+        "tipo_giorno": "riposo",
+        "scheda_allenamento": null,
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "06:30",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "albumi": "150g (~5 albumi)"
+              },
+              {
+                "pane_integrale": "90g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "10:30",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "70g"
+              },
+              {
+                "petto_pollo": "200g"
+              },
+              {
+                "spinaci": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_pomeriggio": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "barretta_proteica": "~150 kcal"
+              }
+            ],
+            "variazioni": []
+          },
+          "shaker_pomeridiano": {
+            "completato": true,
+            "orario_effettivo": "18:00",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "orata": "200g"
+              },
+              {
+                "patate": "150g"
+              },
+              {
+                "insalata_mista": "150g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2200,
+          "proteine_g": 170,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-21.md"
+      },
+      "palestra": {
+        "data": "2026-01-21",
+        "giorno_ciclo": 3,
+        "settimana": 1,
+        "giorno_settimana": "Mercoledì",
+        "scheda": null,
+        "tipo": "riposo",
+        "recupero": {
+          "qualita_sonno": "buona",
+          "ore_sonno": 8,
+          "dolori_muscolari": [],
+          "stretching": false,
+          "mobilita": false
+        },
+        "_filename": "2026-01-21.md"
+      }
+    },
+    {
+      "data": "2026-01-22",
+      "alimentazione": {
+        "data": "2026-01-22",
+        "giorno_ciclo": 4,
+        "settimana": 1,
+        "giorno_settimana": "Giovedì",
+        "tipo_giorno": "allenamento",
+        "scheda_allenamento": "C",
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "06:30",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "albumi": "150g (~5 albumi)"
+              },
+              {
+                "pane_integrale": "90g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "10:30",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "90g"
+              },
+              {
+                "salmone": "180g"
+              },
+              {
+                "fagiolini": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "pre_workout": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "cracker_integrali": "1 pacchetto"
+              },
+              {
+                "banana": "1 (130g)"
+              },
+              {
+                "mandorle": "15g"
+              }
+            ],
+            "variazioni": []
+          },
+          "post_workout": {
+            "completato": true,
+            "orario_effettivo": "19:30",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "petto_pollo": "200g"
+              },
+              {
+                "verdure_miste": "200g"
+              },
+              {
+                "pane_integrale": "40g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2400,
+          "proteine_g": 180,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-22.md"
+      },
+      "palestra": {
+        "data": "2026-01-22",
+        "giorno_ciclo": 4,
+        "settimana": 1,
+        "giorno_settimana": "Giovedì",
+        "scheda": "C",
+        "tipo": "allenamento",
+        "orario": {
+          "inizio": "18:00",
+          "fine": "19:30"
+        },
+        "esercizi": [
+          {
+            "nome": "Esercizio 1",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 2",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 3",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 4",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 5",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              15,
+              12,
+              12
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          }
+        ],
+        "valutazione": 5,
+        "completato": true,
+        "cardio_minuti": 0,
+        "sensazioni": {
+          "energia": "alta",
+          "pump": "buono",
+          "recupero": "ok"
+        },
+        "_filename": "2026-01-22.md"
+      }
+    },
+    {
+      "data": "2026-01-23",
+      "alimentazione": {
+        "data": "2026-01-23",
+        "giorno_ciclo": 5,
+        "settimana": 1,
+        "giorno_settimana": "Venerdì",
+        "tipo_giorno": "riposo",
+        "scheda_allenamento": null,
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "06:30",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "albumi": "150g (~5 albumi)"
+              },
+              {
+                "pane_integrale": "90g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "10:30",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "70g"
+              },
+              {
+                "merluzzo": "200g"
+              },
+              {
+                "broccoli": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_pomeriggio": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "barretta_proteica": "~150 kcal"
+              }
+            ],
+            "variazioni": []
+          },
+          "shaker_pomeridiano": {
+            "completato": true,
+            "orario_effettivo": "18:00",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "petto_tacchino": "200g"
+              },
+              {
+                "zucchine": "200g"
+              },
+              {
+                "pane_integrale": "40g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2200,
+          "proteine_g": 170,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-23.md"
+      },
+      "palestra": {
+        "data": "2026-01-23",
+        "giorno_ciclo": 5,
+        "settimana": 1,
+        "giorno_settimana": "Venerdì",
+        "scheda": null,
+        "tipo": "riposo",
+        "recupero": {
+          "qualita_sonno": "buona",
+          "ore_sonno": 8,
+          "dolori_muscolari": [],
+          "stretching": false,
+          "mobilita": false
+        },
+        "_filename": "2026-01-23.md"
+      }
+    },
+    {
+      "data": "2026-01-24",
+      "alimentazione": {
+        "data": "2026-01-24",
+        "giorno_ciclo": 6,
+        "settimana": 1,
+        "giorno_settimana": "Sabato",
+        "tipo_giorno": "allenamento",
+        "scheda_allenamento": "A",
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "07:00",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "08:30",
+            "alimenti": [
+              {
+                "avena_fiocchi": "70g"
+              },
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "post_workout": {
+            "completato": true,
+            "orario_effettivo": "11:30",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "90g"
+              },
+              {
+                "petto_pollo": "200g"
+              },
+              {
+                "spinaci": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_pomeriggio": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "barretta_proteica": "~150 kcal"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "salmone": "180g"
+              },
+              {
+                "patate": "200g"
+              },
+              {
+                "insalata_mista": "150g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2400,
+          "proteine_g": 180,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-24.md"
+      },
+      "palestra": {
+        "data": "2026-01-24",
+        "giorno_ciclo": 6,
+        "settimana": 1,
+        "giorno_settimana": "Sabato",
+        "scheda": "A",
+        "tipo": "allenamento",
+        "orario": {
+          "inizio": "10:00",
+          "fine": "11:30"
+        },
+        "esercizi": [
+          {
+            "nome": "Esercizio 1",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 2",
+            "serie_previste": 4,
+            "serie_completate": 4,
+            "ripetizioni": [
+              10,
+              10,
+              8,
+              8
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 3",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 4",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              12,
+              10,
+              10
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          },
+          {
+            "nome": "Esercizio 5",
+            "serie_previste": 3,
+            "serie_completate": 3,
+            "ripetizioni": [
+              15,
+              12,
+              12
+            ],
+            "peso": "-- kg",
+            "completato": true,
+            "note": ""
+          }
+        ],
+        "valutazione": 5,
+        "completato": true,
+        "cardio_minuti": 0,
+        "sensazioni": {
+          "energia": "alta",
+          "pump": "buono",
+          "recupero": "ben recuperato"
+        },
+        "_filename": "2026-01-24.md"
+      }
+    },
+    {
+      "data": "2026-01-25",
+      "alimentazione": {
+        "data": "2026-01-25",
+        "giorno_ciclo": 7,
+        "settimana": 1,
+        "giorno_settimana": "Domenica",
+        "tipo_giorno": "riposo",
+        "scheda_allenamento": null,
+        "pasti": {
+          "shaker_mattutino": {
+            "completato": true,
+            "orario_effettivo": "08:00",
+            "alimenti": [
+              {
+                "whey_protein": "30g"
+              },
+              {
+                "latte_avena": "200ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "colazione": {
+            "completato": true,
+            "orario_effettivo": "09:00",
+            "alimenti": [
+              {
+                "avena_fiocchi": "70g"
+              },
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "spremuta_arance": "~300g (2 arance)"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_mattina": {
+            "completato": true,
+            "orario_effettivo": "11:00",
+            "alimenti": [
+              {
+                "yogurt_greco_0": "150g"
+              },
+              {
+                "clementine": "3 pz"
+              }
+            ],
+            "variazioni": []
+          },
+          "pranzo": {
+            "completato": true,
+            "orario_effettivo": "13:00",
+            "alimenti": [
+              {
+                "carote_antipasto": "100g"
+              },
+              {
+                "riso_integrale": "70g"
+              },
+              {
+                "orata": "200g"
+              },
+              {
+                "verdure_grigliate": "200g"
+              },
+              {
+                "olio_evo": "1 cucchiaio"
+              }
+            ],
+            "variazioni": []
+          },
+          "spuntino_pomeriggio": {
+            "completato": true,
+            "orario_effettivo": "17:00",
+            "alimenti": [
+              {
+                "barretta_proteica": "~150 kcal"
+              }
+            ],
+            "variazioni": []
+          },
+          "shaker_pomeridiano": {
+            "completato": true,
+            "orario_effettivo": "18:00",
+            "alimenti": [
+              {
+                "whey_protein": "35g"
+              },
+              {
+                "latte_avena": "250ml"
+              },
+              {
+                "creatina": "5g"
+              }
+            ],
+            "variazioni": []
+          },
+          "cena": {
+            "completato": true,
+            "orario_effettivo": "20:30",
+            "alimenti": [
+              {
+                "petto_pollo": "200g"
+              },
+              {
+                "fagiolini": "200g"
+              },
+              {
+                "pane_integrale": "40g"
+              }
+            ],
+            "variazioni": []
+          }
+        },
+        "macros": {
+          "calorie_totali": 2200,
+          "proteine_g": 170,
+          "carboidrati_g": null,
+          "grassi_g": null
+        },
+        "valutazione": 5,
+        "acqua_litri": 2.5,
+        "_filename": "2026-01-25.md"
+      },
+      "palestra": {
+        "data": "2026-01-25",
+        "giorno_ciclo": 7,
+        "settimana": 1,
+        "giorno_settimana": "Domenica",
+        "scheda": null,
+        "tipo": "riposo",
+        "recupero": {
+          "qualita_sonno": "buona",
+          "ore_sonno": 9,
+          "dolori_muscolari": [],
+          "stretching": false,
+          "mobilita": false
+        },
+        "_filename": "2026-01-25.md"
+      }
+    }
+  ]
+}

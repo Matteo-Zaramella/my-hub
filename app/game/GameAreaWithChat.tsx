@@ -621,6 +621,7 @@ export default function GameAreaWithChat() {
   const [mysteryTyping, setMysteryTyping] = useState(false)
   const [mysteryText, setMysteryText] = useState('')
   const [showMysteryCursor, setShowMysteryCursor] = useState(true)
+  const [mysterySelected, setMysterySelected] = useState(false)
 
   // Stati per iscrizioni
   const [registrationOpen, setRegistrationOpen] = useState(false)
@@ -684,9 +685,9 @@ export default function GameAreaWithChat() {
     loadParticipantInfo()
   }, [])
 
-  // Carica dati cerimonia quando attiva
+  // Carica dati cerimonia quando attiva (dalle 00:00 del 24/01)
   useEffect(() => {
-    if (!ceremonyActive) return
+    if (!registrationOpen) return
 
     loadCeremonyData()
 
@@ -709,7 +710,7 @@ export default function GameAreaWithChat() {
     return () => {
       channel.unsubscribe()
     }
-  }, [ceremonyActive])
+  }, [registrationOpen])
 
   async function loadCeremonyData() {
     // Carica tutti gli indizi disponibili
@@ -929,10 +930,9 @@ export default function GameAreaWithChat() {
 
   // Effetto typing per la tab mystery (frasi Samantha - solo quando cerimonia non attiva)
   useEffect(() => {
-    if (!mysteryTyping || activeTab !== 'mystery' || ceremonyActive) return
+    if (!mysteryTyping || activeTab !== 'mystery' || registrationOpen) return
 
     let charIndex = 0
-    let isDeleting = false
     const phrase = mysteryPhrase
 
     const cursorInterval = setInterval(() => {
@@ -940,29 +940,25 @@ export default function GameAreaWithChat() {
     }, 500)
 
     const animate = () => {
-      if (!isDeleting) {
-        // Fase scrittura
-        if (charIndex < phrase.length) {
-          setMysteryText(phrase.slice(0, charIndex + 1))
-          charIndex++
-          setTimeout(animate, 60)
-        } else {
-          // Pausa prima di cancellare
-          setTimeout(() => {
-            isDeleting = true
-            animate()
-          }, 2000)
-        }
+      // Fase scrittura (velocizzata)
+      if (charIndex < phrase.length) {
+        setMysteryText(phrase.slice(0, charIndex + 1))
+        charIndex++
+        setTimeout(animate, 30)
       } else {
-        // Fase cancellazione
-        if (charIndex > 0) {
-          charIndex--
-          setMysteryText(phrase.slice(0, charIndex))
-          setTimeout(animate, 40)
-        } else {
-          // Finito
-          setMysteryTyping(false)
-        }
+        // Pausa prima di selezionare
+        setTimeout(() => {
+          // Fase selezione (testo in negativo)
+          setMysterySelected(true)
+          setShowMysteryCursor(false)
+
+          // Pausa con selezione visibile, poi cancella tutto
+          setTimeout(() => {
+            setMysterySelected(false)
+            setMysteryText('')
+            setMysteryTyping(false)
+          }, 500)
+        }, 1500)
       }
     }
 
@@ -971,7 +967,7 @@ export default function GameAreaWithChat() {
     return () => {
       clearInterval(cursorInterval)
     }
-  }, [mysteryTyping, mysteryPhrase, activeTab, ceremonyActive])
+  }, [mysteryTyping, mysteryPhrase, activeTab, registrationOpen])
 
   // Calcola quali cerchi sono pieni in base all'ordine
   const filledCircles = allClues
@@ -1132,8 +1128,8 @@ export default function GameAreaWithChat() {
                   }
                 `}</style>
               </div>
-            ) : ceremonyActive ? (
-              /* Cerimonia attiva - input indizi */
+            ) : registrationOpen ? (
+              /* Cerimonia attiva - input indizi (attivo dalle 00:00) */
               <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
                 {/* Commento di Samantha */}
                 <div className={`h-12 flex items-center justify-center transition-opacity duration-300 ${samanthaCommentVisible ? 'opacity-100' : 'opacity-0'}`}>
@@ -1183,11 +1179,15 @@ export default function GameAreaWithChat() {
               /* Cerimonia non ancora attiva - frasi Samantha */
               <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <div className="text-center px-8 max-w-4xl">
-                  <div className="font-mono text-white text-xl md:text-2xl lg:text-3xl">
-                    {mysteryText}
-                    <span className={`${showMysteryCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
-                      _
+                  <div className="font-mono text-xl md:text-2xl lg:text-3xl">
+                    <span className={`transition-all duration-100 ${mysterySelected ? 'bg-white text-black px-2' : 'text-white'}`}>
+                      {mysteryText}
                     </span>
+                    {!mysterySelected && (
+                      <span className={`text-white ${showMysteryCursor ? 'opacity-100' : 'opacity-0'} transition-opacity duration-100`}>
+                        _
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

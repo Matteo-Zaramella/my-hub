@@ -31,10 +31,10 @@ export async function POST(request: NextRequest) {
 
     // Ottieni l'indizio
     const { data: clue, error: clueError } = await supabase
-      .from('clues')
+      .from('game_clues')
       .select(`
         *,
-        challenges (
+        game_challenges (
           challenge_number,
           challenge_name
         )
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Pubblica l'indizio
     const { error: updateError } = await supabase
-      .from('clues')
+      .from('game_clues')
       .update({ is_published: true })
       .eq('id', clue_id)
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         await resend.emails.send({
           from: 'Samantha <samantha@matteozaramella.dev>',
           to: p.email,
-          subject: `Nuovo indizio disponibile - Sfida ${clue.challenges.challenge_number}`,
+          subject: `Nuovo indizio disponibile - Sfida ${clue.game_challenges.challenge_number}`,
           html: `
             <div style="font-family: 'Courier New', monospace; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #ffffff; padding: 40px;">
               <div style="text-align: center; margin-bottom: 30px;">
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
               <div style="border: 1px solid #333; padding: 30px; margin: 20px 0;">
                 <p style="color: #666; font-size: 12px; margin-bottom: 10px;">
-                  SFIDA ${clue.challenges.challenge_number} • INDIZIO ${clue.clue_number} (${clueType})
+                  SFIDA ${clue.game_challenges.challenge_number} • INDIZIO ${clue.clue_number} (${clueType})
                 </p>
 
                 <div style="font-size: 18px; line-height: 1.8; color: #fff; white-space: pre-line;">

@@ -9,27 +9,26 @@ export default function LandingPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [checkingSession, setCheckingSession] = useState(true)
-
-  // Verifica se l'utente ha già una sessione valida
-  useEffect(() => {
-    async function checkExistingSession() {
-      try {
-        const res = await fetch('/api/game/check-session')
-        if (res.ok) {
-          const data = await res.json()
-          if (data.valid) {
-            router.push('/game/area')
-            return
-          }
-        }
-      } catch {
-        // Ignora errori
-      }
-      setCheckingSession(false)
-    }
-    checkExistingSession()
-  }, [router])
+  // TODO: Riattivare auto-redirect dopo sviluppo
+  // const [checkingSession, setCheckingSession] = useState(true)
+  // useEffect(() => {
+  //   async function checkExistingSession() {
+  //     try {
+  //       const res = await fetch('/api/game/check-session')
+  //       if (res.ok) {
+  //         const data = await res.json()
+  //         if (data.valid) {
+  //           router.push('/game/area')
+  //           return
+  //         }
+  //       }
+  //     } catch {
+  //       // Ignora errori
+  //     }
+  //     setCheckingSession(false)
+  //   }
+  //   checkExistingSession()
+  // }, [router])
 
   async function handleAccess(e: React.FormEvent) {
     e.preventDefault()
@@ -56,13 +55,14 @@ export default function LandingPage() {
     }
   }
 
-  if (checkingSession) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-white/50">Caricamento...</div>
-      </div>
-    )
-  }
+  // TODO: Riattivare dopo sviluppo
+  // if (checkingSession) {
+  //   return (
+  //     <div className="fixed inset-0 bg-black flex items-center justify-center">
+  //       <div className="text-white/50">Caricamento...</div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col">
@@ -102,6 +102,7 @@ export default function LandingPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Inserisci il tuo codice"
+                suppressHydrationWarning
                 className="w-full px-4 py-3 bg-transparent border border-white/20 text-white text-center placeholder:text-white/30 focus:border-white/50 focus:outline-none transition"
               />
             </div>

@@ -7,7 +7,7 @@ export async function GET() {
 
     // Ottieni tutte le sfide con i loro indizi pubblicati
     const { data: challenges, error } = await supabase
-      .from('challenges')
+      .from('game_challenges')
       .select(`
         id,
         challenge_number,
@@ -15,7 +15,7 @@ export async function GET() {
         challenge_date,
         challenge_description,
         is_published,
-        clues (
+        game_clues (
           id,
           clue_number,
           clue_text,
@@ -39,7 +39,7 @@ export async function GET() {
       ?.filter(c => c.is_published)
       .map(c => ({
         ...c,
-        clues: c.clues
+        clues: c.game_clues
           ?.filter((clue: { is_published: boolean }) => clue.is_published)
           .sort((a: { clue_number: number }, b: { clue_number: number }) => a.clue_number - b.clue_number)
       }))
