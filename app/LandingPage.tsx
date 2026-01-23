@@ -124,7 +124,7 @@ export default function LandingPage() {
             href="/wishlist"
             className="block mt-8 text-white/40 hover:text-white/60 text-sm transition"
           >
-            Wishlist →
+            Wishlist
           </Link>
         </div>
       </main>

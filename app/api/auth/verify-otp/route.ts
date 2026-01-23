@@ -2,6 +2,35 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, generateParticipantCode } from '@/lib/supabase/admin'
 import bcrypt from 'bcryptjs'
 
+// Funzione per assegnare squadra bilanciata
+async function assignTeamBalanced(supabase: ReturnType<typeof createAdminClient>) {
+  // Carica tutte le squadre
+  const { data: teams, error: teamsError } = await supabase
+    .from('game_teams')
+    .select('id, team_code, team_name, team_color')
+
+  if (teamsError || !teams || teams.length === 0) {
+    console.error('Error loading teams:', teamsError)
+    return null
+  }
+
+  // Conta membri per ogni squadra
+  const { data: participants } = await supabase
+    .from('game_participants')
+    .select('team_id')
+    .not('team_id', 'is', null)
+
+  const teamCounts = teams.map(team => ({
+    ...team,
+    count: participants?.filter(p => p.team_id === team.id).length || 0
+  }))
+
+  // Ordina per numero di membri (crescente) e prendi la prima
+  teamCounts.sort((a, b) => a.count - b.count)
+
+  return teamCounts[0]
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email, nickname, otp } = await request.json()
@@ -63,6 +92,9 @@ export async function POST(request: NextRequest) {
     const randomPassword = Math.random().toString(36).slice(-12)
     const passwordHash = await bcrypt.hash(randomPassword, 10)
 
+    // Assegna squadra bilanciata
+    const assignedTeam = await assignTeamBalanced(supabase)
+
     // Crea partecipante
     const { data: participant, error: insertError } = await supabase
       .from('game_participants')
@@ -74,9 +106,10 @@ export async function POST(request: NextRequest) {
         email: email.toLowerCase(),
         password_hash: passwordHash,
         email_verified: true,
-        total_points: 0
+        total_points: 0,
+        team_id: assignedTeam?.id || null
       })
-      .select('participant_code, nickname')
+      .select('participant_code, nickname, team_id')
       .single()
 
     if (insertError) {
@@ -114,6 +147,12 @@ export async function POST(request: NextRequest) {
       success: true,
       participant_code: participant.participant_code,
       nickname: participant.nickname,
+      team: assignedTeam ? {
+        id: assignedTeam.id,
+        code: assignedTeam.team_code,
+        name: assignedTeam.team_name,
+        color: assignedTeam.team_color
+      } : null,
       message: 'Registrazione completata!'
     })
 

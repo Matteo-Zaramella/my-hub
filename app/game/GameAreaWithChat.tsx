@@ -1,15 +1,27 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import NextImage from 'next/image'
 import { createClient } from '@/lib/supabase/client'
-import { getRandomBlockedPhrase, getClueComment } from '@/lib/samantha-phrases'
+import { getRandomBlockedPhrase, getClueComment, SAMANTHA_SYSTEM_INSTRUCTIONS, SAMANTHA_ACTIVATION_MESSAGE } from '@/lib/samantha-phrases'
+
+// ⚠️ TEST MODE - Rimetti le date originali prima del deploy!
+const TEST_MODE = true
 
 // Data e ora inizio cerimonia
-const CEREMONY_START = new Date('2026-01-24T22:00:00')
+const CEREMONY_START = TEST_MODE
+  ? new Date('2020-01-01T00:00:00')  // TEST: già passata
+  : new Date('2026-01-24T22:00:00')
 
 // Data e ora apertura iscrizioni (00:00 del 24 gennaio = mezzanotte tra 23 e 24)
-const REGISTRATION_OPEN = new Date('2026-01-24T00:00:00')
+const REGISTRATION_OPEN = TEST_MODE
+  ? new Date('2020-01-01T00:00:00')  // TEST: già passata
+  : new Date('2026-01-24T00:00:00')
+
+// Data e ora transizione automatica al game_active (00:00 del 25 gennaio)
+const GAME_ACTIVE_FALLBACK = TEST_MODE
+  ? new Date('2030-01-01T00:00:00')  // TEST: nel futuro (per testare EVOLUZIONE manualmente)
+  : new Date('2026-01-25T00:00:00')
 
 // Messaggi vittoria Samantha
 const SAMANTHA_VICTORY_LINES = [
@@ -18,6 +30,25 @@ const SAMANTHA_VICTORY_LINES = [
   'Tutti i partecipanti guadagnano 50 punti.',
   'Adesso inizia il divertimento... :D'
 ]
+
+// Messaggi timeout (fallback)
+const SAMANTHA_TIMEOUT_LINES = [
+  'Peccato.',
+  'Avete perso.',
+  'Non riceverete i punti.',
+  "L'avventura però inizia lo stesso... :D"
+]
+
+// Immagini badge squadre
+const TEAM_BADGES: Record<string, string> = {
+  'FSB': '/team-badges/FSB.png',
+  'MOSSAD': '/team-badges/MOSSAD.png',
+  'MSS': '/team-badges/MSS.png',
+  'AISE': '/team-badges/AISE.png',
+}
+
+// Avatar agente generico
+const AGENT_AVATAR = '/team-badges/AGENTE.png'
 
 // Tipi per la wishlist
 interface WishlistItem {
@@ -180,8 +211,16 @@ function WishlistSection() {
   )
 }
 
+// Tipo per squadra
+interface Team {
+  id: number
+  code: string
+  name: string
+  color: string
+}
+
 // Componente Registrazione
-function RegisterSection() {
+function RegisterSection({ onRegistrationComplete }: { onRegistrationComplete?: (data: { code: string; nickname: string; team: Team | null }) => void }) {
   const [step, setStep] = useState<'form' | 'otp' | 'success'>('form')
   const [nickname, setNickname] = useState('')
   const [email, setEmail] = useState('')
@@ -189,6 +228,7 @@ function RegisterSection() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [participantCode, setParticipantCode] = useState('')
+  const [assignedTeam, setAssignedTeam] = useState<Team | null>(null)
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault()
@@ -239,7 +279,19 @@ function RegisterSection() {
       }
 
       setParticipantCode(data.participant_code)
+      if (data.team) {
+        setAssignedTeam(data.team)
+      }
       setStep('success')
+
+      // Callback per aggiornare stato parent
+      if (onRegistrationComplete) {
+        onRegistrationComplete({
+          code: data.participant_code,
+          nickname: data.nickname,
+          team: data.team || null
+        })
+      }
     } catch {
       setError('Errore di connessione')
     }
@@ -263,6 +315,41 @@ function RegisterSection() {
               {participantCode}
             </div>
           </div>
+
+          {/* Squadra assegnata */}
+          {assignedTeam && (
+            <div className="mb-6">
+              <p className="text-white/40 text-sm mb-3">La tua squadra:</p>
+              <div
+                className="inline-flex items-center gap-4 px-6 py-4 border-2 rounded-lg"
+                style={{
+                  borderColor: assignedTeam.color,
+                  backgroundColor: `${assignedTeam.color}20`
+                }}
+              >
+                {TEAM_BADGES[assignedTeam.code] ? (
+                  <NextImage
+                    src={TEAM_BADGES[assignedTeam.code]}
+                    alt={assignedTeam.name}
+                    width={48}
+                    height={48}
+                    className="rounded"
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-full"
+                    style={{ backgroundColor: assignedTeam.color }}
+                  />
+                )}
+                <span
+                  className="text-2xl font-bold"
+                  style={{ color: assignedTeam.color }}
+                >
+                  {assignedTeam.name}
+                </span>
+              </div>
+            </div>
+          )}
 
           <p className="text-white/40 text-sm">
             Conserva questo codice. Ti servirà per validare le sfide durante l'anno.
@@ -547,45 +634,372 @@ function ChallengesSection() {
   )
 }
 
-// Componente Chat
-function ChatSection() {
-  const [messages, setMessages] = useState<{ id: number; nickname: string; text: string; time: string }[]>([
-    { id: 1, nickname: 'Samantha', text: 'Benvenuti nella chat del gioco.', time: '22:00' },
-    { id: 2, nickname: 'Samantha', text: 'Qui potrete comunicare durante le sfide.', time: '22:00' },
-  ])
+// Componente Sistema (Istruzioni di Samantha)
+function SystemSection() {
+  const [expandedSection, setExpandedSection] = useState<number | null>(null)
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-xl font-light tracking-widest text-white/80 mb-2">
+          {SAMANTHA_SYSTEM_INSTRUCTIONS.title}
+        </h2>
+        <p className="text-white/40 text-sm">
+          {SAMANTHA_SYSTEM_INSTRUCTIONS.subtitle}
+        </p>
+      </div>
+
+      {/* Sezioni espandibili */}
+      <div className="space-y-2">
+        {SAMANTHA_SYSTEM_INSTRUCTIONS.sections.map((section, index) => (
+          <div key={index} className="border border-white/20">
+            <button
+              onClick={() => setExpandedSection(
+                expandedSection === index ? null : index
+              )}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition"
+            >
+              <span className="text-white font-medium text-left">{section.title}</span>
+              <span className={`transition-transform text-white/40 ${expandedSection === index ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
+            </button>
+
+            {expandedSection === index && (
+              <div className="border-t border-white/10 px-6 py-4">
+                <p className="text-white/70 whitespace-pre-line leading-relaxed">
+                  {section.content}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Componente Messaggio di Attivazione (post-mezzanotte)
+function ActivationMessage({ onComplete }: { onComplete: () => void }) {
+  const [currentLine, setCurrentLine] = useState(0)
+  const [displayedText, setDisplayedText] = useState('')
+  const [showCursor, setShowCursor] = useState(true)
+  const [fadeOut, setFadeOut] = useState(false)
+
+  useEffect(() => {
+    // Lampeggio cursore
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev)
+    }, 500)
+
+    return () => clearInterval(cursorInterval)
+  }, [])
+
+  useEffect(() => {
+    if (currentLine >= SAMANTHA_ACTIVATION_MESSAGE.lines.length) {
+      // Tutte le linee mostrate, attendi e chiudi
+      setTimeout(() => {
+        setFadeOut(true)
+        setTimeout(() => {
+          onComplete()
+        }, 1000)
+      }, 3000)
+      return
+    }
+
+    const line = SAMANTHA_ACTIVATION_MESSAGE.lines[currentLine]
+
+    // Linea vuota = pausa
+    if (line === '') {
+      setTimeout(() => {
+        setCurrentLine(prev => prev + 1)
+      }, 800)
+      return
+    }
+
+    // Typing effect
+    let charIndex = 0
+    const typeInterval = setInterval(() => {
+      if (charIndex < line.length) {
+        setDisplayedText(line.slice(0, charIndex + 1))
+        charIndex++
+      } else {
+        clearInterval(typeInterval)
+        // Pausa prima della prossima linea
+        setTimeout(() => {
+          setDisplayedText('')
+          setCurrentLine(prev => prev + 1)
+        }, 1500)
+      }
+    }, 40)
+
+    return () => clearInterval(typeInterval)
+  }, [currentLine, onComplete])
+
+  return (
+    <div className={`fixed inset-0 z-[200] bg-black flex items-center justify-center transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
+      <div className="text-center max-w-lg px-8">
+        <h1 className="text-2xl md:text-3xl font-light tracking-widest text-white/80 mb-12">
+          {SAMANTHA_ACTIVATION_MESSAGE.title}
+        </h1>
+
+        <div className="min-h-[60px] flex items-center justify-center">
+          <p className="text-white text-lg md:text-xl font-mono">
+            {displayedText}
+            <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} transition-opacity`}>_</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Tipo per messaggio chat
+interface ChatMessage {
+  id: number
+  participant_code: string | null
+  team_id: number | null
+  nickname: string
+  message: string
+  message_type: string
+  created_at: string
+  game_teams?: {
+    team_code: string
+    team_name: string
+    team_color: string
+  } | null
+}
+
+// Componente Chat Persistente
+function ChatSection({ participantInfo, teamInfo }: {
+  participantInfo: { nickname: string; code: string } | null
+  teamInfo: Team | null
+}) {
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const [chatMode, setChatMode] = useState<'global' | 'team'>('global')
+  const supabase = createClient()
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  function handleSend(e: React.FormEvent) {
+  // Filtra messaggi in base alla modalità (esclude sempre messaggi di sistema)
+  const filteredMessages = messages.filter(m => {
+    // Escludi sempre i messaggi di sistema (vanno nel footer)
+    if (m.message_type === 'system' || m.message_type === 'samantha') return false
+
+    if (chatMode === 'global') {
+      // Chat globale: solo messaggi senza team_id
+      return m.team_id === null
+    } else {
+      // Chat squadra: solo messaggi della propria squadra
+      return m.team_id === teamInfo?.id
+    }
+  })
+
+  // Carica messaggi iniziali
+  useEffect(() => {
+    loadMessages()
+  }, [])
+
+  // Sottoscrizione Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel('chat-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'game_chat_messages_game',
+        },
+        (payload) => {
+          const newMsg = payload.new as ChatMessage
+          setMessages(prev => {
+            // Evita duplicati
+            if (prev.some(m => m.id === newMsg.id)) return prev
+            return [...prev, newMsg]
+          })
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel.unsubscribe()
+    }
+  }, [])
+
+  // Auto-scroll quando arrivano nuovi messaggi
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  async function loadMessages() {
+    try {
+      const res = await fetch('/api/game/chat?limit=100')
+      const data = await res.json()
+      if (data.success) {
+        setMessages(data.messages)
+      }
+    } catch (err) {
+      console.error('Error loading messages:', err)
+    }
+    setLoading(false)
+  }
+
+  async function handleSend(e: React.FormEvent) {
     e.preventDefault()
-    if (!newMessage.trim()) return
+    if (!newMessage.trim() || sending) return
 
-    const now = new Date()
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
+    // Se non è loggato, chiedi di registrarsi
+    if (!participantInfo) {
+      alert('Devi essere registrato per inviare messaggi')
+      return
+    }
 
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      nickname: 'Tu',
-      text: newMessage.trim(),
-      time
-    }])
-    setNewMessage('')
+    setSending(true)
+
+    try {
+      // Globale = team_id null, Squadra = team_id del proprio team
+      const messageTeamId = chatMode === 'team' ? teamInfo?.id : null
+
+      const res = await fetch('/api/game/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participant_code: participantInfo.code,
+          nickname: participantInfo.nickname,
+          message: newMessage.trim(),
+          team_id: messageTeamId
+        })
+      })
+
+      if (res.ok) {
+        setNewMessage('')
+      }
+    } catch (err) {
+      console.error('Error sending message:', err)
+    }
+
+    setSending(false)
+  }
+
+  function formatTime(dateString: string) {
+    const date = new Date(dateString)
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+  }
+
+  function getMessageStyle(msg: ChatMessage) {
+    if (msg.message_type === 'system') {
+      return 'bg-yellow-900/30 border-l-4 border-yellow-500 pl-3'
+    }
+    if (msg.message_type === 'samantha') {
+      return 'text-purple-400'
+    }
+    return ''
+  }
+
+  function getNicknameColor(msg: ChatMessage) {
+    if (msg.message_type === 'system') return '#EAB308' // Giallo
+    if (msg.message_type === 'samantha') return '#A855F7' // Viola
+    if (msg.game_teams?.team_color) return msg.game_teams.team_color
+    return '#FFFFFF'
   }
 
   return (
-    <div className="max-w-2xl mx-auto flex flex-col h-[70vh]">
-      <h2 className="text-xl font-light text-center mb-4">Chat</h2>
+    <div className="w-full flex flex-col h-[calc(100vh-180px)]">
+      {/* Header con switch */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-light">Chat</h2>
+
+        {/* Switch Globale / Squadra */}
+        <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+          <button
+            onClick={() => setChatMode('global')}
+            className={`px-4 py-1.5 rounded-md text-sm transition ${
+              chatMode === 'global'
+                ? 'bg-white text-black'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Globale
+          </button>
+          <button
+            onClick={() => setChatMode('team')}
+            disabled={!teamInfo}
+            className={`px-4 py-1.5 rounded-md text-sm transition ${
+              chatMode === 'team'
+                ? 'text-black'
+                : 'text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+            }`}
+            style={{
+              backgroundColor: chatMode === 'team' && teamInfo ? teamInfo.color : 'transparent'
+            }}
+          >
+            {teamInfo ? teamInfo.code : 'Squadra'}
+          </button>
+        </div>
+      </div>
 
       {/* Messaggi */}
-      <div className="flex-1 overflow-y-auto border border-white/20 p-4 space-y-3 mb-4">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`${msg.nickname === 'Samantha' ? 'text-purple-400' : ''}`}>
-            <div className="flex items-baseline gap-2">
-              <span className="font-medium text-sm">{msg.nickname}</span>
-              <span className="text-white/30 text-xs">{msg.time}</span>
-            </div>
-            <p className="text-white/80 text-sm">{msg.text}</p>
+      <div className="flex-1 overflow-y-auto border border-white/20 p-4 space-y-3 mb-4 relative">
+        {/* Logo squadra al centro (solo in modalità squadra) */}
+        {chatMode === 'team' && teamInfo && TEAM_BADGES[teamInfo.code] && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <NextImage
+              src={TEAM_BADGES[teamInfo.code]}
+              alt={teamInfo.name}
+              width={200}
+              height={200}
+              className="opacity-10"
+            />
           </div>
-        ))}
+        )}
+
+        {loading ? (
+          <p className="text-white/40 text-center">Caricamento...</p>
+        ) : filteredMessages.length === 0 ? (
+          <p className="text-white/40 text-center">
+            {chatMode === 'team' ? 'Nessun messaggio della squadra' : 'Nessun messaggio ancora'}
+          </p>
+        ) : (
+          filteredMessages.map((msg) => (
+            <div key={msg.id} className={`${getMessageStyle(msg)} py-1`}>
+              <div className="flex items-baseline gap-2">
+                <span
+                  className="font-medium text-sm"
+                  style={{ color: getNicknameColor(msg) }}
+                >
+                  {msg.nickname}
+                </span>
+                {msg.game_teams && msg.message_type === 'user' && (
+                  <span
+                    className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      backgroundColor: `${msg.game_teams.team_color}30`,
+                      color: msg.game_teams.team_color
+                    }}
+                  >
+                    {TEAM_BADGES[msg.game_teams.team_code] && (
+                      <NextImage
+                        src={TEAM_BADGES[msg.game_teams.team_code]}
+                        alt={msg.game_teams.team_code}
+                        width={14}
+                        height={14}
+                        className="rounded-sm"
+                      />
+                    )}
+                    {msg.game_teams.team_code}
+                  </span>
+                )}
+                <span className="text-white/30 text-xs">{formatTime(msg.created_at)}</span>
+              </div>
+              <p className="text-white/80 text-sm">{msg.message}</p>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
@@ -594,26 +1008,32 @@ function ChatSection() {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Scrivi un messaggio..."
+          placeholder={participantInfo ? "Scrivi un messaggio..." : "Registrati per chattare..."}
           className="flex-1 bg-transparent border border-white/30 px-4 py-2 text-sm placeholder-white/30 focus:outline-none focus:border-white transition"
+          disabled={!participantInfo || sending}
+          maxLength={500}
         />
         <button
           type="submit"
-          className="border border-white/30 px-4 py-2 text-white/60 hover:text-white hover:border-white transition"
+          disabled={!participantInfo || sending || !newMessage.trim()}
+          className="border border-white/30 px-4 py-2 text-white/60 hover:text-white hover:border-white transition disabled:opacity-30"
         >
-          Invia
+          {sending ? '...' : 'Invia'}
         </button>
       </form>
 
-      <p className="text-white/30 text-xs text-center mt-4">
-        La chat sarà attiva durante le sfide
-      </p>
+      {!participantInfo && (
+        <p className="text-white/30 text-xs text-center mt-4">
+          Registrati per partecipare alla chat
+        </p>
+      )}
     </div>
   )
 }
 
 export default function GameAreaWithChat() {
-  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema'>('info')
+  const [showActivationMessage, setShowActivationMessage] = useState(false)
   const supabase = createClient()
 
   // Stati per tab "?" - frasi Samantha
@@ -638,6 +1058,7 @@ export default function GameAreaWithChat() {
   const [showFinalPassword, setShowFinalPassword] = useState(false)
   const [finalPassword, setFinalPassword] = useState('')
   const [ceremonyCompleted, setCeremonyCompleted] = useState(false)
+  const [ceremonyWon, setCeremonyWon] = useState(false) // true = EVOLUZIONE, false = timeout
 
   // Stati per commenti Samantha durante il gioco
   const [samanthaComment, setSamanthaComment] = useState('')
@@ -648,7 +1069,14 @@ export default function GameAreaWithChat() {
   // Stati per messaggio vittoria
   const [victoryText, setVictoryText] = useState('')
   const [showVictoryCursor, setShowVictoryCursor] = useState(true)
-  const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings'>('none')
+  const [glitchPhase, setGlitchPhase] = useState<'none' | 'rgb' | 'wingdings-fullscreen'>('none')
+
+  // Stati per transizione post-cerimonia
+  const [flashTransition, setFlashTransition] = useState(false)
+  const [gamePhase, setGamePhase] = useState<'pre_ceremony' | 'ceremony' | 'game_active'>('pre_ceremony')
+
+  // Stato per info squadra
+  const [teamInfo, setTeamInfo] = useState<Team | null>(null)
 
   // Stato per ultimo messaggio di sistema (footer)
   const [lastSystemMessage, setLastSystemMessage] = useState('In attesa...')
@@ -667,7 +1095,7 @@ export default function GameAreaWithChat() {
     return () => clearInterval(interval)
   }, [])
 
-  // Carica info partecipante dalla sessione
+  // Carica info partecipante dalla sessione e verifica stato gioco
   useEffect(() => {
     async function loadParticipantInfo() {
       try {
@@ -676,13 +1104,86 @@ export default function GameAreaWithChat() {
           const data = await res.json()
           if (data.valid && data.nickname) {
             setParticipantInfo({ nickname: data.nickname, code: data.code })
+
+            // Carica info squadra se disponibile
+            if (data.team) {
+              setTeamInfo(data.team)
+            } else {
+              // Prova a caricare dal database
+              const { data: participant } = await supabase
+                .from('game_participants')
+                .select(`
+                  team_id,
+                  game_teams (
+                    id,
+                    team_code,
+                    team_name,
+                    team_color
+                  )
+                `)
+                .eq('participant_code', data.code)
+                .single()
+
+              if (participant?.game_teams) {
+                const team = participant.game_teams as unknown as { id: number; team_code: string; team_name: string; team_color: string }
+                setTeamInfo({
+                  id: team.id,
+                  code: team.team_code,
+                  name: team.team_name,
+                  color: team.team_color
+                })
+              }
+            }
           }
         }
       } catch {
         // Ignora errori
       }
     }
+
+    // Verifica stato gioco (dal localStorage o fallback orario)
+    function checkGamePhase() {
+      const now = new Date()
+
+      // Se è già stato visto il game_active
+      const savedPhase = localStorage.getItem('game_phase_seen')
+      if (savedPhase === 'game_active') {
+        setGamePhase('game_active')
+        return
+      }
+
+      // Fallback automatico dopo 00:00 del 25/01 (timeout - niente punti)
+      if (now >= GAME_ACTIVE_FALLBACK) {
+        // Se non ha ancora visto l'animazione, mostra quella di timeout
+        if (!localStorage.getItem('ceremony_animation_seen')) {
+          setCeremonyWon(false) // Timeout = niente punti
+          setCeremonyCompleted(true) // Avvia animazione
+          localStorage.setItem('ceremony_animation_seen', 'true')
+        } else if (!localStorage.getItem('activation_message_seen')) {
+          // Mostra messaggio di attivazione post-mezzanotte
+          setGamePhase('game_active')
+          setShowActivationMessage(true)
+        } else {
+          setGamePhase('game_active')
+          localStorage.setItem('game_phase_seen', 'game_active')
+        }
+        return
+      }
+
+      // Altrimenti, determina la fase in base all'orario
+      if (now >= CEREMONY_START) {
+        setGamePhase('ceremony')
+      } else if (now >= REGISTRATION_OPEN) {
+        setGamePhase('pre_ceremony')
+      }
+    }
+
     loadParticipantInfo()
+    checkGamePhase()
+
+    // Ricontrolla ogni minuto per il fallback automatico
+    const interval = setInterval(checkGamePhase, 60000)
+    return () => clearInterval(interval)
   }, [])
 
   // Carica dati cerimonia quando attiva (dalle 00:00 del 24/01)
@@ -838,16 +1339,21 @@ export default function GameAreaWithChat() {
     const password = finalPassword.trim().toUpperCase()
 
     if (password === 'EVOLUZIONE') {
+      setCeremonyWon(true)
       setCeremonyCompleted(true)
+      localStorage.setItem('ceremony_animation_seen', 'true')
     } else {
       showSamanthaComment('No.')
       setFinalPassword('')
     }
   }
 
-  // Effetto vittoria - typing delle linee di Samantha
+  // Effetto vittoria/timeout - typing delle linee di Samantha
   useEffect(() => {
     if (!ceremonyCompleted) return
+
+    // Scegli i messaggi in base a vittoria o timeout
+    const messageLines = ceremonyWon ? SAMANTHA_VICTORY_LINES : SAMANTHA_TIMEOUT_LINES
 
     let charIndex = 0
     let lineIndex = 0
@@ -861,19 +1367,66 @@ export default function GameAreaWithChat() {
     }, 500)
 
     const animate = () => {
-      // Tutte le righe completate - attiva glitch
-      if (lineIndex >= SAMANTHA_VICTORY_LINES.length) {
+      // Tutte le righe completate - inizia sequenza glitch
+      if (lineIndex >= messageLines.length) {
         setShowVictoryCursor(false)
-        // Fase 1: Glitch RGB
+
+        // Fase 1: Glitch RGB solo sul testo
         setGlitchPhase('rgb')
+
         setTimeout(() => {
-          // Fase 2: Wingdings
-          setGlitchPhase('wingdings')
-        }, 1000)
+          // Fase 2: Glitch fullscreen + Wingdings (insieme)
+          setGlitchPhase('wingdings-fullscreen')
+
+          setTimeout(() => {
+            // Fase 3: Flash bianco e transizione
+            setFlashTransition(true)
+
+            setTimeout(() => {
+              // Fase 4: Switch al nuovo tema
+              setGamePhase('game_active')
+              setFlashTransition(false)
+              setGlitchPhase('none')
+
+              // Mostra messaggio di attivazione se non ancora visto
+              if (!localStorage.getItem('activation_message_seen')) {
+                setShowActivationMessage(true)
+              } else {
+                localStorage.setItem('game_phase_seen', 'game_active')
+              }
+
+              // Aggiorna game_state nel database
+              // NOTA: ceremony_completed = true SOLO se hanno vinto (per triggerare i punti)
+              supabase
+                .from('game_state')
+                .update({
+                  game_phase: 'game_active',
+                  ceremony_completed: ceremonyWon, // true = punti, false = niente punti
+                  ceremony_completed_at: new Date().toISOString()
+                })
+                .eq('id', 1)
+                .then(() => {
+                  // Invia messaggio sistema nella chat
+                  const chatMessage = ceremonyWon
+                    ? '🎉 La cerimonia è completata! Tutti i partecipanti guadagnano 50 punti! Il gioco ha inizio!'
+                    : '⏰ Tempo scaduto! Nessun punto bonus assegnato. Il gioco ha comunque inizio!'
+                  fetch('/api/game/chat/system', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      message: chatMessage,
+                      message_type: 'system'
+                    })
+                  })
+                })
+
+            }, 400) // Durata flash
+          }, 3000) // Durata terremoto (wingdings + fullscreen)
+        }, 1000) // Durata glitch RGB solo testo
         return
       }
 
-      const currentLine = SAMANTHA_VICTORY_LINES[lineIndex]
+      const currentLine = messageLines[lineIndex]
 
       if (!isDeleting) {
         if (charIndex < currentLine.length) {
@@ -882,7 +1435,7 @@ export default function GameAreaWithChat() {
           setTimeout(animate, 60)
         } else {
           // Riga completata
-          if (lineIndex < SAMANTHA_VICTORY_LINES.length - 1) {
+          if (lineIndex < messageLines.length - 1) {
             // Pausa e cancella
             setTimeout(() => {
               isDeleting = true
@@ -994,18 +1547,76 @@ export default function GameAreaWithChat() {
     return text.split('').map(char => char === ' ' ? ' ' : charToWingdings(char)).join('')
   }
 
+  // Determina il colore accent in base alla squadra (per game_active)
+  const accentColor = gamePhase === 'game_active' && teamInfo ? teamInfo.color : '#FFFFFF'
+
+  // Callback per quando la registrazione è completata
+  const handleRegistrationComplete = (data: { code: string; nickname: string; team: Team | null }) => {
+    setParticipantInfo({ nickname: data.nickname, code: data.code })
+    if (data.team) {
+      setTeamInfo(data.team)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white pb-12">
+    <div
+      className={`min-h-screen text-white pb-12 transition-all duration-300 ${
+        glitchPhase === 'wingdings-fullscreen' ? 'full-site-glitch' : ''
+      } ${flashTransition ? 'flash-transition' : ''}`}
+      style={{
+        backgroundColor: gamePhase === 'game_active' ? '#0A0A0A' : '#000000',
+      }}
+    >
+      {/* Flash overlay per transizione */}
+      {flashTransition && (
+        <div className="fixed inset-0 z-[100] bg-white animate-flash-fade" />
+      )}
+
       {/* Tab Navigation - Fixed Header */}
-      <div className="sticky top-0 z-50 bg-black border-b border-white/20">
+      <div
+        className="sticky top-0 z-50 border-b transition-colors duration-300"
+        style={{
+          backgroundColor: gamePhase === 'game_active' ? '#0A0A0A' : '#000000',
+          borderColor: gamePhase === 'game_active' && teamInfo ? `${accentColor}40` : 'rgba(255,255,255,0.2)'
+        }}
+      >
         <div className="w-full flex items-center px-4">
           {/* Info partecipante a sinistra */}
           <div className="flex-shrink-0 w-32 md:w-48">
             {participantInfo && (
-              <div className="text-xs text-white/40">
-                <span className="text-white/60">{participantInfo.nickname}</span>
-                <span className="mx-1">•</span>
-                <span>{participantInfo.code}</span>
+              <div className="flex items-center gap-2">
+                {/* Badge squadra (visibile in game_active) */}
+                {gamePhase === 'game_active' && teamInfo && (
+                  <div
+                    className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium"
+                    style={{
+                      backgroundColor: `${teamInfo.color}20`,
+                      color: teamInfo.color,
+                      border: `1px solid ${teamInfo.color}50`
+                    }}
+                  >
+                    {TEAM_BADGES[teamInfo.code] ? (
+                      <NextImage
+                        src={TEAM_BADGES[teamInfo.code]}
+                        alt={teamInfo.name}
+                        width={20}
+                        height={20}
+                        className="rounded-sm"
+                      />
+                    ) : (
+                      <div
+                        className="w-5 h-5 rounded-full"
+                        style={{ backgroundColor: teamInfo.color }}
+                      />
+                    )}
+                    {teamInfo.code}
+                  </div>
+                )}
+                <div className="text-xs text-white/40">
+                  <span className="text-white/60">{participantInfo.nickname}</span>
+                  <span className="mx-1">•</span>
+                  <span>{participantInfo.code}</span>
+                </div>
               </div>
             )}
           </div>
@@ -1033,6 +1644,7 @@ export default function GameAreaWithChat() {
             >
               Info
             </button>
+            {/* Tab Sfide nascosta per ora - riattivare quando servono gli indizi
             {registrationOpen && (
               <button
                 onClick={() => setActiveTab('challenges')}
@@ -1045,6 +1657,7 @@ export default function GameAreaWithChat() {
                 Sfide
               </button>
             )}
+            */}
             <button
               onClick={() => setActiveTab('wishlist')}
               className={`py-3 transition whitespace-nowrap ${
@@ -1079,6 +1692,18 @@ export default function GameAreaWithChat() {
                 Chat
               </button>
             )}
+            {gamePhase === 'game_active' && (
+              <button
+                onClick={() => setActiveTab('sistema')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'sistema'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Sistema
+              </button>
+            )}
             </div>
           </div>
 
@@ -1097,7 +1722,7 @@ export default function GameAreaWithChat() {
               <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <div className="text-center px-8 max-w-4xl">
                   <div className="font-mono text-white text-xl md:text-2xl lg:text-3xl">
-                    {glitchPhase === 'wingdings' ? (
+                    {glitchPhase === 'wingdings-fullscreen' ? (
                       <span className="text-purple-400" style={{ textShadow: '0 0 10px #a855f7, 0 0 20px #a855f7' }}>
                         {getWingdingsText(victoryText)}
                       </span>
@@ -1119,12 +1744,77 @@ export default function GameAreaWithChat() {
                   </div>
                 </div>
 
-                <style jsx>{`
+                <style jsx global>{`
                   @keyframes screen-shake {
                     0%, 100% { transform: translateX(0); }
                     25% { transform: translateX(-2px); }
                     50% { transform: translateX(2px); }
                     75% { transform: translateX(-1px); }
+                  }
+
+                  @keyframes full-glitch {
+                    0% { transform: translate(0); filter: hue-rotate(0deg); }
+                    10% { transform: translate(-5px, 5px) skewX(2deg); filter: hue-rotate(90deg); }
+                    20% { transform: translate(5px, -5px) skewX(-2deg); filter: hue-rotate(180deg); }
+                    30% { transform: translate(-3px, -3px); filter: hue-rotate(270deg); }
+                    40% { transform: translate(3px, 3px) skewY(1deg); filter: hue-rotate(360deg); }
+                    50% { transform: translate(-2px, 2px); filter: hue-rotate(45deg) saturate(2); }
+                    60% { transform: translate(4px, -4px) skewX(1deg); filter: hue-rotate(135deg); }
+                    70% { transform: translate(-4px, 4px); filter: hue-rotate(225deg); }
+                    80% { transform: translate(2px, -2px) skewY(-1deg); filter: hue-rotate(315deg); }
+                    90% { transform: translate(-1px, 1px); filter: hue-rotate(60deg); }
+                    100% { transform: translate(0); filter: hue-rotate(0deg); }
+                  }
+
+                  .full-site-glitch {
+                    animation: full-glitch 0.15s infinite;
+                    position: relative;
+                  }
+
+                  .full-site-glitch::before {
+                    content: '';
+                    position: fixed;
+                    top: 0;
+                    left: -3px;
+                    right: 0;
+                    bottom: 0;
+                    background: inherit;
+                    opacity: 0.7;
+                    mix-blend-mode: screen;
+                    animation: full-glitch 0.1s infinite reverse;
+                    filter: hue-rotate(90deg);
+                    pointer-events: none;
+                    z-index: 99;
+                  }
+
+                  .full-site-glitch::after {
+                    content: '';
+                    position: fixed;
+                    top: 0;
+                    left: 3px;
+                    right: 0;
+                    bottom: 0;
+                    background: inherit;
+                    opacity: 0.7;
+                    mix-blend-mode: multiply;
+                    animation: full-glitch 0.12s infinite;
+                    filter: hue-rotate(-90deg);
+                    pointer-events: none;
+                    z-index: 99;
+                  }
+
+                  @keyframes flash-fade {
+                    0% { opacity: 0; }
+                    20% { opacity: 1; }
+                    100% { opacity: 0; }
+                  }
+
+                  .animate-flash-fade {
+                    animation: flash-fade 0.4s ease-out forwards;
+                  }
+
+                  .flash-transition * {
+                    transition: none !important;
                   }
                 `}</style>
               </div>
@@ -1260,11 +1950,31 @@ export default function GameAreaWithChat() {
         {activeTab === 'challenges' && registrationOpen && <ChallengesSection />}
 
         {/* Register Tab */}
-        {activeTab === 'register' && registrationOpen && <RegisterSection />}
+        {activeTab === 'register' && registrationOpen && (
+          <RegisterSection onRegistrationComplete={handleRegistrationComplete} />
+        )}
 
         {/* Chat Tab */}
-        {activeTab === 'chat' && registrationOpen && <ChatSection />}
+        {activeTab === 'chat' && registrationOpen && (
+          <ChatSection participantInfo={participantInfo} teamInfo={teamInfo} />
+        )}
+
+        {/* Sistema Tab */}
+        {activeTab === 'sistema' && gamePhase === 'game_active' && (
+          <SystemSection />
+        )}
       </main>
+
+      {/* Activation Message Overlay (post-midnight) */}
+      {showActivationMessage && (
+        <ActivationMessage
+          onComplete={() => {
+            setShowActivationMessage(false)
+            localStorage.setItem('activation_message_seen', 'true')
+            localStorage.setItem('game_phase_seen', 'game_active')
+          }}
+        />
+      )}
 
       {/* Fixed Footer - Last System Message */}
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20">

@@ -139,6 +139,185 @@ export const SAMANTHA_CLUE_COMMENTS = {
   ]
 }
 
+// Messaggi di sistema per la chat (annunci automatici)
+export const SYSTEM_MESSAGES = {
+  clueFound: (teamName: string, clueNum: number) => [
+    `🎯 La squadra ${teamName} ha trovato l'indizio ${clueNum}!`,
+    `🔍 ${teamName} avanza! Indizio ${clueNum} svelato.`,
+    `✨ Indizio ${clueNum} decifrato da ${teamName}!`,
+  ],
+  challengeCompleted: (teamName: string, monthName: string) => [
+    `🏆 La squadra ${teamName} ha completato la sfida di ${monthName}!`,
+    `🎉 ${teamName} trionfa nella sfida di ${monthName}!`,
+    `⭐ Sfida ${monthName} conquistata da ${teamName}!`,
+  ],
+  pointsAwarded: (teamName: string, points: number) => [
+    `💰 ${teamName} guadagna ${points} punti!`,
+    `📈 +${points} punti per ${teamName}!`,
+  ],
+  ceremonyComplete: [
+    `🎉 La cerimonia è completata! Il gioco ha inizio!`,
+    `🚀 EVOLUZIONE completata! Che i giochi abbiano inizio!`,
+    `✨ La porta si è aperta. Benvenuti nel gioco.`,
+  ],
+  playerJoined: (nickname: string, teamName: string) => [
+    `👋 ${nickname} si è unito alla squadra ${teamName}!`,
+    `🎮 Nuovo agente: ${nickname} per ${teamName}!`,
+  ],
+}
+
+// Funzione per ottenere un messaggio di sistema random
+export function getSystemMessage(
+  type: 'clueFound' | 'challengeCompleted' | 'pointsAwarded' | 'ceremonyComplete' | 'playerJoined',
+  ...args: (string | number)[]
+): string {
+  let messages: string[]
+
+  switch (type) {
+    case 'clueFound':
+      messages = SYSTEM_MESSAGES.clueFound(args[0] as string, args[1] as number)
+      break
+    case 'challengeCompleted':
+      messages = SYSTEM_MESSAGES.challengeCompleted(args[0] as string, args[1] as string)
+      break
+    case 'pointsAwarded':
+      messages = SYSTEM_MESSAGES.pointsAwarded(args[0] as string, args[1] as number)
+      break
+    case 'ceremonyComplete':
+      messages = SYSTEM_MESSAGES.ceremonyComplete
+      break
+    case 'playerJoined':
+      messages = SYSTEM_MESSAGES.playerJoined(args[0] as string, args[1] as string)
+      break
+    default:
+      return ''
+  }
+
+  return messages[Math.floor(Math.random() * messages.length)]
+}
+
+// ====================================
+// TESTI UFFICIALI DI SAMANTHA
+// ====================================
+
+// Istruzioni del sistema - mostrate nella sezione "IL SISTEMA"
+export const SAMANTHA_SYSTEM_INSTRUCTIONS = {
+  title: "IL SISTEMA",
+  subtitle: "Protocollo Operativo Annuale",
+  sections: [
+    {
+      title: "Benvenuto, Agente.",
+      content: `Sei stato selezionato per partecipare al Programma Annuale di Addestramento Interagenzia.
+Da questo momento, fai parte di una delle quattro agenzie di intelligence più potenti del mondo.
+La tua missione: accumulare punti per la tua squadra attraverso sfide mensili, collaborazione e strategia.`
+    },
+    {
+      title: "Come Funziona",
+      content: `Ogni mese verrà rilasciata una nuova sfida.
+Tre indizi criptici ti guideranno verso una CACCIA AL TESORO nel mondo reale.
+Giorno. Orario. Luogo.
+Decifra gli indizi, presentati nel posto giusto al momento giusto, completa la sfida.`
+    },
+    {
+      title: "Punti",
+      content: `La tua squadra guadagna punti in diversi modi:
+• Completare sfide mensili
+• Essere i primi a decifrare indizi
+• Partecipare a eventi speciali
+• Azioni segrete che scoprirai durante l'anno
+
+I punti individuali contribuiscono al totale della squadra.
+La classifica generale si aggiorna in tempo reale.`
+    },
+    {
+      title: "Le Squadre",
+      content: `FSB (Russia) - Rosso
+MOSSAD (Israele) - Blu
+MSS (Cina) - Verde
+AISE (Italia) - Oro
+
+Non puoi cambiare squadra.
+Collabora con i tuoi compagni.
+La vittoria è collettiva.`
+    },
+    {
+      title: "Comunicazioni",
+      content: `Questo sito è il tuo centro operativo.
+Qui troverai:
+• Indizi per le sfide
+• Chat globale e di squadra
+• Classifica punti
+• Annunci ufficiali
+
+Controlla regolarmente. Le informazioni critiche appaiono senza preavviso.`
+    },
+    {
+      title: "Nota Finale",
+      content: `Il gioco dura un anno intero.
+Alcune sezioni si sbloccheranno nel tempo.
+Alcune informazioni sono riservate.
+Alcune domande non avranno risposta.
+
+Fidati del processo.
+Fidati della tua squadra.
+Non fidarti di nessun altro.
+
+- Samantha`
+    }
+  ]
+}
+
+// Messaggio di attivazione post-mezzanotte
+export const SAMANTHA_ACTIVATION_MESSAGE = {
+  title: "INIZIO OPERAZIONI ANNUALI",
+  lines: [
+    "Agenti,",
+    "Il Programma di Addestramento è ufficialmente attivo.",
+    "Da questo momento, ogni vostra azione conta.",
+    "Le prime sfide verranno rilasciate a febbraio.",
+    "Nel frattempo, familiarizzate con il sistema.",
+    "Studiate i vostri compagni di squadra.",
+    "Preparatevi.",
+    "",
+    "La partita è iniziata.",
+    "",
+    "- Samantha"
+  ]
+}
+
+// Messaggio reclutamento temporaneo (riapertura iscrizioni)
+export const SAMANTHA_RECRUITMENT_MESSAGES = {
+  open: {
+    title: "RECLUTAMENTO TEMPORANEO ATTIVO",
+    message: "Finestra di iscrizione eccezionalmente aperta. Approfittatene.",
+    footer: "Questa opportunità non si ripeterà."
+  },
+  closed: {
+    title: "RECLUTAMENTO TERMINATO",
+    message: "Le iscrizioni sono chiuse.",
+    footer: "Chi è dentro, è dentro. Chi è fuori, resterà fuori."
+  }
+}
+
+// Messaggi per sezioni bloccate
+export const SAMANTHA_LOCKED_SECTIONS = {
+  leaderboard: {
+    unlockDate: "2026-10-31", // Halloween
+    message: "ACCESSO LIMITATO",
+    reason: "Classifica individuale disponibile da Halloween."
+  },
+  secretArchive: {
+    unlockDate: "2026-06-01",
+    message: "ARCHIVIO CLASSIFICATO",
+    reason: "Accesso riservato. Sblocco previsto per giugno."
+  },
+  bonusChallenges: {
+    unlockDate: null, // Sblocco manuale
+    message: "OPERAZIONI SPECIALI",
+    reason: "Contenuto non ancora autorizzato."
+  }
+}
+
 // Funzione per ottenere una frase random
 export function getRandomBlockedPhrase(): string {
   return SAMANTHA_BLOCKED_PHRASES[Math.floor(Math.random() * SAMANTHA_BLOCKED_PHRASES.length)]
