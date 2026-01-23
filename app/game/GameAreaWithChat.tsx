@@ -1668,6 +1668,7 @@ export default function GameAreaWithChat() {
             >
               Wishlist
             </button>
+            {/* Tab Iscriviti e Chat nascoste per ora - riattivare quando serve
             {registrationOpen && (
               <button
                 onClick={() => setActiveTab('register')}
@@ -1692,6 +1693,7 @@ export default function GameAreaWithChat() {
                 Chat
               </button>
             )}
+            */}
             {gamePhase === 'game_active' && (
               <button
                 onClick={() => setActiveTab('sistema')}
