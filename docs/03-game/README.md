@@ -28,6 +28,13 @@ Specifiche delle entità AI nel gioco.
 - Interazioni
 - Comportamenti
 
+### [Sistema Punti e Squadre](./sistema-punti-squadre.md) ⭐ NUOVO
+Sistema completo di punti e gestione squadre.
+- Le 4 squadre (FSB, Mossad, MSS, AISE)
+- Assegnazione automatica
+- Tipi di punti
+- Classifiche
+
 ---
 
 ## ⬆️ Torna a

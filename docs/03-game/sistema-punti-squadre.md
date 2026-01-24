@@ -1,0 +1,106 @@
+# Sistema Punti e Squadre
+
+> Ultimo aggiornamento: 24/01/2026 - 14:30
+> Stato: **ATTIVO** - 21 partecipanti assegnati
+
+## Le 4 Squadre
+
+| Squadra | Codice | Colore | Hex |
+|---------|--------|--------|-----|
+| FSB (Russia) | FSB | Rosso | #DC2626 |
+| Mossad (Israele) | MOSSAD | Blu | #2563EB |
+| MSS (Cina) | MSS | Verde | #16A34A |
+| AISE (Italia) | AISE | Oro | #CA8A04 |
+
+## Composizione Attuale (24/01/2026)
+
+| Squadra | Membri |
+|---------|--------|
+| **FSB** (6) | NATASHA, ZARA, Samantha, MARCO, LEO, IPPOLITO |
+| **MOSSAD** (5) | JACKBOA, VITTO, RACHI, BENNY, ADI |
+| **MSS** (5) | CAROLA, ALESSANDRONAI, MARTINA, GIOVANNI, PANNA |
+| **AISE** (5) | PIETRO, ROBERTO, CESKO, FRANCO, SARA |
+
+## Assegnazione Squadre
+
+- **Automatica**: alla registrazione, il sistema assegna il partecipante alla squadra con meno membri
+- **Non modificabile**: una volta assegnato, il partecipante non può cambiare squadra
+- **Bilanciamento**: il sistema mantiene le squadre bilanciate
+- **Trigger attivo**: `trigger_assign_team` su `game_participants`
+
+## Sistema Punti
+
+### Tipi di Punti
+
+| Tipo | Punti | Descrizione |
+|------|-------|-------------|
+| `ceremony_bonus` | 50 | Bonus per partecipazione alla cerimonia di apertura |
+| `clue_found` | Variabile | Punti per aver trovato un indizio |
+| `challenge_completed` | Variabile | Punti per completamento sfida mensile |
+| `special_action` | Variabile | Azioni segrete durante l'anno |
+
+### Come si Guadagnano
+
+1. **Cerimonia di Apertura (24/01/2026)**
+   - 50 punti a tutti i partecipanti iscritti SE la cerimonia viene completata
+   - Se la cerimonia fallisce (timeout), nessun punto
+
+2. **Indizi Mensili**
+   - Punti per chi decifra per primo gli indizi
+   - Punti bonus per velocità
+
+3. **Sfide Mensili**
+   - Punti variabili in base alla difficoltà
+   - Punti bonus per primi classificati
+
+4. **Azioni Segrete**
+   - Punti nascosti durante l'anno
+   - Svelati progressivamente
+
+### Punti Individuali vs Squadra
+
+- **Punti Individuali**: ogni partecipante accumula punti personali
+- **Punti Squadra**: somma dei punti di tutti i membri
+- **Classifica Individuale**: visibile da Halloween (31/10/2026)
+- **Classifica Squadre**: sempre visibile dopo la cerimonia
+
+## Database
+
+### Tabelle
+
+```sql
+-- Punti assegnati
+game_points (
+  id, participant_id, team_id, points, reason, description, created_at
+)
+
+-- Squadre
+game_teams (
+  id, team_code, team_name, team_color, total_points
+)
+
+-- Partecipanti
+game_participants (
+  id, nickname, team_id, individual_points, ...
+)
+```
+
+### Viste
+
+- `game_team_leaderboard`: classifica squadre
+- `game_individual_leaderboard`: classifica individuale
+
+## File SQL
+
+1. `FASE1_game_teams_and_state.sql` - Creazione squadre
+2. `FASE2_points_system.sql` - Sistema punti
+3. `FASE3_auto_team_assignment.sql` - Assegnazione automatica
+
+## API Endpoints
+
+- `GET /api/game/leaderboard` - Classifica squadre
+- `POST /api/game/points` - Assegna punti (admin)
+
+---
+
+⬆️ [Torna al README](./README.md)
