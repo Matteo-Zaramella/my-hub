@@ -772,9 +772,10 @@ interface ChatMessage {
 }
 
 // Componente Chat Persistente
-function ChatSection({ participantInfo, teamInfo }: {
+function ChatSection({ participantInfo, teamInfo, gamePhase }: {
   participantInfo: { nickname: string; code: string } | null
   teamInfo: Team | null
+  gamePhase: 'pre_ceremony' | 'ceremony' | 'game_active'
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
@@ -913,33 +914,37 @@ function ChatSection({ participantInfo, teamInfo }: {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-light">Chat</h2>
 
-        {/* Switch Globale / Squadra */}
-        <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
-          <button
-            onClick={() => setChatMode('global')}
-            className={`px-4 py-1.5 rounded-md text-sm transition ${
-              chatMode === 'global'
-                ? 'bg-white text-black'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Globale
-          </button>
-          <button
-            onClick={() => setChatMode('team')}
-            disabled={!teamInfo}
-            className={`px-4 py-1.5 rounded-md text-sm transition ${
-              chatMode === 'team'
-                ? 'text-black'
-                : 'text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
-            }`}
-            style={{
-              backgroundColor: chatMode === 'team' && teamInfo ? teamInfo.color : 'transparent'
-            }}
-          >
-            {teamInfo ? teamInfo.code : 'Squadra'}
-          </button>
-        </div>
+        {/* Switch Globale / Squadra - Squadra visibile solo dopo EVOLUZIONE */}
+        {gamePhase === 'game_active' ? (
+          <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+            <button
+              onClick={() => setChatMode('global')}
+              className={`px-4 py-1.5 rounded-md text-sm transition ${
+                chatMode === 'global'
+                  ? 'bg-white text-black'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Globale
+            </button>
+            <button
+              onClick={() => setChatMode('team')}
+              disabled={!teamInfo}
+              className={`px-4 py-1.5 rounded-md text-sm transition ${
+                chatMode === 'team'
+                  ? 'text-black'
+                  : 'text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+              }`}
+              style={{
+                backgroundColor: chatMode === 'team' && teamInfo ? teamInfo.color : 'transparent'
+              }}
+            >
+              {teamInfo ? teamInfo.code : 'Squadra'}
+            </button>
+          </div>
+        ) : (
+          <span className="text-white/40 text-sm">Chat Globale</span>
+        )}
       </div>
 
       {/* Messaggi */}
@@ -1668,7 +1673,7 @@ export default function GameAreaWithChat() {
             >
               Wishlist
             </button>
-            {/* Tab Iscriviti e Chat nascoste per ora - riattivare quando serve
+            {/* Tab Iscriviti nascosta per ora - riattivare quando serve
             {registrationOpen && (
               <button
                 onClick={() => setActiveTab('register')}
@@ -1681,6 +1686,7 @@ export default function GameAreaWithChat() {
                 Iscriviti
               </button>
             )}
+            */}
             {registrationOpen && (
               <button
                 onClick={() => setActiveTab('chat')}
@@ -1693,7 +1699,6 @@ export default function GameAreaWithChat() {
                 Chat
               </button>
             )}
-            */}
             {gamePhase === 'game_active' && (
               <button
                 onClick={() => setActiveTab('sistema')}
@@ -1958,7 +1963,7 @@ export default function GameAreaWithChat() {
 
         {/* Chat Tab */}
         {activeTab === 'chat' && registrationOpen && (
-          <ChatSection participantInfo={participantInfo} teamInfo={teamInfo} />
+          <ChatSection participantInfo={participantInfo} teamInfo={teamInfo} gamePhase={gamePhase} />
         )}
 
         {/* Sistema Tab */}
@@ -1978,11 +1983,11 @@ export default function GameAreaWithChat() {
         />
       )}
 
-      {/* Fixed Footer - Last System Message */}
+      {/* Fixed Footer - Info Festa */}
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20">
         <div className="px-4 py-3 text-center">
           <p className="text-white/60 text-sm">
-            {lastSystemMessage}
+            Vi aspetto stasera · <span className="text-white/80">Via Pelosa 76, Selvazzano</span> · <span className="text-white/80">dalle 21:30</span>
           </p>
         </div>
       </footer>
