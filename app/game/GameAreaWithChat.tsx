@@ -1410,7 +1410,19 @@ export default function GameAreaWithChat() {
                   ceremony_completed_at: new Date().toISOString()
                 })
                 .eq('id', 1)
-                .then(() => {
+                .then(async () => {
+                  // Se hanno vinto, assegna i 50 punti a tutti
+                  if (ceremonyWon) {
+                    try {
+                      await fetch('/api/game/points/ceremony-bonus?key=cerimonia2026', {
+                        method: 'POST'
+                      })
+                      console.log('Punti cerimonia assegnati!')
+                    } catch (err) {
+                      console.error('Errore assegnazione punti:', err)
+                    }
+                  }
+
                   // Invia messaggio sistema nella chat
                   const chatMessage = ceremonyWon
                     ? '🎉 La cerimonia è completata! Tutti i partecipanti guadagnano 50 punti! Il gioco ha inizio!'

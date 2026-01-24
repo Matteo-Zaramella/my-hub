@@ -44,6 +44,7 @@
 1. **Cerimonia di Apertura (24/01/2026)**
    - 50 punti a tutti i partecipanti iscritti SE la cerimonia viene completata
    - Se la cerimonia fallisce (timeout), nessun punto
+   - **Assegnazione automatica**: quando viene inserita "EVOLUZIONE", l'API viene chiamata automaticamente
 
 2. **Indizi Mensili**
    - Punti per chi decifra per primo gli indizi
