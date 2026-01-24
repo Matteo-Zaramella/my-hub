@@ -98,8 +98,41 @@ game_participants (
 
 ## API Endpoints
 
-- `GET /api/game/leaderboard` - Classifica squadre
-- `POST /api/game/points` - Assegna punti (admin)
+### GET /api/game/points
+Ottieni classifica squadre o individuale.
+```
+GET /api/game/points?type=teams     # Classifica squadre (default)
+GET /api/game/points?type=individual # Classifica individuale
+```
+
+### POST /api/game/points
+Assegna punti (richiede admin key).
+```json
+POST /api/game/points?key=cerimonia2026
+{
+  "participant_id": 76,  // opzionale
+  "team_id": 1,          // opzionale (auto se participant_id)
+  "points": 10,          // obbligatorio
+  "reason": "clue_found", // obbligatorio
+  "description": "..."   // opzionale
+}
+```
+
+### POST /api/game/points/ceremony-bonus
+Assegna 50 punti a TUTTI i partecipanti (una volta sola).
+```
+POST /api/game/points/ceremony-bonus?key=cerimonia2026
+```
+
+### GET /api/game/points/ceremony-bonus
+Verifica se i punti cerimonia sono stati assegnati.
+```json
+{
+  "ceremonyBonusAssigned": true,
+  "participantsWithBonus": 21,
+  "totalBonusPoints": 1050
+}
+```
 
 ---
 
