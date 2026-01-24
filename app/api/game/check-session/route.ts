@@ -23,6 +23,7 @@ export async function GET() {
         participant_code,
         nickname,
         team_id,
+        is_admin,
         game_teams (
           id,
           team_code,
@@ -58,7 +59,8 @@ export async function GET() {
       valid: true,
       nickname: participant.nickname,
       code: participant.participant_code,
-      team: team
+      team: team,
+      isAdmin: participant.is_admin || false
     })
   } catch {
     return NextResponse.json({ valid: false })

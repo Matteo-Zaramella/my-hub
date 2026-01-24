@@ -772,16 +772,17 @@ interface ChatMessage {
 }
 
 // Componente Chat Persistente
-function ChatSection({ participantInfo, teamInfo, gamePhase }: {
+function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
   participantInfo: { nickname: string; code: string } | null
   teamInfo: Team | null
   gamePhase: 'pre_ceremony' | 'ceremony' | 'game_active'
+  isAdmin: boolean
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
-  const [chatMode, setChatMode] = useState<'global' | 'team'>('global')
+  const [chatMode, setChatMode] = useState<'global' | 'team' | 1 | 2 | 3 | 4>('global')
   const supabase = createClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -793,10 +794,14 @@ function ChatSection({ participantInfo, teamInfo, gamePhase }: {
     if (chatMode === 'global') {
       // Chat globale: solo messaggi senza team_id
       return m.team_id === null
-    } else {
+    } else if (chatMode === 'team') {
       // Chat squadra: solo messaggi della propria squadra
       return m.team_id === teamInfo?.id
+    } else if (typeof chatMode === 'number') {
+      // Admin: visualizza squadra specifica
+      return m.team_id === chatMode
     }
+    return false
   })
 
   // Carica messaggi iniziali
@@ -914,12 +919,12 @@ function ChatSection({ participantInfo, teamInfo, gamePhase }: {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-light">Chat</h2>
 
-        {/* Switch Globale / Squadra - Squadra visibile solo dopo EVOLUZIONE */}
-        {gamePhase === 'game_active' ? (
-          <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+        {/* Switch Globale / Squadra - Admin vede tutte le squadre */}
+        {gamePhase === 'game_active' || isAdmin ? (
+          <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1 flex-wrap">
             <button
               onClick={() => setChatMode('global')}
-              className={`px-4 py-1.5 rounded-md text-sm transition ${
+              className={`px-3 py-1.5 rounded-md text-sm transition ${
                 chatMode === 'global'
                   ? 'bg-white text-black'
                   : 'text-white/60 hover:text-white'
@@ -927,20 +932,63 @@ function ChatSection({ participantInfo, teamInfo, gamePhase }: {
             >
               Globale
             </button>
-            <button
-              onClick={() => setChatMode('team')}
-              disabled={!teamInfo}
-              className={`px-4 py-1.5 rounded-md text-sm transition ${
-                chatMode === 'team'
-                  ? 'text-black'
-                  : 'text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
-              }`}
-              style={{
-                backgroundColor: chatMode === 'team' && teamInfo ? teamInfo.color : 'transparent'
-              }}
-            >
-              {teamInfo ? teamInfo.code : 'Squadra'}
-            </button>
+            {isAdmin ? (
+              // Admin: mostra tutte le squadre
+              <>
+                <button
+                  onClick={() => setChatMode(1)}
+                  className={`px-3 py-1.5 rounded-md text-sm transition ${
+                    chatMode === 1 ? 'text-black' : 'text-white/60 hover:text-white'
+                  }`}
+                  style={{ backgroundColor: chatMode === 1 ? '#DC2626' : 'transparent' }}
+                >
+                  FSB
+                </button>
+                <button
+                  onClick={() => setChatMode(2)}
+                  className={`px-3 py-1.5 rounded-md text-sm transition ${
+                    chatMode === 2 ? 'text-black' : 'text-white/60 hover:text-white'
+                  }`}
+                  style={{ backgroundColor: chatMode === 2 ? '#2563EB' : 'transparent' }}
+                >
+                  MOSSAD
+                </button>
+                <button
+                  onClick={() => setChatMode(3)}
+                  className={`px-3 py-1.5 rounded-md text-sm transition ${
+                    chatMode === 3 ? 'text-black' : 'text-white/60 hover:text-white'
+                  }`}
+                  style={{ backgroundColor: chatMode === 3 ? '#16A34A' : 'transparent' }}
+                >
+                  MSS
+                </button>
+                <button
+                  onClick={() => setChatMode(4)}
+                  className={`px-3 py-1.5 rounded-md text-sm transition ${
+                    chatMode === 4 ? 'text-black' : 'text-white/60 hover:text-white'
+                  }`}
+                  style={{ backgroundColor: chatMode === 4 ? '#CA8A04' : 'transparent' }}
+                >
+                  AISE
+                </button>
+              </>
+            ) : (
+              // Utente normale: solo propria squadra
+              <button
+                onClick={() => setChatMode('team')}
+                disabled={!teamInfo}
+                className={`px-3 py-1.5 rounded-md text-sm transition ${
+                  chatMode === 'team'
+                    ? 'text-black'
+                    : 'text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+                }`}
+                style={{
+                  backgroundColor: chatMode === 'team' && teamInfo ? teamInfo.color : 'transparent'
+                }}
+              >
+                {teamInfo ? teamInfo.code : 'Squadra'}
+              </button>
+            )}
           </div>
         ) : (
           <span className="text-white/40 text-sm">Chat Globale</span>
@@ -949,12 +997,23 @@ function ChatSection({ participantInfo, teamInfo, gamePhase }: {
 
       {/* Messaggi */}
       <div className="flex-1 overflow-y-auto border border-white/20 p-4 space-y-3 mb-4 relative">
-        {/* Logo squadra al centro (solo in modalità squadra) */}
-        {chatMode === 'team' && teamInfo && TEAM_BADGES[teamInfo.code] && (
+        {/* Logo squadra al centro (in modalità squadra o admin) */}
+        {(chatMode === 'team' && teamInfo && TEAM_BADGES[teamInfo.code]) && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <NextImage
               src={TEAM_BADGES[teamInfo.code]}
               alt={teamInfo.name}
+              width={200}
+              height={200}
+              className="opacity-10"
+            />
+          </div>
+        )}
+        {typeof chatMode === 'number' && TEAM_BADGES[{1: 'FSB', 2: 'MOSSAD', 3: 'MSS', 4: 'AISE'}[chatMode] || ''] && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <NextImage
+              src={TEAM_BADGES[{1: 'FSB', 2: 'MOSSAD', 3: 'MSS', 4: 'AISE'}[chatMode] || '']}
+              alt="Team"
               width={200}
               height={200}
               className="opacity-10"
@@ -966,7 +1025,7 @@ function ChatSection({ participantInfo, teamInfo, gamePhase }: {
           <p className="text-white/40 text-center">Caricamento...</p>
         ) : filteredMessages.length === 0 ? (
           <p className="text-white/40 text-center">
-            {chatMode === 'team' ? 'Nessun messaggio della squadra' : 'Nessun messaggio ancora'}
+            {chatMode === 'global' ? 'Nessun messaggio ancora' : 'Nessun messaggio in questa chat'}
           </p>
         ) : (
           filteredMessages.map((msg) => (
@@ -1083,6 +1142,9 @@ export default function GameAreaWithChat() {
   // Stato per info squadra
   const [teamInfo, setTeamInfo] = useState<Team | null>(null)
 
+  // Stato per admin (può vedere tutte le chat)
+  const [isAdmin, setIsAdmin] = useState(false)
+
   // Stato per ultimo messaggio di sistema (footer)
   const [lastSystemMessage, setLastSystemMessage] = useState('In attesa...')
 
@@ -1109,6 +1171,7 @@ export default function GameAreaWithChat() {
           const data = await res.json()
           if (data.valid && data.nickname) {
             setParticipantInfo({ nickname: data.nickname, code: data.code })
+            setIsAdmin(data.isAdmin || false)
 
             // Carica info squadra se disponibile
             if (data.team) {
@@ -1975,7 +2038,7 @@ export default function GameAreaWithChat() {
 
         {/* Chat Tab */}
         {activeTab === 'chat' && registrationOpen && (
-          <ChatSection participantInfo={participantInfo} teamInfo={teamInfo} gamePhase={gamePhase} />
+          <ChatSection participantInfo={participantInfo} teamInfo={teamInfo} gamePhase={gamePhase} isAdmin={isAdmin} />
         )}
 
         {/* Sistema Tab */}
