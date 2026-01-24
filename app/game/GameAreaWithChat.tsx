@@ -680,6 +680,160 @@ function SystemSection() {
   )
 }
 
+// Componente Classifica
+function LeaderboardSection({ isAdmin }: { isAdmin: boolean }) {
+  const [viewMode, setViewMode] = useState<'teams' | 'individual'>('teams')
+  const [teamsData, setTeamsData] = useState<Array<{
+    id: number
+    team_code: string
+    team_name: string
+    team_color: string
+    total_points: number
+    member_count: number
+  }>>([])
+  const [individualData, setIndividualData] = useState<Array<{
+    id: number
+    nickname: string
+    individual_points: number
+    team_code?: string
+    team_color?: string
+  }>>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadLeaderboard()
+  }, [viewMode])
+
+  async function loadLeaderboard() {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/game/points?type=${viewMode === 'teams' ? 'teams' : 'individual'}`)
+      const data = await res.json()
+      if (viewMode === 'teams') {
+        setTeamsData(data.leaderboard || [])
+      } else {
+        setIndividualData(data.leaderboard || [])
+      }
+    } catch (err) {
+      console.error('Error loading leaderboard:', err)
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-xl font-light tracking-widest text-white/80 mb-2">
+          CLASSIFICA
+        </h2>
+        {isAdmin && (
+          <div className="flex justify-center gap-2 mt-4">
+            <button
+              onClick={() => setViewMode('teams')}
+              className={`px-4 py-2 rounded text-sm transition ${
+                viewMode === 'teams'
+                  ? 'bg-white text-black'
+                  : 'border border-white/30 text-white/60 hover:text-white'
+              }`}
+            >
+              Squadre
+            </button>
+            <button
+              onClick={() => setViewMode('individual')}
+              className={`px-4 py-2 rounded text-sm transition ${
+                viewMode === 'individual'
+                  ? 'bg-white text-black'
+                  : 'border border-white/30 text-white/60 hover:text-white'
+              }`}
+            >
+              Individuale
+            </button>
+          </div>
+        )}
+      </div>
+
+      {loading ? (
+        <p className="text-white/40 text-center">Caricamento...</p>
+      ) : viewMode === 'teams' ? (
+        // Classifica Squadre
+        <div className="space-y-3">
+          {teamsData.map((team, index) => (
+            <div
+              key={team.id}
+              className="flex items-center justify-between p-4 border rounded"
+              style={{ borderColor: team.team_color + '50' }}
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-2xl font-bold text-white/40 w-8">
+                  {index + 1}
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: team.team_color }}
+                    />
+                    <span className="font-medium text-white">
+                      {team.team_name}
+                    </span>
+                  </div>
+                  <span className="text-white/40 text-sm">
+                    {team.member_count} membri
+                  </span>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-bold" style={{ color: team.team_color }}>
+                  {team.total_points}
+                </span>
+                <span className="text-white/40 text-sm ml-1">pt</span>
+              </div>
+            </div>
+          ))}
+          {teamsData.length === 0 && (
+            <p className="text-white/40 text-center">Nessun punto ancora assegnato</p>
+          )}
+        </div>
+      ) : (
+        // Classifica Individuale (solo admin)
+        <div className="space-y-2">
+          {individualData.map((player, index) => (
+            <div
+              key={player.id}
+              className="flex items-center justify-between p-3 border border-white/20 rounded"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-lg font-bold text-white/40 w-6">
+                  {index + 1}
+                </span>
+                <span className="text-white">{player.nickname}</span>
+                {player.team_code && (
+                  <span
+                    className="text-xs px-2 py-0.5 rounded"
+                    style={{
+                      backgroundColor: player.team_color + '30',
+                      color: player.team_color
+                    }}
+                  >
+                    {player.team_code}
+                  </span>
+                )}
+              </div>
+              <span className="font-bold text-white">
+                {player.individual_points} pt
+              </span>
+            </div>
+          ))}
+          {individualData.length === 0 && (
+            <p className="text-white/40 text-center">Nessun punto individuale ancora</p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Componente Messaggio di Attivazione (post-mezzanotte)
 function ActivationMessage({ onComplete }: { onComplete: () => void }) {
   const [currentLine, setCurrentLine] = useState(0)
@@ -1096,7 +1250,7 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
 }
 
 export default function GameAreaWithChat() {
-  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema' | 'classifica'>('info')
   const [showActivationMessage, setShowActivationMessage] = useState(false)
   const supabase = createClient()
 
@@ -1786,6 +1940,18 @@ export default function GameAreaWithChat() {
                 Sistema
               </button>
             )}
+            {gamePhase === 'game_active' && (
+              <button
+                onClick={() => setActiveTab('classifica')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'classifica'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Classifica
+              </button>
+            )}
             </div>
           </div>
 
@@ -2044,6 +2210,11 @@ export default function GameAreaWithChat() {
         {/* Sistema Tab */}
         {activeTab === 'sistema' && gamePhase === 'game_active' && (
           <SystemSection />
+        )}
+
+        {/* Classifica Tab */}
+        {activeTab === 'classifica' && gamePhase === 'game_active' && (
+          <LeaderboardSection isAdmin={isAdmin} />
         )}
       </main>
 
