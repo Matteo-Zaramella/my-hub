@@ -1,7 +1,15 @@
 # Sistema Punti e Squadre
 
-> Ultimo aggiornamento: 24/01/2026 - 14:30
+> Ultimo aggiornamento: 24/01/2026 - 15:00
 > Stato: **ATTIVO** - 21 partecipanti assegnati
+
+## Admin/Organizzatore
+
+**ZARA** (id=71) è impostato come admin superpartes:
+- `is_admin = TRUE`
+- `team_id = NULL` (fuori dalle squadre)
+- Può vedere tutte le chat di tutte le squadre
+- Accesso completo a tutte le funzionalità
 
 ## Le 4 Squadre
 
