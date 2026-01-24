@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD
-  }
-})
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
@@ -38,7 +32,7 @@ export async function POST(request: Request) {
 
     const emails = participants
       ?.filter(p => p.email)
-      .map(p => p.email) || []
+      .map(p => p.email as string) || []
 
     if (emails.length === 0) {
       return NextResponse.json({ error: 'Nessun partecipante con email' }, { status: 400 })
@@ -47,8 +41,8 @@ export async function POST(request: Request) {
     // Invia email a tutti
     const results = await Promise.allSettled(
       emails.map(email =>
-        transporter.sendMail({
-          from: '"Samantha" <' + process.env.GMAIL_USER + '>',
+        resend.emails.send({
+          from: 'Samantha <noreply@matteozaramella.com>',
           to: email,
           subject: 'Trova i 10 indizi.',
           text: 'Trova i 10 indizi.',
