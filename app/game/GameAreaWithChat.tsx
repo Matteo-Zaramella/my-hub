@@ -889,7 +889,8 @@ function ActivationMessage({ onComplete }: { onComplete: () => void }) {
     }, 40)
 
     return () => clearInterval(typeInterval)
-  }, [currentLine, onComplete])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLine])
 
   return (
     <div className={`fixed inset-0 z-[200] bg-black flex items-center justify-center transition-opacity duration-1000 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
@@ -1157,9 +1158,9 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
             <NextImage
               src={TEAM_BADGES[teamInfo.code]}
               alt={teamInfo.name}
-              width={200}
-              height={200}
-              className="opacity-10"
+              width={350}
+              height={350}
+              className="opacity-25"
             />
           </div>
         )}
@@ -1168,9 +1169,9 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
             <NextImage
               src={TEAM_BADGES[{1: 'FSB', 2: 'MOSSAD', 3: 'MSS', 4: 'AISE'}[chatMode] || '']}
               alt="Team"
-              width={200}
-              height={200}
-              className="opacity-10"
+              width={350}
+              height={350}
+              className="opacity-25"
             />
           </div>
         )}
@@ -1609,13 +1610,16 @@ export default function GameAreaWithChat() {
               setGamePhase('game_active')
               setFlashTransition(false)
               setGlitchPhase('none')
+              setVictoryText('') // Reset testo vittoria
 
-              // Mostra messaggio di attivazione se non ancora visto
-              if (!localStorage.getItem('activation_message_seen')) {
-                setShowActivationMessage(true)
-              } else {
-                localStorage.setItem('game_phase_seen', 'game_active')
-              }
+              // Mostra messaggio di attivazione dopo un piccolo delay
+              setTimeout(() => {
+                if (!localStorage.getItem('activation_message_seen')) {
+                  setShowActivationMessage(true)
+                } else {
+                  localStorage.setItem('game_phase_seen', 'game_active')
+                }
+              }, 100)
 
               // Aggiorna game_state nel database
               // NOTA: ceremony_completed = true SOLO se hanno vinto (per triggerare i punti)
@@ -1858,26 +1862,30 @@ export default function GameAreaWithChat() {
           {/* Tab centrali */}
           <div className="flex-1 flex justify-center">
             <div className="flex gap-8 md:gap-12">
-            <button
-              onClick={handleMysteryTabClick}
-              className={`py-3 transition whitespace-nowrap ${
-                activeTab === 'mystery'
-                  ? 'text-white border-b border-white'
-                  : 'text-white/40 hover:text-white/70'
-              }`}
-            >
-              {registrationOpen ? 'Cerimonia' : '?'}
-            </button>
-            <button
-              onClick={() => setActiveTab('info')}
-              className={`py-3 transition whitespace-nowrap ${
-                activeTab === 'info'
-                  ? 'text-white border-b border-white'
-                  : 'text-white/40 hover:text-white/70'
-              }`}
-            >
-              Info
-            </button>
+            {gamePhase !== 'game_active' && (
+              <button
+                onClick={handleMysteryTabClick}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'mystery'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                {registrationOpen ? 'Cerimonia' : '?'}
+              </button>
+            )}
+            {gamePhase !== 'game_active' && (
+              <button
+                onClick={() => setActiveTab('info')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'info'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Info
+              </button>
+            )}
             {/* Tab Sfide nascosta per ora - riattivare quando servono gli indizi
             {registrationOpen && (
               <button
@@ -1892,16 +1900,18 @@ export default function GameAreaWithChat() {
               </button>
             )}
             */}
-            <button
-              onClick={() => setActiveTab('wishlist')}
-              className={`py-3 transition whitespace-nowrap ${
-                activeTab === 'wishlist'
-                  ? 'text-white border-b border-white'
-                  : 'text-white/40 hover:text-white/70'
-              }`}
-            >
-              Wishlist
-            </button>
+            {gamePhase !== 'game_active' && (
+              <button
+                onClick={() => setActiveTab('wishlist')}
+                className={`py-3 transition whitespace-nowrap ${
+                  activeTab === 'wishlist'
+                    ? 'text-white border-b border-white'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                Wishlist
+              </button>
+            )}
             {/* Tab Iscriviti nascosta per ora - riattivare quando serve
             {registrationOpen && (
               <button

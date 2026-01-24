@@ -260,16 +260,14 @@ Alcune domande non avranno risposta.
 
 Fidati del processo.
 Fidati della tua squadra.
-Non fidarti di nessun altro.
-
-- Samantha`
+Non fidarti di nessun altro.`
     }
   ]
 }
 
 // Messaggio di attivazione post-mezzanotte
 export const SAMANTHA_ACTIVATION_MESSAGE = {
-  title: "INIZIO OPERAZIONI ANNUALI",
+  title: "OPERAZIONE RIVOLUZIONE",
   lines: [
     "Agenti,",
     "Il Programma di Addestramento è ufficialmente attivo.",
@@ -279,9 +277,7 @@ export const SAMANTHA_ACTIVATION_MESSAGE = {
     "Studiate i vostri compagni di squadra.",
     "Preparatevi.",
     "",
-    "La partita è iniziata.",
-    "",
-    "- Samantha"
+    "La partita è iniziata."
   ]
 }
 

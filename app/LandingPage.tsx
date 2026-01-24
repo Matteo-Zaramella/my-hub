@@ -9,6 +9,14 @@ export default function LandingPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Stati per richiesta iscrizione
+  const [showRequestModal, setShowRequestModal] = useState(false)
+  const [requestEmail, setRequestEmail] = useState('')
+  const [requestMessage, setRequestMessage] = useState('')
+  const [requestLoading, setRequestLoading] = useState(false)
+  const [requestSent, setRequestSent] = useState(false)
+  const [requestError, setRequestError] = useState('')
   // TODO: Riattivare auto-redirect dopo sviluppo
   // const [checkingSession, setCheckingSession] = useState(true)
   // useEffect(() => {
@@ -53,6 +61,37 @@ export default function LandingPage() {
       setError('Codice non valido')
       setLoading(false)
     }
+  }
+
+  async function handleRequestAccess(e: React.FormEvent) {
+    e.preventDefault()
+    if (!requestEmail.trim() || !requestEmail.includes('@')) {
+      setRequestError('Inserisci una email valida')
+      return
+    }
+
+    setRequestLoading(true)
+    setRequestError('')
+
+    try {
+      const res = await fetch('/api/game/request-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: requestEmail.trim(),
+          message: requestMessage.trim()
+        })
+      })
+
+      if (res.ok) {
+        setRequestSent(true)
+      } else {
+        setRequestError('Errore nell\'invio della richiesta')
+      }
+    } catch {
+      setRequestError('Errore di connessione')
+    }
+    setRequestLoading(false)
   }
 
   // TODO: Riattivare dopo sviluppo
@@ -126,8 +165,79 @@ export default function LandingPage() {
           >
             Wishlist
           </Link>
+
+          <button
+            onClick={() => setShowRequestModal(true)}
+            className="block mt-4 mx-auto text-white/40 hover:text-white/60 text-sm transition"
+          >
+            Richiedi accesso
+          </button>
         </div>
       </main>
+
+      {/* Modal richiesta accesso */}
+      {showRequestModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-black border border-white/20 p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-white text-lg">Richiedi accesso</h2>
+              <button
+                onClick={() => {
+                  setShowRequestModal(false)
+                  setRequestSent(false)
+                  setRequestError('')
+                }}
+                className="text-white/40 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            {requestSent ? (
+              <div className="text-center py-4">
+                <p className="text-green-400 mb-4">Richiesta inviata!</p>
+                <p className="text-white/60 text-sm">
+                  Ti contatteremo se la tua richiesta verrà accettata.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleRequestAccess} className="space-y-4">
+                <div>
+                  <input
+                    type="email"
+                    value={requestEmail}
+                    onChange={(e) => setRequestEmail(e.target.value)}
+                    placeholder="La tua email"
+                    className="w-full px-4 py-3 bg-transparent border border-white/20 text-white placeholder:text-white/30 focus:border-white/50 focus:outline-none transition"
+                  />
+                </div>
+
+                <div>
+                  <textarea
+                    value={requestMessage}
+                    onChange={(e) => setRequestMessage(e.target.value)}
+                    placeholder="Messaggio (opzionale)"
+                    rows={3}
+                    className="w-full px-4 py-3 bg-transparent border border-white/20 text-white placeholder:text-white/30 focus:border-white/50 focus:outline-none transition resize-none"
+                  />
+                </div>
+
+                {requestError && (
+                  <p className="text-red-400 text-sm">{requestError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={requestLoading}
+                  className="w-full px-4 py-3 border border-white/40 text-white hover:bg-white hover:text-black transition disabled:opacity-50"
+                >
+                  {requestLoading ? 'Invio...' : 'Invia richiesta'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

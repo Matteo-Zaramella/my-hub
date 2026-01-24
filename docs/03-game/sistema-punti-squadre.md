@@ -1,7 +1,7 @@
 # Sistema Punti e Squadre
 
-> Ultimo aggiornamento: 24/01/2026 - 15:00
-> Stato: **ATTIVO** - 21 partecipanti assegnati
+> Ultimo aggiornamento: 24/01/2026 - 16:30
+> Stato: **ATTIVO** - 19 partecipanti (18 in squadre + 1 admin)
 
 ## Admin/Organizzatore
 
@@ -22,12 +22,17 @@
 
 ## Composizione Attuale (24/01/2026)
 
-| Squadra | Membri |
-|---------|--------|
-| **FSB** (6) | NATASHA, ZARA, Samantha, MARCO, LEO, IPPOLITO |
-| **MOSSAD** (5) | JACKBOA, VITTO, RACHI, BENNY, ADI |
-| **MSS** (5) | CAROLA, ALESSANDRONAI, MARTINA, GIOVANNI, PANNA |
-| **AISE** (5) | PIETRO, ROBERTO, CESKO, FRANCO, SARA |
+> ⚠️ BENNY e JACKBOA rimossi (non parteciperanno)
+> Squadre ribilanciate con `RIBILANCIA_SQUADRE.sql`
+
+| Squadra | Membri | Note |
+|---------|--------|------|
+| **FSB** (4) | NATASHA, Samantha, MARCO, LEO | -1 spostato a MOSSAD |
+| **MOSSAD** (5) | VITTO, RACHI, ADI + 2 nuovi | +2 da ribilanciamento |
+| **MSS** (4) | CAROLA, ALESSANDRONAI, MARTINA, GIOVANNI | -1 spostato a MOSSAD |
+| **AISE** (5) | PIETRO, ROBERTO, CESKO, FRANCO, SARA | Invariato |
+
+**Totale**: 18 partecipanti in squadra + ZARA admin = 19
 
 ## Assegnazione Squadre
 
@@ -104,6 +109,8 @@ game_participants (
 1. `FASE1_game_teams_and_state.sql` - Creazione squadre
 2. `FASE2_points_system.sql` - Sistema punti
 3. `FASE3_auto_team_assignment.sql` - Assegnazione automatica
+4. `SET_ZARA_ADMIN.sql` - Imposta ZARA come admin
+5. `RIBILANCIA_SQUADRE.sql` - Ribilanciamento dopo rimozione partecipanti
 
 ## API Endpoints
 
