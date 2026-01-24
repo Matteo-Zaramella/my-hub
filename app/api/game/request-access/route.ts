@@ -18,6 +18,12 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
   try {
+    // Blocco iscrizioni dopo le 17:00 del 24/01/2026
+    const deadline = new Date('2026-01-24T17:00:00')
+    if (new Date() >= deadline) {
+      return NextResponse.json({ error: 'Iscrizioni chiuse' }, { status: 403 })
+    }
+
     const { email, message } = await request.json()
 
     if (!email || !email.includes('@')) {

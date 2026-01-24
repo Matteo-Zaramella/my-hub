@@ -17,6 +17,19 @@ export default function LandingPage() {
   const [requestLoading, setRequestLoading] = useState(false)
   const [requestSent, setRequestSent] = useState(false)
   const [requestError, setRequestError] = useState('')
+
+  // Blocco iscrizioni dopo le 17:00 del 24/01/2026
+  const registrationDeadline = new Date('2026-01-24T17:00:00')
+  const [isRegistrationClosed, setIsRegistrationClosed] = useState(false)
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      setIsRegistrationClosed(new Date() >= registrationDeadline)
+    }
+    checkDeadline()
+    const interval = setInterval(checkDeadline, 60000) // Controlla ogni minuto
+    return () => clearInterval(interval)
+  }, [])
   // TODO: Riattivare auto-redirect dopo sviluppo
   // const [checkingSession, setCheckingSession] = useState(true)
   // useEffect(() => {
@@ -166,12 +179,18 @@ export default function LandingPage() {
             Wishlist
           </Link>
 
-          <button
-            onClick={() => setShowRequestModal(true)}
-            className="block mt-4 mx-auto text-white/40 hover:text-white/60 text-sm transition"
-          >
-            Richiedi accesso
-          </button>
+          {isRegistrationClosed ? (
+            <p className="mt-4 text-white/30 text-sm">
+              Iscrizioni chiuse
+            </p>
+          ) : (
+            <button
+              onClick={() => setShowRequestModal(true)}
+              className="block mt-4 mx-auto text-white/40 hover:text-white/60 text-sm transition"
+            >
+              Richiedi accesso
+            </button>
+          )}
         </div>
       </main>
 
