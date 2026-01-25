@@ -530,9 +530,9 @@ function ChallengesSection() {
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
         <div
           key={n}
-          className="w-16 h-16 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
+          className="w-48 h-48 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
         >
-          <span className="text-2xl text-white/30 group-hover:text-white/50 transition">
+          <span className="text-6xl text-white/30 group-hover:text-white/50 transition">
             ?
           </span>
         </div>
