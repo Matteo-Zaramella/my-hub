@@ -525,111 +525,52 @@ const PLACEHOLDER_CHALLENGES: Challenge[] = [
 ]
 
 function ChallengesSection() {
-  const [challenges, setChallenges] = useState<Challenge[]>([])
-  const [loading, setLoading] = useState(true)
-  const [expandedChallenge, setExpandedChallenge] = useState<number | null>(null)
-
-  useEffect(() => {
-    loadChallenges()
-  }, [])
-
-  async function loadChallenges() {
-    try {
-      const res = await fetch('/api/clues')
-      const data = await res.json()
-      // Usa placeholder se non ci sono dati dal database
-      const dbChallenges = data.challenges || []
-      setChallenges(dbChallenges.length > 0 ? dbChallenges : PLACEHOLDER_CHALLENGES)
-    } catch (err) {
-      console.error('Error loading challenges:', err)
-      // In caso di errore, usa i placeholder
-      setChallenges(PLACEHOLDER_CHALLENGES)
-    }
-    setLoading(false)
-  }
-
-  const clueTypes = ['GIORNO', 'ORARIO', 'LUOGO']
-
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-white/40">Caricamento...</p>
-      </div>
-    )
-  }
-
-  if (challenges.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="text-center max-w-md">
-          <p className="text-white/40 text-lg mb-4">Nessuna sfida pubblicata</p>
-          <p className="text-white/20 text-sm">
-            Gli indizi per le sfide appariranno qui quando verranno rilasciati.
-          </p>
-        </div>
-      </div>
-    )
-  }
+  const months = [
+    { month: 'Feb', number: 1 },
+    { month: 'Mar', number: 2 },
+    { month: 'Apr', number: 3 },
+    { month: 'Mag', number: 4 },
+    { month: 'Giu', number: 5 },
+    { month: 'Lug', number: 6 },
+    { month: 'Ago', number: 7 },
+    { month: 'Set', number: 8 },
+    { month: 'Ott', number: 9 },
+    { month: 'Nov', number: 10 },
+    { month: 'Dic', number: 11 },
+  ]
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <h2 className="text-xl font-light text-center mb-8">Sfide e Indizi</h2>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h2 className="text-xl font-light tracking-widest text-white/80 mb-2">
+          SFIDE
+        </h2>
+        <p className="text-white/40 text-sm">
+          11 sfide mensili • Febbraio - Dicembre 2026
+        </p>
+      </div>
 
-      {challenges.map((challenge) => (
-        <div key={challenge.id} className="border border-white/20">
-          <button
-            onClick={() => setExpandedChallenge(
-              expandedChallenge === challenge.id ? null : challenge.id
-            )}
-            className="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition"
+      {/* Griglia sfide */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 px-4">
+        {months.map((m) => (
+          <div
+            key={m.number}
+            className="aspect-square border border-white/20 rounded-lg flex flex-col items-center justify-center hover:border-white/40 transition cursor-pointer group"
           >
-            <div className="text-left">
-              <span className="text-white/40 text-sm">Sfida {challenge.challenge_number}</span>
-              <h3 className="text-white font-medium">{challenge.challenge_name}</h3>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-white/30 text-sm">
-                {challenge.clues.length}/3 indizi
-              </span>
-              <span className={`transition-transform ${expandedChallenge === challenge.id ? 'rotate-180' : ''}`}>
-                ▼
-              </span>
-            </div>
-          </button>
+            <span className="text-3xl md:text-4xl text-white/30 group-hover:text-white/50 transition">
+              ?
+            </span>
+            <span className="text-xs text-white/40 mt-2">
+              {m.month}
+            </span>
+          </div>
+        ))}
+      </div>
 
-          {expandedChallenge === challenge.id && (
-            <div className="border-t border-white/10 px-6 py-4 space-y-4">
-              {challenge.clues.length === 0 ? (
-                <p className="text-white/30 text-sm">Nessun indizio ancora rilasciato</p>
-              ) : (
-                challenge.clues.map((clue) => (
-                  <div key={clue.id} className="bg-white/5 p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-white/40 text-xs">
-                        INDIZIO {clue.clue_number} • {clueTypes[clue.clue_number - 1] || ''}
-                      </span>
-                      <span className="text-white/20 text-xs">
-                        {new Date(clue.clue_date).toLocaleDateString('it-IT')}
-                      </span>
-                    </div>
-                    <p className="text-white whitespace-pre-line leading-relaxed">
-                      {clue.clue_text}
-                    </p>
-                  </div>
-                ))
-              )}
-
-              {challenge.clues.length === 3 && (
-                <div className="text-center pt-4 border-t border-white/10">
-                  <p className="text-white/40 text-sm">
-                    Sfida: <span className="text-white">{new Date(challenge.challenge_date).toLocaleDateString('it-IT')}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ))}
+      <p className="text-center text-white/30 text-sm mt-8">
+        La prima sfida verrà sbloccata a Febbraio
+      </p>
     </div>
   )
 }
@@ -881,58 +822,6 @@ function LeaderboardSection({ isAdmin }: { isAdmin: boolean }) {
           )}
         </div>
       )}
-    </div>
-  )
-}
-
-// Componente Sfide
-function ChallengesSection() {
-  const months = [
-    { month: 'Feb', number: 1 },
-    { month: 'Mar', number: 2 },
-    { month: 'Apr', number: 3 },
-    { month: 'Mag', number: 4 },
-    { month: 'Giu', number: 5 },
-    { month: 'Lug', number: 6 },
-    { month: 'Ago', number: 7 },
-    { month: 'Set', number: 8 },
-    { month: 'Ott', number: 9 },
-    { month: 'Nov', number: 10 },
-    { month: 'Dic', number: 11 },
-  ]
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-xl font-light tracking-widest text-white/80 mb-2">
-          SFIDE
-        </h2>
-        <p className="text-white/40 text-sm">
-          11 sfide mensili • Febbraio - Dicembre 2026
-        </p>
-      </div>
-
-      {/* Griglia sfide */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 px-4">
-        {months.map((m) => (
-          <div
-            key={m.number}
-            className="aspect-square border border-white/20 rounded-lg flex flex-col items-center justify-center hover:border-white/40 transition cursor-pointer group"
-          >
-            <span className="text-3xl md:text-4xl text-white/30 group-hover:text-white/50 transition">
-              ?
-            </span>
-            <span className="text-xs text-white/40 mt-2">
-              {m.month}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <p className="text-center text-white/30 text-sm mt-8">
-        La prima sfida verrà sbloccata a Febbraio
-      </p>
     </div>
   )
 }
