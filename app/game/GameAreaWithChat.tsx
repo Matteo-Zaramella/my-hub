@@ -1364,9 +1364,26 @@ export default function GameAreaWithChat() {
       }
     }
 
-    // Verifica stato gioco (dal localStorage o fallback orario)
-    function checkGamePhase() {
+    // Verifica stato gioco (dal database prima, poi localStorage/orario)
+    async function checkGamePhase() {
       const now = new Date()
+
+      // Prima controlla lo stato nel database
+      try {
+        const { data: gameState } = await supabase
+          .from('game_state')
+          .select('game_phase, ceremony_completed')
+          .eq('id', 1)
+          .single()
+
+        if (gameState?.game_phase === 'game_active' || gameState?.ceremony_completed) {
+          setGamePhase('game_active')
+          localStorage.setItem('game_phase_seen', 'game_active')
+          return
+        }
+      } catch {
+        // Se fallisce, usa il fallback
+      }
 
       // Se è già stato visto il game_active
       const savedPhase = localStorage.getItem('game_phase_seen')
