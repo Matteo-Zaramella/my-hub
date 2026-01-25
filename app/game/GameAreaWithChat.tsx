@@ -699,6 +699,8 @@ function LeaderboardSection({ isAdmin }: { isAdmin: boolean }) {
     team_color?: string
   }>>([])
   const [loading, setLoading] = useState(true)
+  const [expandedTeam, setExpandedTeam] = useState<number | null>(null)
+  const [teamMembers, setTeamMembers] = useState<Record<number, Array<{ nickname: string; individual_points: number }>>>({})
 
   useEffect(() => {
     loadLeaderboard()
@@ -718,6 +720,27 @@ function LeaderboardSection({ isAdmin }: { isAdmin: boolean }) {
       console.error('Error loading leaderboard:', err)
     }
     setLoading(false)
+  }
+
+  async function loadTeamMembers(teamId: number) {
+    if (teamMembers[teamId]) return // Già caricati
+    try {
+      const res = await fetch(`/api/game/points/team-members?team_id=${teamId}`)
+      const data = await res.json()
+      setTeamMembers(prev => ({ ...prev, [teamId]: data.members || [] }))
+    } catch (err) {
+      console.error('Error loading team members:', err)
+    }
+  }
+
+  function handleTeamClick(teamId: number) {
+    if (!isAdmin) return
+    if (expandedTeam === teamId) {
+      setExpandedTeam(null)
+    } else {
+      setExpandedTeam(teamId)
+      loadTeamMembers(teamId)
+    }
   }
 
   return (
@@ -759,36 +782,64 @@ function LeaderboardSection({ isAdmin }: { isAdmin: boolean }) {
         // Classifica Squadre
         <div className="space-y-3">
           {teamsData.map((team, index) => (
-            <div
-              key={team.id}
-              className="flex items-center justify-between p-4 border rounded"
-              style={{ borderColor: team.team_color + '50' }}
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-2xl font-bold text-white/40 w-8">
-                  {index + 1}
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: team.team_color }}
-                    />
-                    <span className="font-medium text-white">
-                      {team.team_name}
+            <div key={team.id}>
+              <div
+                onClick={() => handleTeamClick(team.id)}
+                className={`flex items-center justify-between p-4 border rounded ${isAdmin ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                style={{ borderColor: team.team_color + '50' }}
+              >
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl font-bold text-white/40 w-8">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: team.team_color }}
+                      />
+                      <span className="font-medium text-white">
+                        {team.team_name}
+                      </span>
+                      {isAdmin && (
+                        <span className={`text-white/40 text-sm transition-transform ${expandedTeam === team.id ? 'rotate-180' : ''}`}>
+                          ▼
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-white/40 text-sm">
+                      {team.member_count} membri
                     </span>
                   </div>
-                  <span className="text-white/40 text-sm">
-                    {team.member_count} membri
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-bold" style={{ color: team.team_color }}>
+                    {team.total_points}
                   </span>
+                  <span className="text-white/40 text-sm ml-1">pt</span>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="text-2xl font-bold" style={{ color: team.team_color }}>
-                  {team.total_points}
-                </span>
-                <span className="text-white/40 text-sm ml-1">pt</span>
-              </div>
+              {/* Accordion membri (solo admin) */}
+              {isAdmin && expandedTeam === team.id && (
+                <div className="mt-1 ml-12 p-3 border-l-2" style={{ borderColor: team.team_color + '50' }}>
+                  {teamMembers[team.id] ? (
+                    teamMembers[team.id].length > 0 ? (
+                      <div className="space-y-1">
+                        {teamMembers[team.id].map((member, i) => (
+                          <div key={i} className="flex justify-between text-sm">
+                            <span className="text-white/70">{member.nickname}</span>
+                            <span className="text-white/40">{member.individual_points} pt</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-white/40 text-sm">Nessun membro</p>
+                    )
+                  ) : (
+                    <p className="text-white/40 text-sm">Caricamento...</p>
+                  )}
+                </div>
+              )}
             </div>
           ))}
           {teamsData.length === 0 && (
