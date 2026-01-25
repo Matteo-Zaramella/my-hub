@@ -525,52 +525,20 @@ const PLACEHOLDER_CHALLENGES: Challenge[] = [
 ]
 
 function ChallengesSection() {
-  const months = [
-    { month: 'Feb', number: 1 },
-    { month: 'Mar', number: 2 },
-    { month: 'Apr', number: 3 },
-    { month: 'Mag', number: 4 },
-    { month: 'Giu', number: 5 },
-    { month: 'Lug', number: 6 },
-    { month: 'Ago', number: 7 },
-    { month: 'Set', number: 8 },
-    { month: 'Ott', number: 9 },
-    { month: 'Nov', number: 10 },
-    { month: 'Dic', number: 11 },
-  ]
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-xl font-light tracking-widest text-white/80 mb-2">
-          SFIDE
-        </h2>
-        <p className="text-white/40 text-sm">
-          11 sfide mensili • Febbraio - Dicembre 2026
-        </p>
-      </div>
-
-      {/* Griglia sfide */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 px-4">
-        {months.map((m) => (
+    <div className="max-w-md mx-auto">
+      <div className="flex flex-col gap-3">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
           <div
-            key={m.number}
-            className="aspect-square border border-white/20 rounded-lg flex flex-col items-center justify-center hover:border-white/40 transition cursor-pointer group"
+            key={n}
+            className="h-16 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
           >
-            <span className="text-3xl md:text-4xl text-white/30 group-hover:text-white/50 transition">
+            <span className="text-2xl text-white/30 group-hover:text-white/50 transition">
               ?
-            </span>
-            <span className="text-xs text-white/40 mt-2">
-              {m.month}
             </span>
           </div>
         ))}
       </div>
-
-      <p className="text-center text-white/30 text-sm mt-8">
-        La prima sfida verrà sbloccata a Febbraio
-      </p>
     </div>
   )
 }
@@ -2224,9 +2192,6 @@ export default function GameAreaWithChat() {
 
         {/* Wishlist Tab */}
         {activeTab === 'wishlist' && <WishlistSection />}
-
-        {/* Challenges Tab */}
-        {activeTab === 'challenges' && registrationOpen && <ChallengesSection />}
 
         {/* Register Tab */}
         {activeTab === 'register' && registrationOpen && (
