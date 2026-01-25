@@ -526,19 +526,17 @@ const PLACEHOLDER_CHALLENGES: Challenge[] = [
 
 function ChallengesSection() {
   return (
-    <div className="max-w-md mx-auto">
-      <div className="flex flex-col gap-3">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
-          <div
-            key={n}
-            className="h-16 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
-          >
-            <span className="text-2xl text-white/30 group-hover:text-white/50 transition">
-              ?
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col items-center gap-3">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
+        <div
+          key={n}
+          className="w-16 h-16 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
+        >
+          <span className="text-2xl text-white/30 group-hover:text-white/50 transition">
+            ?
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
