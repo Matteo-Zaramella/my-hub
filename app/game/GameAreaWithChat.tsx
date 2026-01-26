@@ -525,16 +525,58 @@ const PLACEHOLDER_CHALLENGES: Challenge[] = [
 ]
 
 function ChallengesSection() {
+  const [viewingChallenge, setViewingChallenge] = useState<number | null>(null)
+
+  // Sfide sbloccate - mostra solo quelle visibili (compaiono una alla volta)
+  // Per ora: solo sfida 1 (la "Sfida 0" / Cerimonia iniziale con i 10 indizi)
+  const unlockedChallenges = [1]
+
+  // Indizi sbloccati per sfida - compaiono uno alla volta
+  // Per ora: solo indizio 1 della sfida 1
+  const unlockedClues: Record<number, number[]> = {
+    1: [1] // Sfida 1: solo indizio 1 visibile
+  }
+
+  // Vista dettaglio sfida (indizi)
+  if (viewingChallenge !== null) {
+    const cluesForChallenge = unlockedClues[viewingChallenge] || []
+
+    return (
+      <div className="flex flex-col items-center gap-6">
+        {/* Pulsante indietro */}
+        <button
+          onClick={() => setViewingChallenge(null)}
+          className="self-start text-white/40 hover:text-white transition flex items-center gap-2"
+        >
+          <span>←</span>
+          <span>Indietro</span>
+        </button>
+
+        {/* Solo indizi sbloccati */}
+        <div className="flex flex-row items-center justify-center gap-3 mt-8 flex-wrap">
+          {cluesForChallenge.map((n) => (
+            <div
+              key={n}
+              className="w-48 h-48 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition cursor-pointer"
+            >
+              {/* Contenuto indizio - per ora vuoto */}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Vista principale - solo sfide sbloccate (una alla volta)
   return (
     <div className="flex flex-col items-center gap-3">
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
+      {unlockedChallenges.map((n) => (
         <div
           key={n}
-          className="w-48 h-48 border border-white/20 rounded-lg flex items-center justify-center hover:border-white/40 transition cursor-pointer group"
+          onClick={() => setViewingChallenge(n)}
+          className="w-48 h-48 border border-white/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition"
         >
-          <span className="text-6xl text-white/30 group-hover:text-white/50 transition">
-            ?
-          </span>
+          {/* Quadrato vuoto cliccabile */}
         </div>
       ))}
     </div>
@@ -980,8 +1022,14 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
     setSending(true)
 
     try {
-      // Globale = team_id null, Squadra = team_id del proprio team
-      const messageTeamId = chatMode === 'team' ? teamInfo?.id : null
+      // Globale = team_id null, Squadra = team_id del proprio team o squadra selezionata (admin)
+      let messageTeamId: number | null = null
+      if (chatMode === 'team') {
+        messageTeamId = teamInfo?.id || null
+      } else if (typeof chatMode === 'number') {
+        // Admin sta scrivendo in una chat di squadra specifica
+        messageTeamId = chatMode
+      }
 
       const res = await fetch('/api/game/chat', {
         method: 'POST',
@@ -1116,9 +1164,9 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
             <NextImage
               src={TEAM_BADGES[teamInfo.code]}
               alt={teamInfo.name}
-              width={350}
-              height={350}
-              className="opacity-25"
+              width={420}
+              height={420}
+              className="opacity-40"
             />
           </div>
         )}
@@ -1127,9 +1175,9 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
             <NextImage
               src={TEAM_BADGES[{1: 'FSB', 2: 'MOSSAD', 3: 'MSS', 4: 'AISE'}[chatMode] || '']}
               alt="Team"
-              width={350}
-              height={350}
-              className="opacity-25"
+              width={420}
+              height={420}
+              className="opacity-40"
             />
           </div>
         )}
@@ -1793,9 +1841,9 @@ export default function GameAreaWithChat() {
           borderColor: gamePhase === 'game_active' && teamInfo ? `${accentColor}40` : 'rgba(255,255,255,0.2)'
         }}
       >
-        <div className="w-full flex items-center px-4">
-          {/* Info partecipante a sinistra */}
-          <div className="flex-shrink-0 w-32 md:w-48">
+        <div className="w-full flex items-center px-2 md:px-4">
+          {/* Info partecipante a sinistra - nascosto su mobile molto piccolo */}
+          <div className="hidden sm:flex flex-shrink-0 w-auto md:w-48">
             {participantInfo && (
               <div className="flex items-center gap-2">
                 {/* Badge squadra (visibile in game_active) */}
@@ -1812,20 +1860,20 @@ export default function GameAreaWithChat() {
                       <NextImage
                         src={TEAM_BADGES[teamInfo.code]}
                         alt={teamInfo.name}
-                        width={20}
-                        height={20}
+                        width={16}
+                        height={16}
                         className="rounded-sm"
                       />
                     ) : (
                       <div
-                        className="w-5 h-5 rounded-full"
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: teamInfo.color }}
                       />
                     )}
-                    {teamInfo.code}
+                    <span className="hidden md:inline">{teamInfo.code}</span>
                   </div>
                 )}
-                <div className="text-xs text-white/40">
+                <div className="text-xs text-white/40 hidden md:block">
                   <span className="text-white/60">{participantInfo.nickname}</span>
                   <span className="mx-1">•</span>
                   <span>{participantInfo.code}</span>
