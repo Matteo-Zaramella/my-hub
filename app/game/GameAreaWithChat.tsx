@@ -552,14 +552,88 @@ function ChallengesSection() {
           <span>Indietro</span>
         </button>
 
-        {/* Solo indizi sbloccati */}
-        <div className="flex flex-row items-center justify-center gap-3 mt-8 flex-wrap">
+        {/* Solo indizi sbloccati - Slot machine style con glitch */}
+        <div className="flex flex-row items-center justify-center gap-4 mt-8 flex-wrap">
           {cluesForChallenge.map((n) => (
             <div
               key={n}
-              className="w-48 h-48 border border-white/30 rounded-lg flex items-center justify-center hover:border-white/60 hover:bg-white/5 transition cursor-pointer"
+              className="w-40 h-56 border border-white/20 rounded-lg flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group bg-black/50"
+              style={{
+                boxShadow: '0 0 20px rgba(255,255,255,0.05), inset 0 0 30px rgba(255,255,255,0.02)'
+              }}
             >
-              {/* Contenuto indizio - per ora vuoto */}
+              {/* Effetto glitch background */}
+              <div className="absolute inset-0 opacity-30">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent animate-scan" />
+              </div>
+
+              {/* Linee orizzontali stile slot */}
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-full h-px bg-white/10"
+                    style={{ top: `${(i + 1) * 12}%` }}
+                  />
+                ))}
+              </div>
+
+              {/* Contenuto glitch */}
+              <div className="relative z-10 text-center">
+                <div className="text-4xl font-mono text-white/60 glitch-text" data-text={`0${n}`}>
+                  0{n}
+                </div>
+              </div>
+
+              {/* Effetto hover glow */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-white/10 to-transparent" />
+
+              {/* Glitch animation styles */}
+              <style jsx>{`
+                @keyframes scan {
+                  0% { transform: translateY(-100%); }
+                  100% { transform: translateY(100%); }
+                }
+                .animate-scan {
+                  animation: scan 3s linear infinite;
+                }
+                .glitch-text {
+                  position: relative;
+                }
+                .glitch-text::before,
+                .glitch-text::after {
+                  content: attr(data-text);
+                  position: absolute;
+                  left: 0;
+                  width: 100%;
+                }
+                .glitch-text::before {
+                  animation: glitch-1 0.3s infinite linear alternate-reverse;
+                  clip-path: inset(0 0 50% 0);
+                  color: rgba(255,0,0,0.5);
+                }
+                .glitch-text::after {
+                  animation: glitch-2 0.3s infinite linear alternate-reverse;
+                  clip-path: inset(50% 0 0 0);
+                  color: rgba(0,255,255,0.5);
+                }
+                @keyframes glitch-1 {
+                  0% { transform: translateX(0); }
+                  20% { transform: translateX(-2px); }
+                  40% { transform: translateX(2px); }
+                  60% { transform: translateX(-1px); }
+                  80% { transform: translateX(1px); }
+                  100% { transform: translateX(0); }
+                }
+                @keyframes glitch-2 {
+                  0% { transform: translateX(0); }
+                  20% { transform: translateX(2px); }
+                  40% { transform: translateX(-2px); }
+                  60% { transform: translateX(1px); }
+                  80% { transform: translateX(-1px); }
+                  100% { transform: translateX(0); }
+                }
+              `}</style>
             </div>
           ))}
         </div>
@@ -574,9 +648,28 @@ function ChallengesSection() {
         <div
           key={n}
           onClick={() => setViewingChallenge(n)}
-          className="w-48 h-48 border border-white/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-white/60 hover:bg-white/5 transition"
+          className="w-48 h-48 rounded-lg flex items-center justify-center cursor-pointer relative"
         >
-          {/* Quadrato vuoto cliccabile */}
+          {/* Effetto pulsar */}
+          <div className="absolute inset-0 rounded-lg bg-white/10 animate-pulse" />
+          <div
+            className="absolute inset-0 rounded-lg border border-white/30"
+            style={{
+              animation: 'pulsar 2s ease-in-out infinite'
+            }}
+          />
+          <style jsx>{`
+            @keyframes pulsar {
+              0%, 100% {
+                opacity: 0.3;
+                box-shadow: 0 0 10px rgba(255,255,255,0.1);
+              }
+              50% {
+                opacity: 0.6;
+                box-shadow: 0 0 25px rgba(255,255,255,0.3);
+              }
+            }
+          `}</style>
         </div>
       ))}
     </div>
@@ -1257,7 +1350,7 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
 }
 
 export default function GameAreaWithChat() {
-  const [activeTab, setActiveTab] = useState<'info' | 'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema' | 'classifica'>('info')
+  const [activeTab, setActiveTab] = useState<'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema' | 'classifica'>('chat')
   const [showActivationMessage, setShowActivationMessage] = useState(false)
   const supabase = createClient()
 
@@ -1424,8 +1517,27 @@ export default function GameAreaWithChat() {
       }
     }
 
+    // Carica messaggio di sistema per il footer
+    async function loadSystemMessage() {
+      try {
+        const res = await fetch('/api/game/chat?limit=100')
+        const data = await res.json()
+        if (data.success) {
+          const systemMsg = data.messages
+            .filter((m: { message_type: string }) => m.message_type === 'system' || m.message_type === 'samantha')
+            .pop()
+          if (systemMsg) {
+            setLastSystemMessage(systemMsg.message)
+          }
+        }
+      } catch {
+        // Ignora errori
+      }
+    }
+
     loadParticipantInfo()
     checkGamePhase()
+    loadSystemMessage()
 
     // Ricontrolla ogni minuto per il fallback automatico
     const interval = setInterval(checkGamePhase, 60000)
@@ -1897,18 +2009,6 @@ export default function GameAreaWithChat() {
                 {registrationOpen ? 'Cerimonia' : '?'}
               </button>
             )}
-            {gamePhase !== 'game_active' && (
-              <button
-                onClick={() => setActiveTab('info')}
-                className={`py-3 transition whitespace-nowrap ${
-                  activeTab === 'info'
-                    ? 'text-white border-b border-white'
-                    : 'text-white/40 hover:text-white/70'
-                }`}
-              >
-                Info
-              </button>
-            )}
             {/* Tab Sfide nascosta per ora - riattivare quando servono gli indizi
             {registrationOpen && (
               <button
@@ -2178,64 +2278,6 @@ export default function GameAreaWithChat() {
           </>
         )}
 
-        {/* Info Tab */}
-        {activeTab === 'info' && (
-          <div className="space-y-8 max-w-2xl mx-auto">
-            <h2 className="text-xl font-light text-center mb-8">Informazioni Festa</h2>
-
-            {/* Luogo e Orario */}
-            <div className="space-y-4">
-              <p className="text-white font-medium">
-                L'Oste di Vino | Enoteca • Ristorante • Bistrot
-              </p>
-              <p className="text-white/60">
-                Via Pelosa, 76 - Selvazzano Dentro (PD)
-              </p>
-              <p className="text-white/60">
-                24 Gennaio 2026 - Dalle 21:30 / 22:00 alle 02:00
-              </p>
-              <div className="flex gap-4 mt-2">
-                <a
-                  href="https://maps.app.goo.gl/qTRtBD2vRR3VLfgQA"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/40 hover:text-white transition"
-                  title="Google Maps"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                  </svg>
-                </a>
-                <a
-                  href="https://chat.whatsapp.com/J0G6N7owQWcBtuuhcTpCo6"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white/40 hover:text-white transition"
-                  title="Gruppo WhatsApp"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            <div className="border-t border-white/10 pt-8">
-              <p className="text-white/60 mb-4">
-                Il locale dispone di soli 3 posti auto.
-                Parcheggiare nel parcheggio pubblico nelle vicinanze.
-              </p>
-              <div className="border border-white/20">
-                <img
-                  src="/venue-map.png"
-                  alt="Mappa del locale con parcheggio consigliato"
-                  className="w-full h-auto opacity-80"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Wishlist Tab */}
         {activeTab === 'wishlist' && <WishlistSection />}
 
@@ -2275,11 +2317,11 @@ export default function GameAreaWithChat() {
         />
       )}
 
-      {/* Fixed Footer - Info Festa */}
+      {/* Fixed Footer - Messaggio Sistema */}
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20">
         <div className="px-4 py-3 text-center">
-          <p className="text-white/60 text-sm">
-            Vi aspetto stasera · <span className="text-white/80">Via Pelosa 76, Selvazzano</span> · <span className="text-white/80">dalle 21:30</span>
+          <p className="text-white/60 text-sm font-light tracking-wide">
+            {lastSystemMessage}
           </p>
         </div>
       </footer>
