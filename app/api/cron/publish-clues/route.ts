@@ -62,7 +62,8 @@ export async function GET() {
 
     // Per ogni indizio da notificare
     for (const clue of cluesToNotify) {
-      const challengeInfo = clue.game_challenges as { challenge_number: number; title: string } | null
+      const challengeData = clue.game_challenges as { challenge_number: number; title: string }[] | null
+      const challengeInfo = challengeData?.[0] ?? null
       const clueTypes = ['GIORNO', 'ORARIO', 'LUOGO']
       const clueType = clueTypes[clue.clue_number - 1] || `Indizio ${clue.clue_number}`
 
