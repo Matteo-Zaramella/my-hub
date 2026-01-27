@@ -112,11 +112,14 @@ ${clue.clue_text}
       totalSent += sent
 
       // Marca indizio come notificato (ignora errore se colonna non esiste)
-      await supabase
-        .from('game_clues')
-        .update({ notification_sent: true })
-        .eq('id', clue.id)
-        .catch(() => {}) // Ignora se colonna non esiste
+      try {
+        await supabase
+          .from('game_clues')
+          .update({ notification_sent: true })
+          .eq('id', clue.id)
+      } catch {
+        // Ignora errore
+      }
 
       console.log(`Indizio ${clue.id}: ${sent}/${emails.length} email inviate`)
     }
