@@ -221,8 +221,21 @@ Quando arriverà il momento, saprai cosa fare.`
     {
       title: "Punti",
       content: `La tua squadra guadagna punti in diversi modi:
-• Completare sfide
-• Essere i primi a decifrare indizi
+
+INDIZI
+• 10 punti per la prima squadra che decifra un indizio
+• +10 punti bonus se l'indizio riguarda la posizione della sfida
+
+SFIDE MENSILI
+Il completamento delle sfide assegna punti a scalare:
+• 1ª squadra: 100 punti
+• 2ª squadra: 75 punti
+• 3ª squadra: 50 punti
+• 4ª squadra: 25 punti
+• Mancato completamento: 0 punti
+
+PENALITÀ
+Comportamenti scorretti, ostruzionismo volontario o intralcio al fair play possono comportare penalità a discrezione degli organizzatori.
 
 La classifica generale si aggiorna in tempo reale.`
     },
