@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import NextImage from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { getRandomBlockedPhrase, getClueComment, SAMANTHA_SYSTEM_INSTRUCTIONS, SAMANTHA_ACTIVATION_MESSAGE } from '@/lib/samantha-phrases'
+import { useSamantha } from '@/contexts/SamanthaContext'
 
 // ⚠️ TEST MODE - Rimetti le date originali prima del deploy!
 const TEST_MODE = true
@@ -450,228 +451,463 @@ function RegisterSection({ onRegistrationComplete }: { onRegistrationComplete?: 
   )
 }
 
-// Componente Sfide/Indizi
-interface Challenge {
-  id: number
-  challenge_number: number
-  challenge_name: string
-  challenge_date: string
-  challenge_description: string | null
-  clues: {
-    id: number
-    clue_number: number
-    clue_text: string
-    clue_date: string
-    image_url: string | null
-  }[]
+// Indovinelli per gli indizi della prima sfida
+const CHALLENGE_RIDDLES = {
+  calendar: `Nel mese più breve che l'anno riserva,
+tre cigni si posano lungo la via.
+La data nel tempo il segreto conserva:
+nel giorno e nel mese, la stessa magia.`,
+  clock: `Quando il giorno ha passato metà del cammino,
+ma il sole è ancora padrone del cielo.
+Tre passi dal mezzogiorno divino,
+la sfida vi attende, cade ogni velo.`,
+  location: `Nel grembo che Memmo strappò dalla palude,
+settantotto occhi di marmo vi guardano.
+Chi cerca la via che al centro si chiude,
+nell'anello d'acqua le risposte si tardano.`
 }
 
-// Dati placeholder per le sfide (da rimuovere quando ci sono dati reali)
-const PLACEHOLDER_CHALLENGES: Challenge[] = [
-  {
-    id: 2,
-    challenge_number: 2,
-    challenge_name: 'Febbraio 2026',
-    challenge_date: '2026-02-22',
-    challenge_description: 'Prima sfida del gioco',
-    clues: [
-      {
-        id: 1,
-        clue_number: 1,
-        clue_text: 'Nel mese più breve che l\'anno riserva\ntre cigni si posano lungo la via\nla data nel tempo il segreto conserva\nnel giorno e nel mese la stessa magia',
-        clue_date: '2026-02-01',
-        image_url: null
-      },
-      {
-        id: 2,
-        clue_number: 2,
-        clue_text: 'Quando il giorno ha passato metà del cammino\nma il sole è ancora padrone del cielo\ntre passi dal mezzogiorno divino\nla sfida vi attende, cade ogni velo',
-        clue_date: '2026-02-08',
-        image_url: null
-      },
-      {
-        id: 3,
-        clue_number: 3,
-        clue_text: 'Nel grembo che Memmo strappò dalla palude\nsettantotto occhi di marmo vi guardano\nchi cerca la via che al centro si chiude\nnell\'anello d\'acqua le risposte si tardano',
-        clue_date: '2026-02-15',
-        image_url: null
+// Componente Sfide/Indizi
+function ChallengesSection({ participantInfo, teamInfo, isAdmin }: {
+  participantInfo: { nickname: string; code: string } | null
+  teamInfo: { id: number; code: string; name: string; color: string } | null
+  isAdmin: boolean
+}) {
+  const samantha = useSamantha()
+  const [activeClue, setActiveClue] = useState<'calendar' | 'clock' | 'location' | null>(null)
+  const [viewingSolvedClue, setViewingSolvedClue] = useState<'calendar' | 'clock' | 'location' | null>(null)
+  const [riddleText, setRiddleText] = useState('')
+  const [isTypingRiddle, setIsTypingRiddle] = useState(false)
+  const [isTextSelected, setIsTextSelected] = useState(false) // Per animazione selezione
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [selectedDay, setSelectedDay] = useState(1)
+  const [selectedMonth, setSelectedMonth] = useState(1)
+  const [selectedYear, setSelectedYear] = useState(2026)
+  const [solvedClues, setSolvedClues] = useState<Set<string>>(new Set())
+
+  // Carica indizi risolti dal database (specifici per squadra, o tutti per admin)
+  useEffect(() => {
+    async function loadSolvedClues() {
+      if (!teamInfo && !isAdmin) return
+
+      try {
+        const params = new URLSearchParams()
+        if (isAdmin) {
+          params.set('is_admin', 'true')
+        } else if (teamInfo) {
+          params.set('team_id', teamInfo.id.toString())
+        }
+
+        const res = await fetch(`/api/game/clues?${params}`)
+        const data = await res.json()
+
+        if (isAdmin && data.solved) {
+          // Admin vede tutti gli indizi risolti (da qualsiasi squadra)
+          const allSolved = new Set<string>(data.solved.map((s: { clue_type: string; challenge_number: number }) =>
+            `${s.challenge_number}_${s.clue_type}`
+          ))
+          setSolvedClues(allSolved)
+        } else if (data.solved) {
+          // Squadra normale vede solo i propri
+          setSolvedClues(new Set(data.solved))
+        }
+      } catch (error) {
+        console.error('Errore caricamento indizi risolti:', error)
       }
-    ]
-  },
-  {
-    id: 3,
-    challenge_number: 3,
-    challenge_name: 'Marzo 2026',
-    challenge_date: '2026-03-29',
-    challenge_description: 'Seconda sfida del gioco',
-    clues: [
-      {
-        id: 4,
-        clue_number: 1,
-        clue_text: 'Il dio della guerra sta per lasciare il trono\nventinove guerrieri lo salutano al tramonto\nprima che i fiori rubino la scena e il suono\ncercate quel giorno, è quasi il confronto',
-        clue_date: '2026-03-08',
-        image_url: null
+    }
+
+    loadSolvedClues()
+  }, [teamInfo, isAdmin])
+  const [showGreenGlow, setShowGreenGlow] = useState(false)
+  const [currentVerse, setCurrentVerse] = useState(0)
+
+  // Effetto typing per l'indovinello (verso per verso)
+  useEffect(() => {
+    if (!isTypingRiddle || !activeClue) return
+
+    const riddle = CHALLENGE_RIDDLES[activeClue]
+    const verses = riddle.split('\n')
+
+    let verseIndex = 0
+    let charIndex = 0
+    let currentText = ''
+    let intervalId: NodeJS.Timeout
+
+    const finishTyping = () => {
+      setIsTypingRiddle(false)
+      // Dopo 1s, mostra animazione selezione (ctrl+a)
+      setTimeout(() => {
+        setIsTextSelected(true)
+        // Dopo 600ms, nascondi testo e mostra date picker
+        setTimeout(() => {
+          setIsTextSelected(false)
+          setRiddleText('')
+          setShowDatePicker(true)
+        }, 600)
+      }, 1000)
+    }
+
+    const typeNextChar = () => {
+      if (verseIndex >= verses.length) {
+        finishTyping()
+        return
       }
-    ]
-  },
-  {
-    id: 4,
-    challenge_number: 4,
-    challenge_name: 'Aprile 2026',
-    challenge_date: '2026-04-26',
-    challenge_description: null,
-    clues: []
+
+      const currentVerse = verses[verseIndex]
+
+      if (charIndex < currentVerse.length) {
+        currentText += currentVerse[charIndex]
+        setRiddleText(currentText)
+        charIndex++
+        intervalId = setTimeout(typeNextChar, 60)
+      } else {
+        // Fine del verso, passa al prossimo
+        verseIndex++
+        setCurrentVerse(verseIndex)
+        if (verseIndex < verses.length) {
+          currentText += '\n'
+          setRiddleText(currentText)
+          charIndex = 0
+          // Pausa di 800ms tra i versi
+          intervalId = setTimeout(typeNextChar, 800)
+        } else {
+          finishTyping()
+        }
+      }
+    }
+
+    typeNextChar()
+
+    return () => clearTimeout(intervalId)
+  }, [isTypingRiddle, activeClue])
+
+
+  const handleClueClick = (clue: 'calendar' | 'clock' | 'location') => {
+    // Se già risolto, non fare nulla (challenge 1)
+    if (solvedClues.has(`1_${clue}`)) return
+
+    setActiveClue(clue)
+    setRiddleText('')
+    setCurrentVerse(0)
+    setShowDatePicker(false)
+    setShowGreenGlow(false)
+    setSelectedDay(1)
+    setSelectedMonth(1)
+    setSelectedYear(2026)
+
+    // Avvia typing dopo un breve delay
+    setTimeout(() => setIsTypingRiddle(true), 300)
   }
-]
 
-function ChallengesSection() {
-  const [viewingChallenge, setViewingChallenge] = useState<number | null>(null)
+  const handleConfirm = async () => {
+    // Verifica risposta corretta: 22/02/2026
+    if (selectedDay === 22 && selectedMonth === 2 && selectedYear === 2026) {
+      // Risposta corretta!
+      setShowGreenGlow(true)
 
-  // Sfide sbloccate - mostra solo quelle visibili (compaiono una alla volta)
-  // Per ora: solo sfida 1 (la "Sfida 0" / Cerimonia iniziale con i 10 indizi)
-  const unlockedChallenges = [1]
+      // Numero indizio (1, 2, 3)
+      const clueNumber = activeClue === 'calendar' ? 1 : activeClue === 'clock' ? 2 : 3
+      const challengeNumber = 1 // Prima sfida
 
-  // Indizi sbloccati per sfida - compaiono uno alla volta
-  // Per ora: solo indizio 1 della sfida 1
-  const unlockedClues: Record<number, number[]> = {
-    1: [1] // Sfida 1: solo indizio 1 visibile
+      // Invia messaggi e punti solo se abbiamo le info del partecipante
+      if (participantInfo && teamInfo) {
+        try {
+          // Messaggio chat globale (con nome squadra)
+          await fetch('/api/game/chat/system', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: `La squadra ${teamInfo.name} ha indovinato l'indizio ${clueNumber} della sfida ${challengeNumber}! Vengono assegnati 10 punti!`,
+              message_type: 'samantha',
+              team_id: null // Globale
+            })
+          })
+
+          // Messaggio chat squadra (con nickname)
+          await fetch('/api/game/chat/system', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: `${participantInfo.nickname} ha indovinato l'indizio ${clueNumber} della sfida ${challengeNumber}! Vengono assegnati 10 punti!`,
+              message_type: 'samantha',
+              team_id: teamInfo.id
+            })
+          })
+
+          // Assegna 10 punti al partecipante
+          await fetch('/api/game/points?key=cerimonia2026', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              participant_code: participantInfo.code,
+              points: 10,
+              reason: 'clue_solved',
+              description: `Indizio ${clueNumber} sfida ${challengeNumber}`
+            })
+          })
+
+          // Salva indizio come risolto nel database
+          await fetch('/api/game/clues', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              team_id: teamInfo.id,
+              clue_type: activeClue,
+              challenge_number: challengeNumber,
+              solved_by_code: participantInfo.code,
+              solved_by_nickname: participantInfo.nickname
+            })
+          })
+        } catch (error) {
+          console.error('Errore invio messaggi/punti:', error)
+        }
+      }
+
+      // Dopo l'animazione verde, segna come risolto e torna ai 3 indizi
+      setTimeout(() => {
+        setSolvedClues(prev => new Set([...prev, `${1}_${activeClue!}`]))
+        setActiveClue(null)
+        setShowDatePicker(false)
+        setShowGreenGlow(false)
+      }, 1500)
+    } else {
+      // Risposta sbagliata - torna ai 3 indizi
+      setActiveClue(null)
+      setShowDatePicker(false)
+    }
   }
 
-  // Vista dettaglio sfida (indizi)
-  if (viewingChallenge !== null) {
-    const cluesForChallenge = unlockedClues[viewingChallenge] || []
+  const handleBack = () => {
+    setActiveClue(null)
+    setRiddleText('')
+    setShowDatePicker(false)
+    setIsTypingRiddle(false)
+    setShowGreenGlow(false)
+  }
 
+  // Funzioni per modificare la data
+  const adjustDay = (delta: number) => {
+    let newDay = selectedDay + delta
+    if (newDay < 1) newDay = 31
+    if (newDay > 31) newDay = 1
+    setSelectedDay(newDay)
+  }
+
+  const adjustMonth = (delta: number) => {
+    let newMonth = selectedMonth + delta
+    if (newMonth < 1) newMonth = 12
+    if (newMonth > 12) newMonth = 1
+    setSelectedMonth(newMonth)
+  }
+
+  const adjustYear = (delta: number) => {
+    setSelectedYear(prev => prev + delta)
+  }
+
+  // Controlla data speciale per messaggio Samantha
+  useEffect(() => {
+    if (selectedDay === 25 && selectedMonth === 1 && selectedYear === 2002) {
+      samantha.showMessage('Buon compleanno!', 'success', 'helpful', 3000)
+    }
+  }, [selectedDay, selectedMonth, selectedYear, samantha])
+
+  // Vista indizio risolto (mostra la soluzione con sfondo verde)
+  if (viewingSolvedClue) {
+    // Soluzioni per ogni indizio
+    const solutions: Record<string, string> = {
+      calendar: '22/02/2026',
+      clock: '??:??', // TODO: soluzione orologio
+      location: '???', // TODO: soluzione posizione
+    }
     return (
-      <div className="flex flex-col items-center gap-6">
-        {/* Pulsante indietro */}
-        <button
-          onClick={() => setViewingChallenge(null)}
-          className="self-start text-white/40 hover:text-white transition flex items-center gap-2"
-        >
-          <span>←</span>
-          <span>Indietro</span>
-        </button>
-
-        {/* Solo indizi sbloccati - Slot machine style con glitch */}
-        <div className="flex flex-row items-center justify-center gap-4 mt-8 flex-wrap">
-          {cluesForChallenge.map((n) => (
-            <div
-              key={n}
-              className="w-40 h-56 border border-white/20 rounded-lg flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group bg-black/50"
-              style={{
-                boxShadow: '0 0 20px rgba(255,255,255,0.05), inset 0 0 30px rgba(255,255,255,0.02)'
-              }}
-            >
-              {/* Effetto glitch background */}
-              <div className="absolute inset-0 opacity-30">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent animate-scan" />
-              </div>
-
-              {/* Linee orizzontali stile slot */}
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(8)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-full h-px bg-white/10"
-                    style={{ top: `${(i + 1) * 12}%` }}
-                  />
-                ))}
-              </div>
-
-              {/* Contenuto glitch */}
-              <div className="relative z-10 text-center">
-                <div className="text-4xl font-mono text-white/60 glitch-text" data-text={`0${n}`}>
-                  0{n}
-                </div>
-              </div>
-
-              {/* Effetto hover glow */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-white/10 to-transparent" />
-
-              {/* Glitch animation styles */}
-              <style jsx>{`
-                @keyframes scan {
-                  0% { transform: translateY(-100%); }
-                  100% { transform: translateY(100%); }
-                }
-                .animate-scan {
-                  animation: scan 3s linear infinite;
-                }
-                .glitch-text {
-                  position: relative;
-                }
-                .glitch-text::before,
-                .glitch-text::after {
-                  content: attr(data-text);
-                  position: absolute;
-                  left: 0;
-                  width: 100%;
-                }
-                .glitch-text::before {
-                  animation: glitch-1 0.3s infinite linear alternate-reverse;
-                  clip-path: inset(0 0 50% 0);
-                  color: rgba(255,0,0,0.5);
-                }
-                .glitch-text::after {
-                  animation: glitch-2 0.3s infinite linear alternate-reverse;
-                  clip-path: inset(50% 0 0 0);
-                  color: rgba(0,255,255,0.5);
-                }
-                @keyframes glitch-1 {
-                  0% { transform: translateX(0); }
-                  20% { transform: translateX(-2px); }
-                  40% { transform: translateX(2px); }
-                  60% { transform: translateX(-1px); }
-                  80% { transform: translateX(1px); }
-                  100% { transform: translateX(0); }
-                }
-                @keyframes glitch-2 {
-                  0% { transform: translateX(0); }
-                  20% { transform: translateX(2px); }
-                  40% { transform: translateX(-2px); }
-                  60% { transform: translateX(1px); }
-                  80% { transform: translateX(-1px); }
-                  100% { transform: translateX(0); }
-                }
-              `}</style>
-            </div>
-          ))}
+      <div
+        className="absolute inset-0 bg-black flex items-center justify-center px-8 pb-16 z-40 cursor-pointer"
+        onClick={() => setViewingSolvedClue(null)}
+      >
+        <div className="text-center">
+          <p className="font-mono text-4xl md:text-5xl bg-green-500 text-white px-8 py-4">
+            {solutions[viewingSolvedClue]}
+          </p>
         </div>
       </div>
     )
   }
 
-  // Vista principale - solo sfide sbloccate (una alla volta)
-  return (
-    <div className="flex flex-col items-center gap-3">
-      {unlockedChallenges.map((n) => (
-        <div
-          key={n}
-          onClick={() => setViewingChallenge(n)}
-          className="w-48 h-48 rounded-lg flex items-center justify-center cursor-pointer relative"
-        >
-          {/* Effetto pulsar */}
-          <div className="absolute inset-0 rounded-lg bg-white/10 animate-pulse" />
-          <div
-            className="absolute inset-0 rounded-lg border border-white/30"
-            style={{
-              animation: 'pulsar 2s ease-in-out infinite'
-            }}
-          />
-          <style jsx>{`
-            @keyframes pulsar {
-              0%, 100% {
-                opacity: 0.3;
-                box-shadow: 0 0 10px rgba(255,255,255,0.1);
-              }
-              50% {
-                opacity: 0.6;
-                box-shadow: 0 0 25px rgba(255,255,255,0.3);
-              }
-            }
-          `}</style>
+  // Vista indizio attivo (indovinello + date picker)
+  if (activeClue) {
+    // Schermata indovinello (prima del date picker)
+    if (!showDatePicker) {
+      return (
+        <div className="absolute inset-0 bg-black flex items-center justify-center px-8 pb-16 z-40">
+          <div className="text-center max-w-2xl">
+            <p className={`font-mono text-lg md:text-xl whitespace-pre-line leading-relaxed transition-all duration-300 ${
+              isTextSelected
+                ? 'bg-white text-black px-4 py-2'
+                : 'text-white/90'
+            }`}>
+              {riddleText}
+              {isTypingRiddle && <span className="animate-pulse">|</span>}
+            </p>
+          </div>
         </div>
-      ))}
+      )
+    }
+
+    // Schermata date picker (dopo l'indovinello)
+    return (
+      <div className="absolute inset-0 bg-black flex items-center justify-center px-4 pb-16 z-40">
+        <div className={`flex flex-col items-center gap-8 transition-all duration-500 ${showGreenGlow ? 'green-glow' : ''}`}>
+          <div className="flex items-center gap-4">
+            {/* Giorno */}
+            <div className="flex flex-col items-center">
+              <button
+                onClick={() => adjustDay(1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▲
+              </button>
+              <div
+                className={`text-4xl font-mono w-20 text-center py-2 border-b-2 transition-all ${
+                  showGreenGlow ? 'border-green-500 bg-green-500 text-white' : 'border-white/30 text-white'
+                }`}
+              >
+                {selectedDay.toString().padStart(2, '0')}
+              </div>
+              <button
+                onClick={() => adjustDay(-1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▼
+              </button>
+            </div>
+
+            <span className="text-white/40 text-3xl">/</span>
+
+            {/* Mese */}
+            <div className="flex flex-col items-center">
+              <button
+                onClick={() => adjustMonth(1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▲
+              </button>
+              <div
+                className={`text-4xl font-mono w-20 text-center py-2 border-b-2 transition-all ${
+                  showGreenGlow ? 'border-green-500 bg-green-500 text-white' : 'border-white/30 text-white'
+                }`}
+              >
+                {selectedMonth.toString().padStart(2, '0')}
+              </div>
+              <button
+                onClick={() => adjustMonth(-1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▼
+              </button>
+            </div>
+
+            <span className="text-white/40 text-3xl">/</span>
+
+            {/* Anno */}
+            <div className="flex flex-col items-center">
+              <button
+                onClick={() => adjustYear(1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▲
+              </button>
+              <div
+                className={`text-4xl font-mono w-28 text-center py-2 border-b-2 transition-all ${
+                  showGreenGlow ? 'border-green-500 bg-green-500 text-white' : 'border-white/30 text-white'
+                }`}
+              >
+                {selectedYear}
+              </div>
+              <button
+                onClick={() => adjustYear(-1)}
+                className="text-white/40 hover:text-white text-2xl p-2 transition"
+                disabled={showGreenGlow}
+              >
+                ▼
+              </button>
+            </div>
+          </div>
+
+          {/* Pulsante Conferma */}
+          {!showGreenGlow && (
+            <button
+              onClick={handleConfirm}
+              className="mt-4 border border-white/40 text-white/60 px-8 py-3 hover:border-white hover:text-white transition"
+            >
+              Conferma
+            </button>
+          )}
+
+        </div>
+
+        {/* Stile per green glow */}
+        <style jsx>{`
+          .green-glow {
+            animation: greenPulse 0.5s ease-in-out infinite alternate;
+          }
+          @keyframes greenPulse {
+            from {
+              filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.3));
+            }
+            to {
+              filter: drop-shadow(0 0 25px rgba(34, 197, 94, 0.6));
+            }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
+  // Vista principale - 3 emoji indizi (challenge 1)
+  const isCalendarSolved = solvedClues.has('1_calendar')
+  const isClockSolved = solvedClues.has('1_clock')
+  const isLocationSolved = solvedClues.has('1_location')
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-evenly px-8 md:px-16 pb-16">
+      {/* Calendario */}
+      <button
+        onClick={() => isCalendarSolved ? setViewingSolvedClue('calendar') : handleClueClick('calendar')}
+        className="text-6xl md:text-7xl transition-all duration-300 hover:scale-110 cursor-pointer"
+      >
+        {isCalendarSolved ? '✅' : '📅'}
+      </button>
+
+      {/* Orologio */}
+      <button
+        onClick={() => isClockSolved ? setViewingSolvedClue('clock') : handleClueClick('clock')}
+        className={`text-6xl md:text-7xl transition-all duration-300 ${
+          isClockSolved
+            ? 'hover:scale-110 cursor-pointer'
+            : 'opacity-40 cursor-not-allowed'
+        }`}
+        disabled={!isClockSolved} // Non ancora attivo se non risolto
+      >
+        {isClockSolved ? '✅' : '🕐'}
+      </button>
+
+      {/* Posizione */}
+      <button
+        onClick={() => isLocationSolved ? setViewingSolvedClue('location') : handleClueClick('location')}
+        className={`text-6xl md:text-7xl transition-all duration-300 ${
+          isLocationSolved
+            ? 'hover:scale-110 cursor-pointer'
+            : 'opacity-40 cursor-not-allowed'
+        }`}
+        disabled={!isLocationSolved} // Non ancora attivo se non risolto
+      >
+        {isLocationSolved ? '✅' : '📍'}
+      </button>
     </div>
   )
 }
@@ -1353,6 +1589,19 @@ export default function GameAreaWithChat() {
   const [activeTab, setActiveTab] = useState<'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema' | 'classifica'>('chat')
   const [showActivationMessage, setShowActivationMessage] = useState(false)
   const supabase = createClient()
+  const samantha = useSamantha()
+
+  // Samantha: messaggio di benvenuto all'ingresso
+  const [samanthaWelcomeShown, setSamanthaWelcomeShown] = useState(false)
+  useEffect(() => {
+    if (!samanthaWelcomeShown) {
+      const timer = setTimeout(() => {
+        samantha.showPagePhrase('gameArea', 5000)
+        setSamanthaWelcomeShown(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [samanthaWelcomeShown, samantha])
 
   // Stati per tab "?" - frasi Samantha
   const [mysteryPhrase, setMysteryPhrase] = useState('')
@@ -1398,9 +1647,6 @@ export default function GameAreaWithChat() {
 
   // Stato per admin (può vedere tutte le chat)
   const [isAdmin, setIsAdmin] = useState(false)
-
-  // Stato per ultimo messaggio di sistema (footer)
-  const [lastSystemMessage, setLastSystemMessage] = useState('In attesa...')
 
   // Verifica se iscrizioni sono aperte (dopo 00:00 del 24/01/2026)
   // e se cerimonia è attiva (dopo 22:00 del 24/01/2026)
@@ -1517,27 +1763,8 @@ export default function GameAreaWithChat() {
       }
     }
 
-    // Carica messaggio di sistema per il footer
-    async function loadSystemMessage() {
-      try {
-        const res = await fetch('/api/game/chat?limit=100')
-        const data = await res.json()
-        if (data.success) {
-          const systemMsg = data.messages
-            .filter((m: { message_type: string }) => m.message_type === 'system' || m.message_type === 'samantha')
-            .pop()
-          if (systemMsg) {
-            setLastSystemMessage(systemMsg.message)
-          }
-        }
-      } catch {
-        // Ignora errori
-      }
-    }
-
     loadParticipantInfo()
     checkGamePhase()
-    loadSystemMessage()
 
     // Ricontrolla ogni minuto per il fallback automatico
     const interval = setInterval(checkGamePhase, 60000)
@@ -1610,7 +1837,6 @@ export default function GameAreaWithChat() {
     setSamanthaCommentText('')
     setSamanthaCommentVisible(true)
     setIsTypingComment(true)
-    setLastSystemMessage(comment)
   }
 
   // Effetto typing per i commenti
@@ -2302,7 +2528,7 @@ export default function GameAreaWithChat() {
         )}
 
         {activeTab === 'challenges' && gamePhase === 'game_active' && (
-          <ChallengesSection />
+          <ChallengesSection participantInfo={participantInfo} teamInfo={teamInfo} isAdmin={isAdmin} />
         )}
       </main>
 
@@ -2317,14 +2543,6 @@ export default function GameAreaWithChat() {
         />
       )}
 
-      {/* Fixed Footer - Messaggio Sistema */}
-      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20">
-        <div className="px-4 py-3 text-center">
-          <p className="text-white/60 text-sm font-light tracking-wide">
-            {lastSystemMessage}
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

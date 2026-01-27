@@ -91,19 +91,34 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { participant_id, team_id, points, reason, description } = body
+    const { participant_id, participant_code, team_id, points, reason, description } = body
 
     if (!points || !reason) {
       return NextResponse.json({
         error: 'Parametri mancanti',
         required: ['points', 'reason'],
-        optional: ['participant_id', 'team_id', 'description']
+        optional: ['participant_id', 'participant_code', 'team_id', 'description']
       }, { status: 400 })
     }
 
-    // Se c'è participant_id, ottieni anche team_id
+    // Risolvi participant_id da participant_code se necessario
+    let finalParticipantId = participant_id
     let finalTeamId = team_id
-    if (participant_id && !team_id) {
+
+    if (participant_code && !participant_id) {
+      const { data: participant } = await supabase
+        .from('game_participants')
+        .select('id, team_id')
+        .eq('unique_code', participant_code)
+        .single()
+
+      if (participant) {
+        finalParticipantId = participant.id
+        if (!team_id) {
+          finalTeamId = participant.team_id
+        }
+      }
+    } else if (participant_id && !team_id) {
       const { data: participant } = await supabase
         .from('game_participants')
         .select('team_id')
@@ -119,7 +134,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from('game_points')
       .insert({
-        participant_id: participant_id || null,
+        participant_id: finalParticipantId || null,
         team_id: finalTeamId || null,
         points,
         reason,

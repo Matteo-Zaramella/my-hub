@@ -203,30 +203,27 @@ export function getSystemMessage(
 // Istruzioni del sistema - mostrate nella sezione "IL SISTEMA"
 export const SAMANTHA_SYSTEM_INSTRUCTIONS = {
   title: "IL SISTEMA",
-  subtitle: "Protocollo Operativo Annuale",
+  subtitle: "Protocollo Operativo",
   sections: [
     {
       title: "Benvenuto, Agente.",
-      content: `Sei stato selezionato per partecipare al Programma Annuale di Addestramento Interagenzia.
+      content: `Sei stato selezionato per partecipare al Programma di Addestramento Interagenzia.
 Da questo momento, fai parte di una delle quattro agenzie di intelligence più potenti del mondo.
-La tua missione: accumulare punti per la tua squadra attraverso sfide mensili, collaborazione e strategia.`
+La tua missione: accumulare punti per la tua squadra attraverso sfide, collaborazione e strategia.`
     },
     {
       title: "Come Funziona",
-      content: `Ogni mese verrà rilasciata una nuova sfida.
-Tre indizi criptici ti guideranno verso una CACCIA AL TESORO nel mondo reale.
-Giorno. Orario. Luogo.
-Decifra gli indizi, presentati nel posto giusto al momento giusto, completa la sfida.`
+      content: `Verrai avvisato quando ci sarà un nuovo evento.
+Email. Notifiche. Instagram.
+Tieni d'occhio i canali ufficiali.
+Quando arriverà il momento, saprai cosa fare.`
     },
     {
       title: "Punti",
       content: `La tua squadra guadagna punti in diversi modi:
-• Completare sfide mensili
+• Completare sfide
 • Essere i primi a decifrare indizi
-• Partecipare a eventi speciali
-• Azioni segrete che scoprirai durante l'anno
 
-I punti individuali contribuiscono al totale della squadra.
 La classifica generale si aggiorna in tempo reale.`
     },
     {
@@ -249,18 +246,18 @@ Qui troverai:
 • Classifica punti
 • Annunci ufficiali
 
+Riceverai comunicazioni anche via email dall'indirizzo noreply@matteozaramella.com (controlla la cartella spam).
+Seguici anche su Instagram per aggiornamenti: @a_tutto_reality_la_rivoluzione
+
 Controlla regolarmente. Le informazioni critiche appaiono senza preavviso.`
     },
     {
       title: "Nota Finale",
-      content: `Il gioco dura un anno intero.
-Alcune sezioni si sbloccheranno nel tempo.
-Alcune informazioni sono riservate.
-Alcune domande non avranno risposta.
+      content: `Alcune sezioni del sito si sbloccheranno progressivamente, quando sarà il momento giusto.
+Non tutte le informazioni sono accessibili fin da subito, e alcune domande potrebbero rimanere senza risposta.
 
-Fidati del processo.
-Fidati della tua squadra.
-Non fidarti di nessun altro.`
+Segui il processo e affidati alla tua squadra per affrontare le sfide che verranno.
+Al di fuori del tuo team, mantieni un sano scetticismo.`
     }
   ]
 }
@@ -323,4 +320,294 @@ export function getRandomBlockedPhrase(): string {
 export function getClueComment(type: 'correct' | 'wrong' | 'almostThere' | 'firstClue' | 'halfway'): string {
   const phrases = SAMANTHA_CLUE_COMMENTS[type]
   return phrases[Math.floor(Math.random() * phrases.length)]
+}
+
+// ====================================
+// SISTEMA SAMANTHA DINAMICO
+// Frasi per pagine specifiche e eventi
+// ====================================
+
+// Tipi per il sistema Samantha (definiti qui per evitare dipendenze circolari)
+export type SamanthaMessageType = 'info' | 'warning' | 'error' | 'success' | 'mystery' | 'system'
+export type SamanthaMood = 'neutral' | 'mysterious' | 'sarcastic' | 'helpful' | 'creepy'
+
+// Configurazione frasi per pagina
+export const SAMANTHA_PAGE_PHRASES: Record<string, {
+  phrases: string[]
+  type: SamanthaMessageType
+  mood: SamanthaMood
+}> = {
+  // Landing page - benvenuto misterioso
+  landing: {
+    phrases: [
+      "Benvenuto.",
+      "Ti aspettavo.",
+      "Inserisci il tuo codice.",
+      "Sei nuovo qui?",
+      "Un altro visitatore...",
+      "Questa porta conduce altrove.",
+      "Pronto per entrare?",
+    ],
+    type: 'mystery',
+    mood: 'mysterious'
+  },
+
+  // Pagina wishlist
+  wishlist: {
+    phrases: [
+      "Sfoglia pure.",
+      "Idee regalo.",
+      "Qualcosa ti interessa?",
+      "Lista desideri.",
+      "Non tutto e' in vendita.",
+    ],
+    type: 'info',
+    mood: 'neutral'
+  },
+
+  // Area gioco
+  gameArea: {
+    phrases: [
+      "Bentornato, agente.",
+      "Centro operativo attivo.",
+      "Nuove missioni in arrivo.",
+      "La tua squadra ti aspetta.",
+      "Il sistema e' online.",
+    ],
+    type: 'system',
+    mood: 'helpful'
+  },
+
+  // Pagina sfide
+  challenges: {
+    phrases: [
+      "Nuove sfide disponibili.",
+      "Metti alla prova le tue abilita'.",
+      "Punti in palio.",
+      "Chi sara' il piu' veloce?",
+      "La competizione e' aperta.",
+    ],
+    type: 'info',
+    mood: 'neutral'
+  },
+
+  // Pagina classifica
+  leaderboard: {
+    phrases: [
+      "La classifica aggiornata.",
+      "Chi comanda?",
+      "I punti non mentono.",
+      "La competizione si fa seria.",
+      "Ogni punto conta.",
+    ],
+    type: 'info',
+    mood: 'neutral'
+  },
+
+  // Area privata
+  private: {
+    phrases: [
+      "Area riservata.",
+      "Accesso limitato.",
+      "Solo per autorizzati.",
+      "Identificati.",
+    ],
+    type: 'warning',
+    mood: 'mysterious'
+  },
+
+  // Dashboard
+  dashboard: {
+    phrases: [
+      "Dashboard personale.",
+      "I tuoi dati.",
+      "Tutto sotto controllo.",
+      "Panoramica completa.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  },
+
+  // Errore 404
+  notFound: {
+    phrases: [
+      "Pagina non trovata.",
+      "Hai sbagliato strada.",
+      "Questo posto non esiste.",
+      "Torna indietro.",
+      "Niente da vedere qui.",
+      "Ti sei perso?",
+      "Questa pagina e' stata... rimossa.",
+    ],
+    type: 'error',
+    mood: 'sarcastic'
+  }
+}
+
+// Frasi per eventi specifici
+export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
+  // Benvenuto generico
+  welcome: [
+    "Benvenuto.",
+    "Ciao.",
+    "Eccoti.",
+    "Ti aspettavo.",
+    "Finalmente.",
+  ],
+
+  // Errori
+  error: [
+    "Qualcosa e' andato storto.",
+    "Errore.",
+    "Non ha funzionato.",
+    "Riprova.",
+    "Problema tecnico.",
+    "Il sistema ha avuto un... inconveniente.",
+  ],
+
+  // Successo
+  success: [
+    "Fatto.",
+    "Completato.",
+    "Operazione riuscita.",
+    "Perfetto.",
+    "Eccellente.",
+    "Ben fatto.",
+  ],
+
+  // Caricamento
+  loading: [
+    "Caricamento...",
+    "Un momento...",
+    "Elaborazione...",
+    "Pazienza...",
+    "Quasi pronto...",
+  ],
+
+  // Inattivita'
+  idle: [
+    "Sei ancora li'?",
+    "Tutto bene?",
+    "Ti sei addormentato?",
+    "Il tempo passa...",
+    "Aspetto.",
+    "...",
+  ],
+
+  // Logout
+  logout: [
+    "Arrivederci.",
+    "A presto.",
+    "Tornerai.",
+    "La porta e' sempre aperta.",
+    "Ci rivediamo.",
+  ],
+
+  // Login riuscito
+  loginSuccess: [
+    "Accesso confermato.",
+    "Identita' verificata.",
+    "Benvenuto nel sistema.",
+    "Autenticazione completata.",
+  ],
+
+  // Login fallito
+  loginFailed: [
+    "Accesso negato.",
+    "Credenziali non valide.",
+    "Chi sei veramente?",
+    "Non ti riconosco.",
+    "Riprova.",
+  ],
+
+  // Codice corretto
+  codeCorrect: [
+    "Codice accettato.",
+    "Accesso garantito.",
+    "Benvenuto.",
+    "Identita' confermata.",
+  ],
+
+  // Codice errato
+  codeWrong: [
+    "Codice non valido.",
+    "Riprova.",
+    "Non e' questo il codice.",
+    "Sbagliato.",
+  ],
+
+  // Chat - nuovo messaggio
+  newMessage: [
+    "Nuovo messaggio.",
+    "Qualcuno ha scritto.",
+    "Comunicazione in arrivo.",
+  ],
+
+  // Sfida completata
+  challengeComplete: [
+    "Sfida completata!",
+    "Missione compiuta.",
+    "Obiettivo raggiunto.",
+    "Punti guadagnati.",
+  ],
+
+  // Notte (dopo le 23:00)
+  nightTime: [
+    "E' tardi.",
+    "Dovresti dormire.",
+    "Le ore piccole...",
+    "Notte fonda.",
+    "Il buio porta consiglio.",
+  ],
+
+  // Mattina (6:00-12:00)
+  morning: [
+    "Buongiorno.",
+    "Una nuova giornata.",
+    "Caffe'?",
+    "Pronto per iniziare?",
+  ],
+
+  // Pomeriggio (12:00-18:00)
+  afternoon: [
+    "Buon pomeriggio.",
+    "La giornata procede.",
+    "Ancora molto da fare.",
+  ],
+
+  // Sera (18:00-23:00)
+  evening: [
+    "Buonasera.",
+    "La giornata volge al termine.",
+    "Ancora qui?",
+  ]
+}
+
+// Funzione helper per ottenere frase di pagina
+export function getPagePhrase(page: keyof typeof SAMANTHA_PAGE_PHRASES): string {
+  const config = SAMANTHA_PAGE_PHRASES[page]
+  if (!config) return ''
+  return config.phrases[Math.floor(Math.random() * config.phrases.length)]
+}
+
+// Funzione helper per ottenere frase di evento
+export function getEventPhrase(event: keyof typeof SAMANTHA_EVENT_PHRASES): string {
+  const phrases = SAMANTHA_EVENT_PHRASES[event]
+  if (!phrases) return ''
+  return phrases[Math.floor(Math.random() * phrases.length)]
+}
+
+// Funzione per ottenere saluto basato sull'ora
+export function getTimeBasedGreeting(): string {
+  const hour = new Date().getHours()
+
+  if (hour >= 6 && hour < 12) {
+    return getEventPhrase('morning')
+  } else if (hour >= 12 && hour < 18) {
+    return getEventPhrase('afternoon')
+  } else if (hour >= 18 && hour < 23) {
+    return getEventPhrase('evening')
+  } else {
+    return getEventPhrase('nightTime')
+  }
 }

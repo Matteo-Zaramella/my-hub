@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 // POST - Invia messaggio di sistema
 export async function POST(request: NextRequest) {
   try {
-    const { message, message_type = 'system' } = await request.json()
+    const { message, message_type = 'system', team_id = null } = await request.json()
 
     if (!message) {
       return NextResponse.json(
@@ -16,11 +16,12 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     // Inserisci messaggio di sistema
+    // team_id: null = globale, numero = specifico per squadra
     const { data: newMessage, error } = await supabase
       .from('game_chat_messages_game')
       .insert({
         participant_code: null,
-        team_id: null,
+        team_id: team_id,
         nickname: message_type === 'samantha' ? 'Samantha' : 'Sistema',
         message: message.trim(),
         message_type: message_type  // system, samantha

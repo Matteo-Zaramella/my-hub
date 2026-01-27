@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSamantha } from '@/contexts/SamanthaContext'
 
 export default function LandingPage() {
   const router = useRouter()
+  const samantha = useSamantha()
   const [code, setCode] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   // Stati per richiesta iscrizione
@@ -30,6 +31,19 @@ export default function LandingPage() {
     const interval = setInterval(checkDeadline, 60000) // Controlla ogni minuto
     return () => clearInterval(interval)
   }, [])
+
+  // Samantha: messaggio di benvenuto
+  const [welcomeShown, setWelcomeShown] = useState(false)
+  useEffect(() => {
+    if (!welcomeShown) {
+      const timer = setTimeout(() => {
+        samantha.showPagePhrase('landing', 5000)
+        setWelcomeShown(true)
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [welcomeShown, samantha])
+
   // TODO: Riattivare auto-redirect dopo sviluppo
   // const [checkingSession, setCheckingSession] = useState(true)
   // useEffect(() => {
@@ -54,12 +68,11 @@ export default function LandingPage() {
   async function handleAccess(e: React.FormEvent) {
     e.preventDefault()
     if (!code.trim()) {
-      setError('Inserisci il tuo codice')
+      samantha.showMessage('Inserisci il tuo codice.', 'warning', 'neutral', 3000)
       return
     }
 
     setLoading(true)
-    setError('')
 
     // Verifica il codice
     const res = await fetch('/api/game/verify-code', {
@@ -69,9 +82,10 @@ export default function LandingPage() {
     })
 
     if (res.ok) {
-      router.push('/game/area')
+      samantha.showEventPhrase('codeCorrect', 2000)
+      setTimeout(() => router.push('/game/area'), 1000)
     } else {
-      setError('Codice non valido')
+      samantha.showEventPhrase('codeWrong', 3000)
       setLoading(false)
     }
   }
@@ -159,9 +173,6 @@ export default function LandingPage() {
               />
             </div>
 
-            {error && (
-              <p className="text-red-400 text-sm">{error}</p>
-            )}
 
             <button
               type="submit"
@@ -178,19 +189,6 @@ export default function LandingPage() {
           >
             Wishlist
           </Link>
-
-          {isRegistrationClosed ? (
-            <p className="mt-4 text-white/30 text-sm">
-              Iscrizioni chiuse
-            </p>
-          ) : (
-            <button
-              onClick={() => setShowRequestModal(true)}
-              className="block mt-4 mx-auto text-white/40 hover:text-white/60 text-sm transition"
-            >
-              Richiedi accesso
-            </button>
-          )}
         </div>
       </main>
 
