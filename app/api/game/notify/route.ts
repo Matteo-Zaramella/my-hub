@@ -1,0 +1,88 @@
+import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+import { Resend } from 'resend'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+// POST - Invia notifica email a tutti i partecipanti
+export async function POST(request: Request) {
+  try {
+    // Verifica chiave admin
+    const { searchParams } = new URL(request.url)
+    const key = searchParams.get('key')
+
+    if (key !== 'cerimonia2026') {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+    }
+
+    const { subject, message, html_message } = await request.json()
+
+    if (!subject || !message) {
+      return NextResponse.json({
+        error: 'Parametri mancanti',
+        required: ['subject', 'message']
+      }, { status: 400 })
+    }
+
+    // Ottieni tutti i partecipanti con email
+    const { data: participants, error } = await supabase
+      .from('game_participants')
+      .select('email, nickname')
+      .not('email', 'is', null)
+
+    if (error) {
+      console.error('Error fetching participants:', error)
+      return NextResponse.json({ error: 'Errore database' }, { status: 500 })
+    }
+
+    const emails = participants
+      ?.filter(p => p.email)
+      .map(p => p.email as string) || []
+
+    if (emails.length === 0) {
+      return NextResponse.json({ error: 'Nessun partecipante con email' }, { status: 400 })
+    }
+
+    // HTML di default se non fornito
+    const htmlContent = html_message || `
+      <div style="font-family: monospace; background: #000; color: #fff; padding: 40px; text-align: center;">
+        <p style="font-size: 18px; margin: 0; white-space: pre-line;">${message}</p>
+        <p style="font-size: 12px; margin-top: 30px; color: #666;">
+          <a href="https://matteozaramella.com/game/area" style="color: #888;">Accedi al gioco</a>
+        </p>
+      </div>
+    `
+
+    // Invia email a tutti
+    const results = await Promise.allSettled(
+      emails.map(email =>
+        resend.emails.send({
+          from: 'Samantha <noreply@matteozaramella.com>',
+          to: email,
+          subject: subject,
+          text: message,
+          html: htmlContent
+        })
+      )
+    )
+
+    const sent = results.filter(r => r.status === 'fulfilled').length
+    const failed = results.filter(r => r.status === 'rejected').length
+
+    return NextResponse.json({
+      success: true,
+      sent,
+      failed,
+      total: emails.length
+    })
+
+  } catch (error) {
+    console.error('Error sending notification:', error)
+    return NextResponse.json({ error: 'Errore interno' }, { status: 500 })
+  }
+}
