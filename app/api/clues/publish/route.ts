@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Inizializza Resend solo se l'API key è presente
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // API Key semplice per proteggere l'endpoint (da usare solo tu)
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY || 'atr-revolution-2026'
@@ -87,7 +88,15 @@ export async function POST(request: NextRequest) {
     const clueTypes = ['GIORNO', 'ORARIO', 'LUOGO']
     const clueType = clueTypes[clue.clue_number - 1] || `Indizio ${clue.clue_number}`
 
-    // Invia email a tutti i partecipanti
+    // Invia email a tutti i partecipanti (solo se Resend è configurato)
+    if (!resend) {
+      return NextResponse.json({
+        success: true,
+        message: 'Indizio pubblicato (email non inviate - Resend non configurato)',
+        emails_sent: 0
+      })
+    }
+
     const emailPromises = participants.map(async (p) => {
       try {
         await resend.emails.send({

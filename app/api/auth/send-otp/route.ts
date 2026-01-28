@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient, generateOTP } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Inizializza Resend solo se l'API key è presente
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,7 +90,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Invia email con OTP
+    // Invia email con OTP (solo se Resend è configurato)
+    if (!resend) {
+      console.log('Resend non configurato, OTP generato:', otp)
+      return NextResponse.json({
+        success: true,
+        message: 'Codice generato (email non inviata in ambiente di sviluppo)'
+      })
+    }
+
     const { error: emailError } = await resend.emails.send({
       from: 'A Tutto Reality <noreply@matteozaramella.dev>',
       to: email,

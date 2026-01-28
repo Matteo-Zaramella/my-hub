@@ -7,7 +7,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Inizializza Resend solo se l'API key è presente
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Questo cron viene chiamato ogni sabato mattina
 // Controlla se c'è un indizio da pubblicare oggi e invia le notifiche
@@ -59,6 +60,14 @@ export async function GET() {
 
     const emails = participants.map(p => p.email).filter(Boolean) as string[]
     let totalSent = 0
+
+    // Verifica che Resend sia configurato
+    if (!resend) {
+      return NextResponse.json({
+        message: 'Resend non configurato, email non inviate',
+        clues_found: cluesToNotify.length
+      })
+    }
 
     // Per ogni indizio da notificare
     for (const clue of cluesToNotify) {

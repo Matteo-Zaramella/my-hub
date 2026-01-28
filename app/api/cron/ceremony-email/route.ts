@@ -7,7 +7,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Inizializza Resend solo se l'API key è presente
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function GET() {
   try {
@@ -41,7 +42,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Nessun partecipante con email' }, { status: 400 })
     }
 
-    // Invia email a tutti
+    // Invia email a tutti (solo se Resend è configurato)
+    if (!resend) {
+      return NextResponse.json({
+        skipped: true,
+        reason: 'Resend non configurato'
+      })
+    }
+
     const results = await Promise.allSettled(
       emails.map(email =>
         resend.emails.send({

@@ -525,8 +525,24 @@ const PLACEHOLDER_CHALLENGES: Challenge[] = [
   }
 ]
 
+// Schedule sblocco indizi (basato su data/ora)
+// Formato: { challenge_number: { clue_type: Date } }
+const CLUE_UNLOCK_SCHEDULE: Record<number, Record<string, Date>> = {
+  1: {
+    calendar: TEST_MODE
+      ? new Date('2020-01-01T00:00:00')  // TEST: già sbloccato
+      : new Date('2026-01-25T00:00:00'), // Primo indizio disponibile dal 25/01
+    clock: TEST_MODE
+      ? new Date('2020-01-01T00:00:00')  // TEST: già sbloccato
+      : new Date('2026-01-31T00:00:00'), // Secondo indizio dal 31/01 alle 00:00
+    location: TEST_MODE
+      ? new Date('2020-01-01T00:00:00')  // TEST: già sbloccato
+      : new Date('2026-02-07T00:00:00')  // Terzo indizio dal 07/02 alle 00:00
+  }
+}
+
 // Indovinelli per la sfida di Febbraio
-const CHALLENGE_RIDDLES = {
+const CHALLENGE_RIDDLES: Record<string, string> = {
   calendar: `Nel mese più breve che l'anno riserva,
 tre cigni si posano lungo la via.
 La data nel tempo il segreto conserva:
@@ -573,6 +589,14 @@ function ChallengesSection({
   const [selectedDay, setSelectedDay] = useState(1)
   const [selectedMonth, setSelectedMonth] = useState(1)
   const [selectedYear, setSelectedYear] = useState(2026)
+
+  // Stato per il selettore orario (clock picker)
+  const [selectedHour, setSelectedHour] = useState(12)
+  const [selectedMinute, setSelectedMinute] = useState(0)
+  const [clockMode, setClockMode] = useState<'hours' | 'minutes'>('hours')
+
+  // Stato per input luogo
+  const [locationInput, setLocationInput] = useState('')
 
   // Stato per indizi risolti (caricati dal server)
   const [solvedClues, setSolvedClues] = useState<SolvedClue[]>([])
@@ -632,6 +656,32 @@ function ChallengesSection({
     }
   }, [teamInfo, supabase])
 
+  // Stato per ora corrente (per sblocco temporizzato)
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  // Aggiorna l'ora corrente ogni minuto per verificare gli sblocchi
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 60000) // Ogni minuto
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Helper per verificare se un indizio è sbloccato (basato su data/ora)
+  const isClueUnlocked = (challengeNum: number, clueType: string): boolean => {
+    const schedule = CLUE_UNLOCK_SCHEDULE[challengeNum]
+    if (!schedule || !schedule[clueType]) return false
+    return currentTime >= schedule[clueType]
+  }
+
+  // Helper per ottenere la data di sblocco di un indizio
+  const getClueUnlockDate = (challengeNum: number, clueType: string): Date | null => {
+    const schedule = CLUE_UNLOCK_SCHEDULE[challengeNum]
+    if (!schedule || !schedule[clueType]) return null
+    return schedule[clueType]
+  }
+
   // Helper per verificare se un indizio e' risolto
   const isCluesSolved = (clueType: string): SolvedClue | undefined => {
     return solvedClues.find(s => s.clue_type === clueType && s.challenge_number === 1)
@@ -685,6 +735,10 @@ function ChallengesSection({
       setSelectedDay(1)
       setSelectedMonth(1)
       setSelectedYear(2026)
+      setSelectedHour(12)
+      setSelectedMinute(0)
+      setClockMode('hours')
+      setLocationInput('')
     } else {
       setViewingChallenge(null)
     }
@@ -896,6 +950,422 @@ function ChallengesSection({
     )
   }
 
+  // Vista indovinello orologio
+  if (activeClue === 'clock') {
+    // Calcolo posizioni per il clock picker
+    const getClockPosition = (value: number, total: number, radius: number) => {
+      const angle = ((value / total) * 360 - 90) * (Math.PI / 180)
+      return {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius
+      }
+    }
+
+    const handleClockClick = (e: React.MouseEvent<SVGSVGElement>) => {
+      const svg = e.currentTarget
+      const rect = svg.getBoundingClientRect()
+      const centerX = rect.width / 2
+      const centerY = rect.height / 2
+      const x = e.clientX - rect.left - centerX
+      const y = e.clientY - rect.top - centerY
+
+      // Calcola l'angolo
+      let angle = Math.atan2(y, x) * (180 / Math.PI) + 90
+      if (angle < 0) angle += 360
+
+      if (clockMode === 'hours') {
+        const hour = Math.round(angle / 30) % 12 || 12
+        setSelectedHour(hour)
+        // Passa automaticamente ai minuti dopo aver selezionato l'ora
+        setTimeout(() => setClockMode('minutes'), 300)
+      } else {
+        const minute = Math.round(angle / 6) % 60
+        setSelectedMinute(minute)
+      }
+    }
+
+    return (
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        {/* Pulsante indietro */}
+        <button
+          onClick={handleBack}
+          className="absolute top-4 left-4 text-white/40 hover:text-white transition flex items-center gap-2 z-10"
+        >
+          <span>←</span>
+          <span>Indietro</span>
+        </button>
+
+        {/* Contenuto centrale */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          {riddlePhase !== 'input' ? (
+            // Fase indovinello
+            <p className={`font-mono text-lg md:text-xl text-center whitespace-pre-line max-w-2xl leading-relaxed transition-all duration-200 ${
+              isDeleting ? 'bg-white text-black px-2 py-1' : 'text-white'
+            }`}>
+              {riddleText}
+              {isTyping && <span className="inline-block w-2 h-5 ml-1 bg-white animate-pulse" />}
+            </p>
+          ) : (
+            // Fase input orario - clock picker circolare
+            <div className="flex flex-col items-center gap-6">
+              {/* Display orario selezionato */}
+              <div className="flex items-center gap-2 font-mono text-4xl">
+                <span
+                  onClick={() => setClockMode('hours')}
+                  className={`cursor-pointer transition px-2 py-1 rounded ${
+                    clockMode === 'hours'
+                      ? showCorrectAnimation ? 'text-green-400 bg-green-400/20' : 'text-white bg-white/10'
+                      : showCorrectAnimation ? 'text-green-400/50' : 'text-white/50 hover:text-white/80'
+                  }`}
+                >
+                  {selectedHour.toString().padStart(2, '0')}
+                </span>
+                <span className={showCorrectAnimation ? 'text-green-400' : 'text-white/50'}>:</span>
+                <span
+                  onClick={() => setClockMode('minutes')}
+                  className={`cursor-pointer transition px-2 py-1 rounded ${
+                    clockMode === 'minutes'
+                      ? showCorrectAnimation ? 'text-green-400 bg-green-400/20' : 'text-white bg-white/10'
+                      : showCorrectAnimation ? 'text-green-400/50' : 'text-white/50 hover:text-white/80'
+                  }`}
+                >
+                  {selectedMinute.toString().padStart(2, '0')}
+                </span>
+              </div>
+
+              {/* Clock picker circolare */}
+              <svg
+                width="280"
+                height="280"
+                viewBox="-140 -140 280 280"
+                onClick={handleClockClick}
+                className="cursor-pointer"
+              >
+                {/* Cerchio esterno */}
+                <circle
+                  cx="0"
+                  cy="0"
+                  r="130"
+                  fill="transparent"
+                  stroke={showCorrectAnimation ? '#22c55e' : 'rgba(255,255,255,0.2)'}
+                  strokeWidth="2"
+                  className="transition-colors duration-300"
+                />
+
+                {/* Numeri sul cerchio */}
+                {clockMode === 'hours' ? (
+                  // Ore (1-12)
+                  Array.from({ length: 12 }, (_, i) => {
+                    const hour = i + 1
+                    const pos = getClockPosition(hour, 12, 100)
+                    const isSelected = selectedHour === hour
+                    return (
+                      <g key={hour}>
+                        {isSelected && (
+                          <circle
+                            cx={pos.x}
+                            cy={pos.y}
+                            r="20"
+                            fill={showCorrectAnimation ? '#22c55e' : '#fff'}
+                            className="transition-colors duration-300"
+                          />
+                        )}
+                        <text
+                          x={pos.x}
+                          y={pos.y}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          className={`text-lg font-medium transition-colors duration-300 ${
+                            isSelected
+                              ? 'fill-black'
+                              : showCorrectAnimation ? 'fill-green-400' : 'fill-white'
+                          }`}
+                        >
+                          {hour}
+                        </text>
+                      </g>
+                    )
+                  })
+                ) : (
+                  // Minuti (0, 5, 10, ... 55)
+                  Array.from({ length: 12 }, (_, i) => {
+                    const minute = i * 5
+                    const pos = getClockPosition(minute, 60, 100)
+                    const isSelected = selectedMinute === minute
+                    return (
+                      <g key={minute}>
+                        {isSelected && (
+                          <circle
+                            cx={pos.x}
+                            cy={pos.y}
+                            r="20"
+                            fill={showCorrectAnimation ? '#22c55e' : '#fff'}
+                            className="transition-colors duration-300"
+                          />
+                        )}
+                        <text
+                          x={pos.x}
+                          y={pos.y}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          className={`text-lg font-medium transition-colors duration-300 ${
+                            isSelected
+                              ? 'fill-black'
+                              : showCorrectAnimation ? 'fill-green-400' : 'fill-white'
+                          }`}
+                        >
+                          {minute.toString().padStart(2, '0')}
+                        </text>
+                      </g>
+                    )
+                  })
+                )}
+
+                {/* Lancetta */}
+                {(() => {
+                  const value = clockMode === 'hours' ? selectedHour : selectedMinute
+                  const total = clockMode === 'hours' ? 12 : 60
+                  const pos = getClockPosition(value, total, 70)
+                  return (
+                    <line
+                      x1="0"
+                      y1="0"
+                      x2={pos.x}
+                      y2={pos.y}
+                      stroke={showCorrectAnimation ? '#22c55e' : '#fff'}
+                      strokeWidth="2"
+                      className="transition-colors duration-300"
+                    />
+                  )
+                })()}
+
+                {/* Centro */}
+                <circle
+                  cx="0"
+                  cy="0"
+                  r="6"
+                  fill={showCorrectAnimation ? '#22c55e' : '#fff'}
+                  className="transition-colors duration-300"
+                />
+              </svg>
+
+              {/* Toggle ore/minuti */}
+              <div className="flex gap-4 text-sm">
+                <button
+                  onClick={() => setClockMode('hours')}
+                  className={`px-4 py-2 rounded transition ${
+                    clockMode === 'hours'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/50 hover:text-white'
+                  }`}
+                  disabled={showCorrectAnimation}
+                >
+                  Ore
+                </button>
+                <button
+                  onClick={() => setClockMode('minutes')}
+                  className={`px-4 py-2 rounded transition ${
+                    clockMode === 'minutes'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/50 hover:text-white'
+                  }`}
+                  disabled={showCorrectAnimation}
+                >
+                  Minuti
+                </button>
+              </div>
+
+              {/* Pulsante conferma */}
+              <button
+                onClick={async () => {
+                  if (isSubmitting) return
+
+                  if (!participantInfo) {
+                    samantha.showMessage('Devi essere registrato per rispondere.', 'warning', 'neutral', 3000)
+                    return
+                  }
+
+                  const answer = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`
+
+                  setIsSubmitting(true)
+
+                  try {
+                    const res = await fetch('/api/game/clues/solve', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        participant_code: participantInfo.code,
+                        challenge_number: 1,
+                        clue_type: 'clock',
+                        answer
+                      })
+                    })
+
+                    const data = await res.json()
+
+                    if (data.correct) {
+                      setShowCorrectAnimation(true)
+                      samantha.showMessage('Orario corretto!', 'success', 'mysterious', 3000)
+
+                      // Aggiorna indizi risolti
+                      if (teamInfo) {
+                        const solvedRes = await fetch(`/api/game/clues/solve?team_id=${teamInfo.id}&challenge_number=1`)
+                        const solvedData = await solvedRes.json()
+                        if (solvedData.success) {
+                          setSolvedClues(solvedData.solved_clues)
+                        }
+                      }
+
+                      setTimeout(() => {
+                        setShowCorrectAnimation(false)
+                        setActiveClue(null)
+                        setRiddlePhase('typing')
+                        setSelectedHour(12)
+                        setSelectedMinute(0)
+                        setClockMode('hours')
+                      }, 2000)
+                    } else if (data.already_solved) {
+                      samantha.showMessage('La tua squadra ha già risolto questo indizio.', 'info', 'neutral', 3000)
+                    } else {
+                      samantha.showMessage('Orario errato. Riprova.', 'warning', 'mysterious', 3000)
+                    }
+                  } catch (err) {
+                    console.error('Error solving clue:', err)
+                    samantha.showMessage('Errore di connessione.', 'error', 'neutral', 3000)
+                  }
+
+                  setIsSubmitting(false)
+                }}
+                className="mt-4 px-8 py-3 border border-white/40 text-white hover:bg-white hover:text-black transition font-mono"
+                disabled={showCorrectAnimation || isSubmitting}
+              >
+                {isSubmitting ? 'Verifica...' : 'Conferma'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Vista indovinello luogo
+  if (activeClue === 'location') {
+    return (
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        {/* Pulsante indietro */}
+        <button
+          onClick={handleBack}
+          className="absolute top-4 left-4 text-white/40 hover:text-white transition flex items-center gap-2 z-10"
+        >
+          <span>←</span>
+          <span>Indietro</span>
+        </button>
+
+        {/* Contenuto centrale */}
+        <div className="flex-1 flex items-center justify-center p-8">
+          {riddlePhase !== 'input' ? (
+            // Fase indovinello
+            <p className={`font-mono text-lg md:text-xl text-center whitespace-pre-line max-w-2xl leading-relaxed transition-all duration-200 ${
+              isDeleting ? 'bg-white text-black px-2 py-1' : 'text-white'
+            }`}>
+              {riddleText}
+              {isTyping && <span className="inline-block w-2 h-5 ml-1 bg-white animate-pulse" />}
+            </p>
+          ) : (
+            // Fase input luogo
+            <div className="flex flex-col items-center gap-8 w-full max-w-md">
+              {/* Input luogo */}
+              <div className="w-full">
+                <input
+                  type="text"
+                  value={locationInput}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                  placeholder="Inserisci il luogo..."
+                  className={`w-full bg-transparent border-b-2 px-4 py-3 text-center text-2xl font-mono focus:outline-none transition-all duration-300 ${
+                    showCorrectAnimation
+                      ? 'border-green-400 text-green-400'
+                      : 'border-white/30 text-white focus:border-white'
+                  }`}
+                  disabled={showCorrectAnimation}
+                  autoFocus
+                />
+              </div>
+
+              {/* Suggerimento */}
+              <p className="text-white/40 text-sm text-center">
+                Inserisci il nome del luogo o della città
+              </p>
+
+              {/* Pulsante conferma */}
+              <button
+                onClick={async () => {
+                  if (isSubmitting || !locationInput.trim()) return
+
+                  if (!participantInfo) {
+                    samantha.showMessage('Devi essere registrato per rispondere.', 'warning', 'neutral', 3000)
+                    return
+                  }
+
+                  setIsSubmitting(true)
+
+                  try {
+                    const res = await fetch('/api/game/clues/solve', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        participant_code: participantInfo.code,
+                        challenge_number: 1,
+                        clue_type: 'location',
+                        answer: locationInput.trim()
+                      })
+                    })
+
+                    const data = await res.json()
+
+                    if (data.correct) {
+                      setShowCorrectAnimation(true)
+                      const bonusMsg = data.location_bonus ? ' (+10 bonus posizione!)' : ''
+                      samantha.showMessage(`Luogo corretto!${bonusMsg}`, 'success', 'mysterious', 3000)
+
+                      // Aggiorna indizi risolti
+                      if (teamInfo) {
+                        const solvedRes = await fetch(`/api/game/clues/solve?team_id=${teamInfo.id}&challenge_number=1`)
+                        const solvedData = await solvedRes.json()
+                        if (solvedData.success) {
+                          setSolvedClues(solvedData.solved_clues)
+                        }
+                      }
+
+                      setTimeout(() => {
+                        setShowCorrectAnimation(false)
+                        setActiveClue(null)
+                        setRiddlePhase('typing')
+                        setLocationInput('')
+                      }, 2000)
+                    } else if (data.already_solved) {
+                      samantha.showMessage('La tua squadra ha già risolto questo indizio.', 'info', 'neutral', 3000)
+                    } else {
+                      samantha.showMessage('Luogo errato. Riprova.', 'warning', 'mysterious', 3000)
+                    }
+                  } catch (err) {
+                    console.error('Error solving clue:', err)
+                    samantha.showMessage('Errore di connessione.', 'error', 'neutral', 3000)
+                  }
+
+                  setIsSubmitting(false)
+                }}
+                className="px-8 py-3 border border-white/40 text-white hover:bg-white hover:text-black transition font-mono"
+                disabled={showCorrectAnimation || isSubmitting || !locationInput.trim()}
+              >
+                {isSubmitting ? 'Verifica...' : 'Conferma'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // Vista dettaglio sfida - mostra le tre icone indizio
   if (viewingChallenge !== null) {
     return (
@@ -912,26 +1382,88 @@ function ChallengesSection({
         {/* Tre icone indizio: centrate perfettamente */}
         <div className="absolute inset-0 flex items-center justify-evenly">
           {/* Calendario */}
-          <div
-            onClick={() => !isCluesSolved('calendar') && setActiveClue('calendar')}
-            className={`text-5xl transition-all duration-200 ${
-              isCluesSolved('calendar')
-                ? 'opacity-100 cursor-default'
-                : 'opacity-70 hover:opacity-100 cursor-pointer hover:scale-110'
-            }`}
-          >
-            {isCluesSolved('calendar') ? '✅' : '📅'}
-          </div>
+          {(() => {
+            const unlocked = isClueUnlocked(1, 'calendar')
+            const solved = isCluesSolved('calendar')
+            const unlockDate = getClueUnlockDate(1, 'calendar')
+            return (
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  onClick={() => unlocked && !solved && setActiveClue('calendar')}
+                  className={`text-5xl transition-all duration-200 ${
+                    !unlocked
+                      ? 'opacity-30 cursor-default'
+                      : solved
+                        ? 'opacity-100 cursor-default'
+                        : 'opacity-70 hover:opacity-100 cursor-pointer hover:scale-110'
+                  }`}
+                >
+                  {!unlocked ? '🔒' : solved ? '✅' : '📅'}
+                </div>
+                {!unlocked && unlockDate && (
+                  <span className="text-xs text-white/30">
+                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                )}
+              </div>
+            )
+          })()}
 
-          {/* Orologio - TODO */}
-          <div className="text-5xl opacity-30 cursor-not-allowed">
-            🕐
-          </div>
+          {/* Orologio */}
+          {(() => {
+            const unlocked = isClueUnlocked(1, 'clock')
+            const solved = isCluesSolved('clock')
+            const unlockDate = getClueUnlockDate(1, 'clock')
+            return (
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  onClick={() => unlocked && !solved && setActiveClue('clock')}
+                  className={`text-5xl transition-all duration-200 ${
+                    !unlocked
+                      ? 'opacity-30 cursor-default'
+                      : solved
+                        ? 'opacity-100 cursor-default'
+                        : 'opacity-70 hover:opacity-100 cursor-pointer hover:scale-110'
+                  }`}
+                >
+                  {!unlocked ? '🔒' : solved ? '✅' : '🕐'}
+                </div>
+                {!unlocked && unlockDate && (
+                  <span className="text-xs text-white/30">
+                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                )}
+              </div>
+            )
+          })()}
 
-          {/* Pin posizione - TODO */}
-          <div className="text-5xl opacity-30 cursor-not-allowed">
-            📍
-          </div>
+          {/* Pin posizione */}
+          {(() => {
+            const unlocked = isClueUnlocked(1, 'location')
+            const solved = isCluesSolved('location')
+            const unlockDate = getClueUnlockDate(1, 'location')
+            return (
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  onClick={() => unlocked && !solved && setActiveClue('location')}
+                  className={`text-5xl transition-all duration-200 ${
+                    !unlocked
+                      ? 'opacity-30 cursor-default'
+                      : solved
+                        ? 'opacity-100 cursor-default'
+                        : 'opacity-70 hover:opacity-100 cursor-pointer hover:scale-110'
+                  }`}
+                >
+                  {!unlocked ? '🔒' : solved ? '✅' : '📍'}
+                </div>
+                {!unlocked && unlockDate && (
+                  <span className="text-xs text-white/30">
+                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                )}
+              </div>
+            )
+          })()}
         </div>
       </div>
     )
