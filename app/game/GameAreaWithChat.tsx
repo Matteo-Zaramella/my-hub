@@ -1405,11 +1405,8 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
   const supabase = createClient()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Filtra messaggi in base alla modalità (esclude sempre messaggi di sistema)
+  // Filtra messaggi in base alla modalità
   const filteredMessages = messages.filter(m => {
-    // Escludi sempre i messaggi di sistema (vanno nel footer)
-    if (m.message_type === 'system' || m.message_type === 'samantha') return false
-
     if (chatMode === 'global') {
       // Chat globale: solo messaggi senza team_id
       return m.team_id === null
