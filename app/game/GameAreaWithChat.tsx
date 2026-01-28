@@ -534,10 +534,10 @@ const CLUE_UNLOCK_SCHEDULE: Record<number, Record<string, Date>> = {
       : new Date('2026-01-25T00:00:00'), // Primo indizio disponibile dal 25/01
     clock: TEST_MODE
       ? new Date('2020-01-01T00:00:00')  // TEST: già sbloccato
-      : new Date('2026-01-31T00:00:00'), // Secondo indizio dal 31/01 alle 00:00
+      : new Date('2026-02-07T00:00:00'), // Secondo indizio dal 07/02 alle 00:00
     location: TEST_MODE
       ? new Date('2020-01-01T00:00:00')  // TEST: già sbloccato
-      : new Date('2026-02-07T00:00:00')  // Terzo indizio dal 07/02 alle 00:00
+      : new Date('2026-02-14T00:00:00')  // Terzo indizio dal 14/02 alle 00:00 (San Valentino)
   }
 }
 
