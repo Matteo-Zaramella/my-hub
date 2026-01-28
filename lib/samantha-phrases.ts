@@ -221,21 +221,8 @@ Quando arriverà il momento, saprai cosa fare.`
     {
       title: "Punti",
       content: `La tua squadra guadagna punti in diversi modi:
-
-INDIZI
-• 10 punti per la prima squadra che decifra un indizio
-• +10 punti bonus se l'indizio riguarda la posizione della sfida
-
-SFIDE MENSILI
-Il completamento delle sfide assegna punti a scalare:
-• 1ª squadra: 100 punti
-• 2ª squadra: 75 punti
-• 3ª squadra: 50 punti
-• 4ª squadra: 25 punti
-• Mancato completamento: 0 punti
-
-PENALITÀ
-Comportamenti scorretti, ostruzionismo volontario o intralcio al fair play possono comportare penalità a discrezione degli organizzatori.
+• Completare sfide
+• Essere i primi a decifrare indizi
 
 La classifica generale si aggiorna in tempo reale.`
     },
@@ -260,7 +247,7 @@ Qui troverai:
 • Annunci ufficiali
 
 Riceverai comunicazioni anche via email dall'indirizzo noreply@matteozaramella.com (controlla la cartella spam).
-Seguici anche su Instagram per aggiornamenti: @a_tutto_reality_la_rivoluzione
+Seguici anche su Instagram per aggiornamenti: @matteozaramella_
 
 Controlla regolarmente. Le informazioni critiche appaiono senza preavviso.`
     },
@@ -344,11 +331,21 @@ export function getClueComment(type: 'correct' | 'wrong' | 'almostThere' | 'firs
 export type SamanthaMessageType = 'info' | 'warning' | 'error' | 'success' | 'mystery' | 'system'
 export type SamanthaMood = 'neutral' | 'mysterious' | 'sarcastic' | 'helpful' | 'creepy'
 
+// Route dove le info di gioco possono essere mostrate
+export const GAME_ALLOWED_ROUTES = ['/game/area', '/game']
+
+// Pagine che contengono info di gioco (gameOnly = true)
+export const GAME_ONLY_PAGES = ['gameArea', 'challenges', 'leaderboard']
+
+// Eventi che contengono info di gioco
+export const GAME_ONLY_EVENTS = ['newMessage', 'challengeComplete', 'registration']
+
 // Configurazione frasi per pagina
 export const SAMANTHA_PAGE_PHRASES: Record<string, {
   phrases: string[]
   type: SamanthaMessageType
   mood: SamanthaMood
+  gameOnly?: boolean  // Se true, mostrare solo in /game/area
 }> = {
   // Landing page - benvenuto misterioso
   landing: {
@@ -372,39 +369,41 @@ export const SAMANTHA_PAGE_PHRASES: Record<string, {
       "Idee regalo.",
       "Qualcosa ti interessa?",
       "Lista desideri.",
-      "Non tutto e' in vendita.",
+      "Non tutto è in vendita.",
     ],
     type: 'info',
     mood: 'neutral'
   },
 
-  // Area gioco
+  // Area gioco - SOLO in /game/area
   gameArea: {
     phrases: [
       "Bentornato, agente.",
       "Centro operativo attivo.",
       "Nuove missioni in arrivo.",
       "La tua squadra ti aspetta.",
-      "Il sistema e' online.",
+      "Il sistema è online.",
     ],
     type: 'system',
-    mood: 'helpful'
+    mood: 'helpful',
+    gameOnly: true
   },
 
-  // Pagina sfide
+  // Pagina sfide - SOLO in /game/area
   challenges: {
     phrases: [
       "Nuove sfide disponibili.",
-      "Metti alla prova le tue abilita'.",
+      "Metti alla prova le tue abilità.",
       "Punti in palio.",
-      "Chi sara' il piu' veloce?",
-      "La competizione e' aperta.",
+      "Chi sarà il più veloce?",
+      "La competizione è aperta.",
     ],
     type: 'info',
-    mood: 'neutral'
+    mood: 'neutral',
+    gameOnly: true
   },
 
-  // Pagina classifica
+  // Pagina classifica - SOLO in /game/area
   leaderboard: {
     phrases: [
       "La classifica aggiornata.",
@@ -414,7 +413,8 @@ export const SAMANTHA_PAGE_PHRASES: Record<string, {
       "Ogni punto conta.",
     ],
     type: 'info',
-    mood: 'neutral'
+    mood: 'neutral',
+    gameOnly: true
   },
 
   // Area privata
@@ -450,7 +450,7 @@ export const SAMANTHA_PAGE_PHRASES: Record<string, {
       "Torna indietro.",
       "Niente da vedere qui.",
       "Ti sei perso?",
-      "Questa pagina e' stata... rimossa.",
+      "Questa pagina è stata... rimossa.",
     ],
     type: 'error',
     mood: 'sarcastic'
@@ -470,7 +470,7 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
 
   // Errori
   error: [
-    "Qualcosa e' andato storto.",
+    "Qualcosa è andato storto.",
     "Errore.",
     "Non ha funzionato.",
     "Riprova.",
@@ -497,9 +497,9 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
     "Quasi pronto...",
   ],
 
-  // Inattivita'
+  // Inattività
   idle: [
-    "Sei ancora li'?",
+    "Sei ancora lì?",
     "Tutto bene?",
     "Ti sei addormentato?",
     "Il tempo passa...",
@@ -512,14 +512,14 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
     "Arrivederci.",
     "A presto.",
     "Tornerai.",
-    "La porta e' sempre aperta.",
+    "La porta è sempre aperta.",
     "Ci rivediamo.",
   ],
 
   // Login riuscito
   loginSuccess: [
     "Accesso confermato.",
-    "Identita' verificata.",
+    "Identità verificata.",
     "Benvenuto nel sistema.",
     "Autenticazione completata.",
   ],
@@ -533,19 +533,27 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
     "Riprova.",
   ],
 
+  // Registrazione
+  registration: [
+    "Nuovo agente rilevato.",
+    "Registrazione in corso.",
+    "Un nuovo volto.",
+    "Benvenuto nel programma.",
+  ],
+
   // Codice corretto
   codeCorrect: [
     "Codice accettato.",
     "Accesso garantito.",
     "Benvenuto.",
-    "Identita' confermata.",
+    "Identità confermata.",
   ],
 
   // Codice errato
   codeWrong: [
     "Codice non valido.",
     "Riprova.",
-    "Non e' questo il codice.",
+    "Non è questo il codice.",
     "Sbagliato.",
   ],
 
@@ -566,7 +574,7 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
 
   // Notte (dopo le 23:00)
   nightTime: [
-    "E' tardi.",
+    "È tardi.",
     "Dovresti dormire.",
     "Le ore piccole...",
     "Notte fonda.",
@@ -577,7 +585,7 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
   morning: [
     "Buongiorno.",
     "Una nuova giornata.",
-    "Caffe'?",
+    "Caffè?",
     "Pronto per iniziare?",
   ],
 

@@ -10,6 +10,7 @@ export default function LandingPage() {
   const samantha = useSamantha()
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
+  const [welcomeShown, setWelcomeShown] = useState(false)
 
   // Stati per richiesta iscrizione
   const [showRequestModal, setShowRequestModal] = useState(false)
@@ -32,12 +33,11 @@ export default function LandingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Samantha: messaggio di benvenuto
-  const [welcomeShown, setWelcomeShown] = useState(false)
+  // Samantha: mostra messaggio di benvenuto
   useEffect(() => {
     if (!welcomeShown) {
       const timer = setTimeout(() => {
-        samantha.showPagePhrase('landing', 5000)
+        samantha.showPagePhrase('landing', 4000)
         setWelcomeShown(true)
       }, 1500)
       return () => clearTimeout(timer)
@@ -68,7 +68,7 @@ export default function LandingPage() {
   async function handleAccess(e: React.FormEvent) {
     e.preventDefault()
     if (!code.trim()) {
-      samantha.showMessage('Inserisci il tuo codice.', 'warning', 'neutral', 3000)
+      samantha.showMessage('Inserisci il codice.', 'warning', 'sarcastic', 3000)
       return
     }
 
@@ -172,7 +172,6 @@ export default function LandingPage() {
                 className="w-full px-4 py-3 bg-transparent border border-white/20 text-white text-center placeholder:text-white/30 focus:border-white/50 focus:outline-none transition"
               />
             </div>
-
 
             <button
               type="submit"
