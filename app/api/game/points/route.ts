@@ -31,6 +31,7 @@ export async function GET(request: Request) {
             team_color
           )
         `)
+        .neq('nickname', 'Samantha') // Escludi Samantha
         .gt('individual_points', 0)
         .order('individual_points', { ascending: false })
 
@@ -44,43 +45,58 @@ export async function GET(request: Request) {
       })
 
     } else {
-      // Classifica squadre
-      const { data, error } = await supabase
+      // Classifica squadre - calcola totale dinamicamente
+      const { data: teams, error: teamsError } = await supabase
         .from('game_teams')
-        .select('id, team_code, team_name, team_color, total_points')
-        .order('total_points', { ascending: false })
+        .select('id, team_code, team_name, team_color')
 
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+      if (teamsError) {
+        return NextResponse.json({ error: teamsError.message }, { status: 500 })
       }
 
-      // Aggiungi conteggio membri
-      const teamsWithCount = await Promise.all(
-        (data || []).map(async (team) => {
-          const { count } = await supabase
+      // Per ogni squadra, calcola il totale punti e conta i membri (esclusa Samantha)
+      const teamsWithStats = await Promise.all(
+        (teams || []).map(async (team) => {
+          // Ottieni tutti i membri della squadra (esclusa Samantha)
+          const { data: members, error: membersError } = await supabase
             .from('game_participants')
-            .select('*', { count: 'exact', head: true })
+            .select('individual_points')
             .eq('team_id', team.id)
+            .neq('nickname', 'Samantha')
+
+          if (membersError) {
+            console.error('Error fetching members:', membersError)
+            return { ...team, total_points: 0, member_count: 0 }
+          }
+
+          // Calcola somma punti e conta membri
+          const total_points = (members || []).reduce((sum, m) => sum + (m.individual_points || 0), 0)
+          const member_count = members?.length || 0
 
           return {
             ...team,
-            member_count: count || 0
+            total_points,
+            member_count
           }
         })
       )
 
+      // Ordina per punti totali (decrescente)
+      teamsWithStats.sort((a, b) => b.total_points - a.total_points)
+
       return NextResponse.json({
         type: 'teams',
-        leaderboard: teamsWithCount
+        leaderboard: teamsWithStats
       })
     }
 
   } catch (error) {
+    console.error('Points GET error:', error)
     return NextResponse.json({ error: 'Errore interno' }, { status: 500 })
   }
 }
 
-// POST - Assegna punti (admin)
+// POST - Assegna punti
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -91,38 +107,54 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { participant_id, participant_code, team_id, points, reason, description } = body
+    const { participant_id, participant_code, nickname, team_id, points, reason, description } = body
 
     if (!points || !reason) {
       return NextResponse.json({
         error: 'Parametri mancanti',
         required: ['points', 'reason'],
-        optional: ['participant_id', 'participant_code', 'team_id', 'description']
+        optional: ['participant_id', 'participant_code', 'nickname', 'team_id', 'description']
       }, { status: 400 })
     }
 
-    // Risolvi participant_id da participant_code se necessario
+    // Risolvi participant_id
     let finalParticipantId = participant_id
     let finalTeamId = team_id
 
+    // Cerca per participant_code
     if (participant_code && !participant_id) {
       const { data: participant } = await supabase
         .from('game_participants')
         .select('id, team_id')
-        .eq('unique_code', participant_code)
+        .eq('participant_code', participant_code)
         .single()
 
       if (participant) {
         finalParticipantId = participant.id
-        if (!team_id) {
-          finalTeamId = participant.team_id
-        }
+        if (!team_id) finalTeamId = participant.team_id
       }
-    } else if (participant_id && !team_id) {
+    }
+
+    // Cerca per nickname
+    if (nickname && !finalParticipantId) {
+      const { data: participant } = await supabase
+        .from('game_participants')
+        .select('id, team_id')
+        .eq('nickname', nickname)
+        .single()
+
+      if (participant) {
+        finalParticipantId = participant.id
+        if (!team_id) finalTeamId = participant.team_id
+      }
+    }
+
+    // Se abbiamo participant_id ma non team_id, recuperalo
+    if (finalParticipantId && !finalTeamId) {
       const { data: participant } = await supabase
         .from('game_participants')
         .select('team_id')
-        .eq('id', participant_id)
+        .eq('id', finalParticipantId)
         .single()
 
       if (participant) {
@@ -130,8 +162,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Inserisci punti
-    const { data, error } = await supabase
+    // 1. Registra la transazione nel log
+    const { error: logError } = await supabase
       .from('game_points')
       .insert({
         participant_id: finalParticipantId || null,
@@ -140,19 +172,46 @@ export async function POST(request: Request) {
         reason,
         description: description || null
       })
-      .select()
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (logError) {
+      console.error('Error logging points:', logError)
+      return NextResponse.json({ error: logError.message }, { status: 500 })
+    }
+
+    // 2. Aggiorna i punti individuali del partecipante (se specificato)
+    if (finalParticipantId) {
+      const { error: updateError } = await supabase.rpc('increment_participant_points', {
+        p_id: finalParticipantId,
+        p_points: points
+      })
+
+      // Se la funzione RPC non esiste, fai l'update manuale
+      if (updateError) {
+        // Fallback: update manuale
+        const { data: current } = await supabase
+          .from('game_participants')
+          .select('individual_points')
+          .eq('id', finalParticipantId)
+          .single()
+
+        const newPoints = (current?.individual_points || 0) + points
+
+        await supabase
+          .from('game_participants')
+          .update({ individual_points: newPoints })
+          .eq('id', finalParticipantId)
+      }
     }
 
     return NextResponse.json({
       success: true,
       message: `${points} punti assegnati`,
-      data
+      participant_id: finalParticipantId,
+      team_id: finalTeamId
     })
 
   } catch (error) {
+    console.error('Points POST error:', error)
     return NextResponse.json({ error: 'Errore interno' }, { status: 500 })
   }
 }

@@ -136,33 +136,59 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Assegna 5 punti al partecipante
+    // 2. Calcola punti: 10 base + 10 bonus se è l'indizio posizione
+    const basePoints = 10
+    const locationBonus = clue_type === 'location' ? 10 : 0
+    const totalPoints = basePoints + locationBonus
+
+    // 2a. Log nella tabella game_points
     const { error: pointsError } = await supabase
       .from('game_points')
       .insert({
         participant_id: participant.id,
         team_id: team.id,
-        points: 5,
+        points: totalPoints,
         reason: 'clue_found',
-        description: `Indovinato indizio ${CLUE_NAMES[clue_type]} sfida ${challenge_number}`
+        description: `Indovinato indizio ${CLUE_NAMES[clue_type]} sfida ${challenge_number}${locationBonus ? ' (+10 bonus posizione)' : ''}`
       })
 
     if (pointsError) {
       console.error('Error assigning points:', pointsError)
-      // Non blocchiamo, i punti possono essere assegnati manualmente
+    }
+
+    // 2b. Aggiorna i punti individuali del partecipante
+    const { data: currentParticipant } = await supabase
+      .from('game_participants')
+      .select('individual_points')
+      .eq('id', participant.id)
+      .single()
+
+    const newPoints = (currentParticipant?.individual_points || 0) + totalPoints
+
+    const { error: updateError } = await supabase
+      .from('game_participants')
+      .update({ individual_points: newPoints })
+      .eq('id', participant.id)
+
+    if (updateError) {
+      console.error('Error updating individual points:', updateError)
     }
 
     // Numero indizio (1, 2, 3 basato sul tipo)
     const clueNumber = clue_type === 'calendar' ? 1 : clue_type === 'clock' ? 2 : 3
 
     // 3. Messaggio nella chat globale (senza rivelare la soluzione)
+    const pointsMessage = locationBonus
+      ? `${basePoints} punti + ${locationBonus} bonus posizione`
+      : `${basePoints} punti`
+
     await supabase
       .from('game_chat_messages_game')
       .insert({
         participant_code: null,
         team_id: null, // Chat globale
         nickname: 'Sistema',
-        message: `Squadra ${team.team_name} ha trovato la soluzione per l'indizio ${clueNumber} della sfida ${challenge_number}! La squadra guadagna 5 punti.`,
+        message: `Squadra ${team.team_name} ha trovato la soluzione per l'indizio ${clueNumber} della sfida ${challenge_number}! La squadra guadagna ${pointsMessage}.`,
         message_type: 'system'
       })
 
@@ -181,7 +207,8 @@ export async function POST(request: NextRequest) {
       success: true,
       correct: true,
       message: 'Risposta corretta!',
-      points_awarded: 5
+      points_awarded: totalPoints,
+      location_bonus: locationBonus > 0
     })
 
   } catch (error) {

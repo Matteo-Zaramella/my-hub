@@ -587,9 +587,10 @@ function ChallengesSection({
   useEffect(() => {
     if (!teamInfo) return
 
+    const teamId = teamInfo.id
     async function loadSolvedClues() {
       try {
-        const res = await fetch(`/api/game/clues/solve?team_id=${teamInfo.id}&challenge_number=1`)
+        const res = await fetch(`/api/game/clues/solve?team_id=${teamId}&challenge_number=1`)
         const data = await res.json()
         if (data.success) {
           setSolvedClues(data.solved_clues)
@@ -901,8 +902,8 @@ function ChallengesSection({
       <div className="relative min-h-[60vh]">
         {/* Pulsante indietro */}
         <button
-          onClick={handleBack}
-          className="absolute top-0 left-0 text-white/40 hover:text-white transition flex items-center gap-2"
+          onClick={() => setViewingChallenge(null)}
+          className="absolute top-0 left-0 z-50 p-2 text-white/40 hover:text-white transition flex items-center gap-2"
         >
           <span>←</span>
           <span>Indietro</span>
@@ -912,14 +913,14 @@ function ChallengesSection({
         <div className="absolute inset-0 flex items-center justify-evenly">
           {/* Calendario */}
           <div
-            onClick={() => !solvedClues.calendar && setActiveClue('calendar')}
+            onClick={() => !isCluesSolved('calendar') && setActiveClue('calendar')}
             className={`text-5xl transition-all duration-200 ${
-              solvedClues.calendar
+              isCluesSolved('calendar')
                 ? 'opacity-100 cursor-default'
                 : 'opacity-70 hover:opacity-100 cursor-pointer hover:scale-110'
             }`}
           >
-            {solvedClues.calendar ? '✅' : '📅'}
+            {isCluesSolved('calendar') ? '✅' : '📅'}
           </div>
 
           {/* Orologio - TODO */}
@@ -936,36 +937,111 @@ function ChallengesSection({
     )
   }
 
-  // Vista principale - solo sfide sbloccate (una alla volta)
-  return (
-    <div className="flex flex-col items-center gap-3">
-      {unlockedChallenges.map((n) => (
+  // Determina lo stato di ogni sfida per i cerchi Mario Bros
+  const getChallengeStatus = (challengeNum: number): 'locked' | 'active' | 'completed' => {
+    // Solo sfida 1 è sbloccata per ora
+    if (!unlockedChallenges.includes(challengeNum)) {
+      return 'locked'
+    }
+
+    // Conta indizi risolti per questa sfida (dall'array solvedClues)
+    const solvedForChallenge = solvedClues.filter(s => s.challenge_number === challengeNum)
+    const totalClues = 3 // Ogni sfida ha 3 indizi
+
+    if (solvedForChallenge.length >= totalClues) {
+      return 'completed'
+    }
+
+    return 'active'
+  }
+
+  // Componente cerchio stile Mario Bros
+  const MarioCircle = ({ status, onClick, isLast }: {
+    status: 'locked' | 'active' | 'completed'
+    onClick?: () => void
+    isLast?: boolean
+  }) => {
+    const isClickable = status !== 'locked'
+    const size = 120 // Cerchi molto grandi
+
+    // Colori in base allo stato
+    const innerColor = status === 'locked'
+      ? 'transparent'
+      : status === 'completed'
+        ? '#22c55e' // verde
+        : '#ef4444' // rosso
+
+    const borderColor = status === 'locked' ? '#444' : '#fff'
+    // Glow solo per completed, non per active (evita sfondo quadrato visibile)
+    const glowColor = status === 'completed'
+      ? 'rgba(34, 197, 94, 0.4)'
+      : 'none'
+
+    return (
+      <div className="flex flex-col items-center flex-shrink-0">
         <div
-          key={n}
-          onClick={() => setViewingChallenge(n)}
-          className="w-48 h-48 rounded-lg flex items-center justify-center cursor-pointer relative"
+          onClick={isClickable ? onClick : undefined}
+          className={`relative flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+            isClickable ? 'cursor-pointer hover:scale-105' : 'cursor-default'
+          }`}
+          style={{ width: size, height: size }}
         >
-          {/* Effetto pulsar */}
-          <div className="absolute inset-0 rounded-lg bg-white/10 animate-pulse" />
-          <div
-            className="absolute inset-0 rounded-lg border border-white/30"
-            style={{
-              animation: 'pulsar 2s ease-in-out infinite'
-            }}
-          />
-          <style jsx>{`
-            @keyframes pulsar {
-              0%, 100% {
-                opacity: 0.3;
-                box-shadow: 0 0 10px rgba(255,255,255,0.1);
-              }
-              50% {
-                opacity: 0.6;
-                box-shadow: 0 0 25px rgba(255,255,255,0.3);
-              }
-            }
-          `}</style>
+          {/* Cerchio stile Mario Bros */}
+          <svg width={size} height={size} viewBox="0 0 120 120" className="absolute">
+            {/* Ombra esterna */}
+            <circle
+              cx="60"
+              cy="63"
+              r="52"
+              fill="none"
+              stroke="#111"
+              strokeWidth="6"
+            />
+            {/* Ring principale */}
+            <circle
+              cx="60"
+              cy="60"
+              r="52"
+              fill={innerColor}
+              stroke={borderColor}
+              strokeWidth="5"
+              style={{
+                filter: status !== 'locked' ? `drop-shadow(0 0 25px ${glowColor})` : 'none'
+              }}
+            />
+            {/* Highlight interno per effetto 3D */}
+            <circle
+              cx="60"
+              cy="60"
+              r="40"
+              fill="none"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="2"
+            />
+          </svg>
         </div>
+
+        {/* Linea verticale di collegamento (non per l'ultimo) */}
+        {!isLast && (
+          <div
+            className="w-1 flex-shrink-0 bg-gradient-to-b from-white/30 to-white/5"
+            style={{ height: 40 }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  // Vista principale - 11 cerchi in verticale stile Mario Bros con scroll
+  return (
+    <div className="flex flex-col items-center py-8 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
+        <MarioCircle
+          key={n}
+          status={getChallengeStatus(n)}
+          onClick={() => getChallengeStatus(n) !== 'locked' && setViewingChallenge(n)}
+          isLast={n === 11}
+        />
       ))}
     </div>
   )
@@ -1644,9 +1720,156 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
   )
 }
 
+// Componente Feedback Modal
+function FeedbackModal({
+  isOpen,
+  onClose,
+  participantInfo,
+  teamInfo
+}: {
+  isOpen: boolean
+  onClose: () => void
+  participantInfo: { nickname: string; code: string } | null
+  teamInfo: { id: number; code: string; name: string; color: string } | null
+}) {
+  const [message, setMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Stato per animazione typing di Samantha
+  const samanthaMessage = "Hai notato qualcosa che non va? Scrivilo qui e lo sistemeremo."
+  const [samanthaText, setSamanthaText] = useState('')
+  const [samanthaTyping, setSamanthaTyping] = useState(false)
+
+  // Effetto typing quando il modal si apre
+  useEffect(() => {
+    if (!isOpen) {
+      setSamanthaText('')
+      setSamanthaTyping(false)
+      return
+    }
+
+    setSamanthaTyping(true)
+    let index = 0
+    const interval = setInterval(() => {
+      if (index < samanthaMessage.length) {
+        setSamanthaText(samanthaMessage.slice(0, index + 1))
+        index++
+      } else {
+        setSamanthaTyping(false)
+        clearInterval(interval)
+      }
+    }, 30) // 30ms per carattere
+
+    return () => clearInterval(interval)
+  }, [isOpen])
+
+  const handleSubmit = async () => {
+    if (!message.trim() || sending) return
+
+    setSending(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/game/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: message.trim(),
+          participant_code: participantInfo?.code || null,
+          nickname: participantInfo?.nickname || 'Anonimo',
+          team_name: teamInfo?.name || null
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Errore nell\'invio')
+      }
+
+      setMessage('')
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore sconosciuto')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div className="relative w-full max-w-2xl bg-[#0A0A0A] border border-white/20 rounded-lg shadow-2xl">
+        {/* Header con X a sinistra e Invia a destra */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <button
+            onClick={onClose}
+            className="text-white/40 hover:text-white transition p-1"
+            title="Chiudi"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={!message.trim() || sending}
+            className="px-4 py-1.5 text-sm font-medium bg-white text-black rounded hover:bg-white/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {sending ? 'Invio...' : 'Invia'}
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Scrivi qui..."
+            className="w-full h-80 bg-transparent border-none text-white placeholder-white/30 focus:outline-none resize-none text-base"
+            maxLength={1000}
+            disabled={sending}
+            autoFocus
+          />
+
+          {error && (
+            <p className="text-red-400 text-sm mb-2">{error}</p>
+          )}
+        </div>
+
+        {/* Footer con animazione typing */}
+        <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between">
+          <span className="text-xs font-mono text-white/70">
+            {samanthaText}
+            {samanthaTyping && (
+              <span className="inline-block w-2 h-3 ml-0.5 bg-white/70 animate-pulse" />
+            )}
+          </span>
+          <span className={`text-xs ${message.length > 900 ? 'text-orange-400' : 'text-white/30'}`}>
+            {message.length}/1000
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function GameAreaWithChat() {
   const [activeTab, setActiveTab] = useState<'mystery' | 'wishlist' | 'register' | 'challenges' | 'chat' | 'sistema' | 'classifica'>('chat')
   const [showActivationMessage, setShowActivationMessage] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const supabase = createClient()
   const samantha = useSamantha()
 
@@ -2351,8 +2574,19 @@ export default function GameAreaWithChat() {
             </div>
           </div>
 
-          {/* Spacer a destra per bilanciare */}
-          <div className="flex-shrink-0 w-32 md:w-48"></div>
+          {/* Pulsante Feedback a destra */}
+          <div className="flex-shrink-0 w-32 md:w-48 flex justify-end">
+            <button
+              onClick={() => setShowFeedbackModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white/50 hover:text-white border border-white/20 hover:border-white/40 rounded transition"
+              title="Invia feedback"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              <span className="hidden sm:inline">Feedback</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2545,7 +2779,7 @@ export default function GameAreaWithChat() {
         )}
 
         {activeTab === 'challenges' && gamePhase === 'game_active' && (
-          <ChallengesSection />
+          <ChallengesSection participantInfo={participantInfo} teamInfo={teamInfo} />
         )}
       </main>
 
@@ -2559,6 +2793,14 @@ export default function GameAreaWithChat() {
           }}
         />
       )}
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        participantInfo={participantInfo}
+        teamInfo={teamInfo}
+      />
 
     </div>
   )

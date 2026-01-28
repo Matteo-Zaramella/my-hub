@@ -20,6 +20,7 @@ export async function GET(request: Request) {
       .select('nickname, individual_points')
       .eq('team_id', parseInt(teamId))
       .eq('is_admin', false)
+      .neq('nickname', 'Samantha') // Escludi Samantha dalla classifica
       .order('individual_points', { ascending: false })
 
     if (error) {

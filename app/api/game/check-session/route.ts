@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
@@ -41,17 +41,27 @@ export async function GET() {
     // Prepara info squadra
     let team = null
     if (participant.game_teams) {
-      const teamData = participant.game_teams as unknown as {
+      // Handle both array and object responses from Supabase
+      const gameTeams = participant.game_teams as unknown as {
         id: number
         team_code: string
         team_name: string
         team_color: string
-      }
-      team = {
-        id: teamData.id,
-        code: teamData.team_code,
-        name: teamData.team_name,
-        color: teamData.team_color
+      } | {
+        id: number
+        team_code: string
+        team_name: string
+        team_color: string
+      }[]
+      const teamData = Array.isArray(gameTeams) ? gameTeams[0] : gameTeams
+
+      if (teamData) {
+        team = {
+          id: teamData.id,
+          code: teamData.team_code,
+          name: teamData.team_name,
+          color: teamData.team_color
+        }
       }
     }
 
