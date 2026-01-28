@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const team = participant.game_teams as { id: number; team_code: string; team_name: string }
+    const gameTeams = participant.game_teams as unknown as { id: number; team_code: string; team_name: string } | { id: number; team_code: string; team_name: string }[]
+    const team = Array.isArray(gameTeams) ? gameTeams[0] : gameTeams
 
     // Verifica che l'indizio non sia gia' stato risolto dalla squadra
     const { data: existingSolved } = await supabase
