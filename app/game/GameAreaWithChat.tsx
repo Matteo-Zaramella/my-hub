@@ -6,8 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { getRandomBlockedPhrase, getClueComment, SAMANTHA_SYSTEM_INSTRUCTIONS, SAMANTHA_ACTIVATION_MESSAGE, getTabPhraseConfig } from '@/lib/samantha-phrases'
 import { useSamantha } from '@/contexts/SamanthaContext'
 
-// ⚠️ TEST MODE - Rimetti le date originali prima del deploy!
-const TEST_MODE = true
+// ⚠️ TEST MODE - Rimetti a true solo per test locali!
+const TEST_MODE = false
 
 // Data e ora inizio cerimonia
 const CEREMONY_START = TEST_MODE
