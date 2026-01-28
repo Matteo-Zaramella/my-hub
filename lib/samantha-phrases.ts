@@ -604,6 +604,120 @@ export const SAMANTHA_EVENT_PHRASES: Record<string, string[]> = {
   ]
 }
 
+// ====================================
+// FRASI PER TAB DEL GAME AREA
+// Spiegazioni del funzionamento di ogni sezione
+// ====================================
+
+export const SAMANTHA_TAB_PHRASES: Record<string, {
+  phrases: string[]
+  type: SamanthaMessageType
+  mood: SamanthaMood
+}> = {
+  // Tab Mystery (?)
+  mystery: {
+    phrases: [
+      "Questa sezione nasconde segreti. Alcuni si svelano solo quando è il momento.",
+      "Il mistero è parte del gioco. Non tutto deve essere compreso subito.",
+      "Qui troverai indizi criptici. Sta a te decifrarli.",
+      "Alcune risposte arriveranno. Altre no. Dipende da te.",
+      "La pazienza è una virtù. Soprattutto in questo gioco.",
+    ],
+    type: 'mystery',
+    mood: 'mysterious'
+  },
+
+  // Tab Sfide
+  challenges: {
+    phrases: [
+      "Ogni cerchio è una sfida. Rosso significa attiva, verde completata.",
+      "Risolvi gli indizi per guadagnare punti. Data, orario, luogo.",
+      "Gli indizi si sbloccano nel tempo. Non tutti sono subito disponibili.",
+      "La prima squadra a risolvere guadagna più punti. Sii veloce.",
+      "Tre indizi per sfida. Completa tutti e tre per massimizzare i punti.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  },
+
+  // Tab Wishlist
+  wishlist: {
+    phrases: [
+      "Qui trovi idee regalo per Matteo. Divise per fascia di prezzo.",
+      "Non è obbligatorio comprare nulla. È solo una lista di suggerimenti.",
+      "Clicca su un prodotto per vedere i dettagli e il link.",
+      "I prezzi sono indicativi. Controlla sempre il sito originale.",
+      "Se hai dubbi sulle taglie, chiedi direttamente a Matteo.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  },
+
+  // Tab Registrazione
+  register: {
+    phrases: [
+      "Inserisci email e nickname per registrarti. Riceverai un codice di verifica.",
+      "Il nickname sarà visibile agli altri giocatori. Sceglilo con cura.",
+      "Una volta registrato, verrai assegnato automaticamente a una squadra.",
+      "Usa un'email che controlli spesso. Arriveranno comunicazioni importanti.",
+      "Se non trovi l'email, controlla la cartella spam.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  },
+
+  // Tab Chat
+  chat: {
+    phrases: [
+      "Due chat: globale per tutti, squadra solo per il tuo team.",
+      "Usa la chat di squadra per strategie. Quella globale per socializzare.",
+      "I messaggi di sistema annunciano eventi importanti. Presta attenzione.",
+      "Puoi vedere chi è nella tua squadra dalla lista membri.",
+      "Sii rispettoso. Tutti siamo qui per divertirci.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  },
+
+  // Tab Sistema
+  sistema: {
+    phrases: [
+      "Qui trovi tutte le regole del gioco. Leggile con attenzione.",
+      "Espandi ogni sezione per vedere i dettagli del funzionamento.",
+      "Le squadre sono quattro: FSB, MOSSAD, MSS, AISE.",
+      "I punti si accumulano completando sfide e risolvendo indizi.",
+      "Controlla regolarmente. Nuove informazioni potrebbero apparire.",
+    ],
+    type: 'system',
+    mood: 'helpful'
+  },
+
+  // Tab Classifica
+  classifica: {
+    phrases: [
+      "Due classifiche: squadre e individuale. Puoi alternare la vista.",
+      "I punti squadra sono la somma dei punti di tutti i membri.",
+      "La classifica si aggiorna in tempo reale dopo ogni azione.",
+      "Clicca su una squadra per vedere i contributi individuali.",
+      "Ogni punto conta. Anche le piccole azioni fanno la differenza.",
+    ],
+    type: 'info',
+    mood: 'helpful'
+  }
+}
+
+// Funzione per ottenere frase di tab
+export function getTabPhrase(tab: keyof typeof SAMANTHA_TAB_PHRASES): string {
+  const config = SAMANTHA_TAB_PHRASES[tab]
+  if (!config) return ''
+  return config.phrases[Math.floor(Math.random() * config.phrases.length)]
+}
+
+// Funzione per ottenere config completa di tab
+export function getTabPhraseConfig(tab: keyof typeof SAMANTHA_TAB_PHRASES) {
+  return SAMANTHA_TAB_PHRASES[tab] || null
+}
+
 // Funzione helper per ottenere frase di pagina
 export function getPagePhrase(page: keyof typeof SAMANTHA_PAGE_PHRASES): string {
   const config = SAMANTHA_PAGE_PHRASES[page]

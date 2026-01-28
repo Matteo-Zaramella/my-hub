@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import NextImage from 'next/image'
 import { createClient } from '@/lib/supabase/client'
-import { getRandomBlockedPhrase, getClueComment, SAMANTHA_SYSTEM_INSTRUCTIONS, SAMANTHA_ACTIVATION_MESSAGE } from '@/lib/samantha-phrases'
+import { getRandomBlockedPhrase, getClueComment, SAMANTHA_SYSTEM_INSTRUCTIONS, SAMANTHA_ACTIVATION_MESSAGE, getTabPhraseConfig } from '@/lib/samantha-phrases'
 import { useSamantha } from '@/contexts/SamanthaContext'
 
 // ⚠️ TEST MODE - Rimetti le date originali prima del deploy!
@@ -2898,6 +2898,29 @@ export default function GameAreaWithChat() {
       setMysteryTyping(true)
     }
   }
+
+  // Effetto per mostrare frasi Samantha quando si cambia tab (con probabilità 30%)
+  const lastTabRef = useRef<string | null>(null)
+  useEffect(() => {
+    // Solo se il tab è effettivamente cambiato (non al primo render)
+    if (lastTabRef.current === null) {
+      lastTabRef.current = activeTab
+      return
+    }
+
+    if (lastTabRef.current !== activeTab) {
+      lastTabRef.current = activeTab
+
+      // 30% di probabilità di mostrare un messaggio
+      if (Math.random() < 0.3) {
+        const tabConfig = getTabPhraseConfig(activeTab)
+        if (tabConfig) {
+          const randomPhrase = tabConfig.phrases[Math.floor(Math.random() * tabConfig.phrases.length)]
+          samantha.showMessage(randomPhrase, tabConfig.type, tabConfig.mood, 5000)
+        }
+      }
+    }
+  }, [activeTab, samantha])
 
   // Effetto typing per la tab mystery (frasi Samantha - solo quando cerimonia non attiva)
   useEffect(() => {
