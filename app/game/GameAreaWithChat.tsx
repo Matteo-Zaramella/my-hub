@@ -1518,6 +1518,29 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
   }
 
+  function formatDate(dateString: string) {
+    const date = new Date(dateString)
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+
+    const isToday = date.toDateString() === today.toDateString()
+    const isYesterday = date.toDateString() === yesterday.toDateString()
+
+    if (isToday) return 'Oggi'
+    if (isYesterday) return 'Ieri'
+
+    return date.toLocaleDateString('it-IT', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    })
+  }
+
+  function getDateKey(dateString: string) {
+    return new Date(dateString).toDateString()
+  }
+
   function getMessageStyle(msg: ChatMessage) {
     if (msg.message_type === 'system') {
       return 'bg-yellow-900/30 border-l-4 border-yellow-500 pl-3'
@@ -1650,40 +1673,59 @@ function ChatSection({ participantInfo, teamInfo, gamePhase, isAdmin }: {
             {chatMode === 'global' ? 'Nessun messaggio ancora' : 'Nessun messaggio in questa chat'}
           </p>
         ) : (
-          filteredMessages.map((msg) => (
-            <div key={msg.id} className={`${getMessageStyle(msg)} py-1`}>
-              <div className="flex items-baseline gap-2">
-                <span
-                  className="font-medium text-sm"
-                  style={{ color: getNicknameColor(msg) }}
-                >
-                  {msg.nickname}
-                </span>
-                {msg.game_teams && msg.message_type === 'user' && (
-                  <span
-                    className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: `${msg.game_teams.team_color}30`,
-                      color: msg.game_teams.team_color
-                    }}
-                  >
-                    {TEAM_BADGES[msg.game_teams.team_code] && (
-                      <NextImage
-                        src={TEAM_BADGES[msg.game_teams.team_code]}
-                        alt={msg.game_teams.team_code}
-                        width={14}
-                        height={14}
-                        className="rounded-sm"
-                      />
-                    )}
-                    {msg.game_teams.team_code}
-                  </span>
+          filteredMessages.map((msg, index) => {
+            const showDateDivider = index === 0 ||
+              getDateKey(msg.created_at) !== getDateKey(filteredMessages[index - 1].created_at)
+
+            return (
+              <div key={msg.id}>
+                {/* Divisore data */}
+                {showDateDivider && (
+                  <div className="flex items-center gap-3 my-4">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-white/40 text-xs font-medium uppercase tracking-wider">
+                      {formatDate(msg.created_at)}
+                    </span>
+                    <div className="flex-1 h-px bg-white/10" />
+                  </div>
                 )}
-                <span className="text-white/30 text-xs">{formatTime(msg.created_at)}</span>
+
+                {/* Messaggio */}
+                <div className={`${getMessageStyle(msg)} py-1`}>
+                  <div className="flex items-baseline gap-2">
+                    <span
+                      className="font-medium text-sm"
+                      style={{ color: getNicknameColor(msg) }}
+                    >
+                      {msg.nickname}
+                    </span>
+                    {msg.game_teams && msg.message_type === 'user' && (
+                      <span
+                        className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded"
+                        style={{
+                          backgroundColor: `${msg.game_teams.team_color}30`,
+                          color: msg.game_teams.team_color
+                        }}
+                      >
+                        {TEAM_BADGES[msg.game_teams.team_code] && (
+                          <NextImage
+                            src={TEAM_BADGES[msg.game_teams.team_code]}
+                            alt={msg.game_teams.team_code}
+                            width={14}
+                            height={14}
+                            className="rounded-sm"
+                          />
+                        )}
+                        {msg.game_teams.team_code}
+                      </span>
+                    )}
+                    <span className="text-white/30 text-xs">{formatTime(msg.created_at)}</span>
+                  </div>
+                  <p className="text-white/80 text-sm">{msg.message}</p>
+                </div>
               </div>
-              <p className="text-white/80 text-sm">{msg.message}</p>
-            </div>
-          ))
+            )
+          })
         )}
         <div ref={messagesEndRef} />
       </div>
