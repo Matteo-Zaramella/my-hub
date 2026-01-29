@@ -32,7 +32,6 @@ export async function GET(request: Request) {
           )
         `)
         .neq('nickname', 'Samantha') // Escludi Samantha
-        .gt('individual_points', 0)
         .order('individual_points', { ascending: false })
 
       if (error) {

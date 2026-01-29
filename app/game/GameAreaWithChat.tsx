@@ -1400,11 +1400,6 @@ function ChallengesSection({
                 >
                   {!unlocked ? '🔒' : solved ? '✅' : '📅'}
                 </div>
-                {!unlocked && unlockDate && (
-                  <span className="text-xs text-white/30">
-                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
-                  </span>
-                )}
               </div>
             )
           })()}
@@ -1428,11 +1423,6 @@ function ChallengesSection({
                 >
                   {!unlocked ? '🔒' : solved ? '✅' : '🕐'}
                 </div>
-                {!unlocked && unlockDate && (
-                  <span className="text-xs text-white/30">
-                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
-                  </span>
-                )}
               </div>
             )
           })()}
@@ -1456,11 +1446,6 @@ function ChallengesSection({
                 >
                   {!unlocked ? '🔒' : solved ? '✅' : '📍'}
                 </div>
-                {!unlocked && unlockDate && (
-                  <span className="text-xs text-white/30">
-                    {unlockDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })}
-                  </span>
-                )}
               </div>
             )
           })()}
