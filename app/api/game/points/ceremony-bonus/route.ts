@@ -85,6 +85,7 @@ export async function POST(request: Request) {
 
 // GET per verificare stato
 export async function GET() {
+  const supabase = createAdminClient()
   try {
     // Conta punti cerimonia già assegnati
     const { data: bonusPoints, error } = await supabase
