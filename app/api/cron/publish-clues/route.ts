@@ -1,18 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { Resend } from 'resend'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-// Inizializza Resend solo se l'API key è presente
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Questo cron viene chiamato ogni sabato mattina
 // Controlla se c'è un indizio da pubblicare oggi e invia le notifiche
 export async function GET() {
+  const supabase = createAdminClient()
+  const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
   try {
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 

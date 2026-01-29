@@ -1,15 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 // API per assegnare i 50 punti bonus della cerimonia
 // POST /api/game/points/ceremony-bonus
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export async function POST(request: Request) {
+  const supabase = createAdminClient()
   try {
     // Verifica authorization (semplice per ora)
     const { searchParams } = new URL(request.url)

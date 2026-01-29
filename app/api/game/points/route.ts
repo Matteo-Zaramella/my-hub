@@ -1,17 +1,13 @@
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 // API per gestire i punti
 // GET /api/game/points - Classifica
 // POST /api/game/points - Assegna punti (admin)
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 // GET - Ottieni classifica
 export async function GET(request: Request) {
+  const supabase = createAdminClient()
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type') || 'teams' // 'teams' o 'individual'
@@ -97,6 +93,7 @@ export async function GET(request: Request) {
 
 // POST - Assegna punti
 export async function POST(request: Request) {
+  const supabase = createAdminClient()
   try {
     const { searchParams } = new URL(request.url)
     const adminKey = searchParams.get('key')
