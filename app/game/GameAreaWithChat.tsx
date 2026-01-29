@@ -563,8 +563,10 @@ interface SolvedClue {
   team_id: number
   challenge_number: number
   clue_type: string
-  answer: string
-  solver_nickname: string
+  answer?: string
+  solver_nickname?: string
+  solved_by_nickname?: string
+  solved_by_code?: string
   solved_at: string
 }
 
