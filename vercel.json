@@ -1,16 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/rsvp-reminder",
-      "schedule": "0 9 11 1 *"
-    },
-    {
-      "path": "/api/cron/ceremony-email",
-      "schedule": "0 19 24 1 *"
-    },
-    {
-      "path": "/api/cron/publish-clues",
-      "schedule": "0 8 * * 6"
-    }
-  ]
-}
+{}
