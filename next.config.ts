@@ -19,6 +19,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'www.fitmarket.it',
       },
+      {
+        protocol: 'https',
+        hostname: 'image.uniqlo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.media.amplience.net',
+      },
     ],
   },
 };
