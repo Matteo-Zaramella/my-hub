@@ -140,8 +140,8 @@ function formatDuration(start: Date, end: Date, now: Date) {
 // ── WeekView ──────────────────────────────────────────────────────────────────
 
 const HOUR_HEIGHT = 72 // px per hour
-const START_HOUR = 7
-const END_HOUR = 23
+const START_HOUR = 0
+const END_HOUR = 24
 const TOTAL_HOURS = END_HOUR - START_HOUR
 const TIME_COL_W = 56
 
